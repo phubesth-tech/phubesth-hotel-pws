@@ -1,0 +1,3346 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ภูเบศร์อินเตอร์โฮเต็ล - Smart PMS (PWA)</title>
+
+<!-- ตั้งค่า PWA ให้มีตัวติดตั้งโปรแกรม และเปิดเต็มจอโดยไม่ค้าง -->
+<meta name="theme-color" content="#0b0f19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ภูเบศร์โฮเต็ล">
+<link id="pwa-apple-icon" rel="apple-touch-icon" href="">
+<link id="pwa-favicon" rel="icon" type="image/png" href="">
+<link id="pwa-manifest" rel="manifest" href="">
+
+<style>
+ :root {
+ --bg: #0b0f19;
+ --card: #111827;
+ --card2: #030712;
+ --border: #1f2937;
+ --amber: #f59e0b;
+ --emerald: #10b981;
+ --rose: #f43f5e;
+ --sky: #0284c7;
+ --purple: #9333ea;
+ --text: #f8fafc;
+ --muted: #94a3b8;
+ }
+ * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+ body { background: var(--bg); color: var(--text); margin: 0; padding: env(safe-area-inset-top) 0 90px 0; font-size: 13px; user-select: none; }
+ button, input, select, textarea { font-family: inherit; font-size: 13px; outline: none; }
+ button { cursor: pointer; border: none; transition: 0.15s; }
+ button:active { transform: scale(0.97); }
+ .hidden { display: none !important; }
+ .container { max-width: 1120px; margin: 0 auto; padding: 10px; }
+ .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+ .subcard { background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+ .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+ .between { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+ .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+ .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+ .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+ .rooms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+ @media(min-width: 640px) {
+ .grid-4 { grid-template-columns: repeat(4, 1fr); }
+ .rooms-grid { grid-template-columns: repeat(4, 1fr); }
+ .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+ }
+ @media(min-width: 960px) {
+ .rooms-grid { grid-template-columns: repeat(6, 1fr); }
+ }
+ input[type="text"], input[type="number"], select, textarea {
+ width: 100%; background: #090d16; border: 1px solid #334155; color: #fff;
+ padding: 8px 10px; border-radius: 10px; user-select: text;
+ }
+ .btn { padding: 8px 12px; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+ .btn-amber { background: var(--amber); color: #000; font-weight: 900; }
+ .btn-emerald { background: var(--emerald); color: #fff; font-weight: 800; }
+ .btn-rose { background: rgba(244,63,94,0.2); color: #fda4af; border: 1px solid rgba(244,63,94,0.4); }
+ .btn-dark { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+ .btn-sky { background: var(--sky); color: #fff; font-weight: 800; }
+ .btn-purple { background: var(--purple); color: #fff; font-weight: 800; }
+
+ @keyframes blinkGreen {
+ 0% { background: #10b981; box-shadow: 0 0 0 0 rgba(16,185,129,0.9); transform: scale(0.95); }
+ 50% { background: #34d399; box-shadow: 0 0 12px 4px rgba(16,185,129,0.7); transform: scale(1.25); }
+ 100% { background: #10b981; box-shadow: 0 0 0 0 rgba(16,185,129,0); transform: scale(0.95); }
+ }
+ .led-green { width: 10px; height: 10px; border-radius: 50%; display: inline-block; animation: blinkGreen 1.2s infinite; }
+
+ .modal-backdrop {
+ position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+ display: flex; align-items: center; justify-content: center; padding: 10px; overflow-y: auto;
+ }
+ .modal-box {
+ background: var(--card); border: 1px solid #374151; border-radius: 22px;
+ width: 100%; max-width: 880px; max-height: 92vh; overflow-y: auto; padding: 14px;
+ }
+
+ #receipt-paper {
+ background: #ffffff; color: #000000; max-width: 340px; margin: 0 auto;
+ padding: 18px; border-radius: 12px; font-family: Tahoma, "Sarabun", sans-serif;
+ line-height: 1.45; letter-spacing: 0px;
+ }
+ #receipt-paper * { color: #000000; font-family: Tahoma, "Sarabun", sans-serif; letter-spacing: 0px; }
+
+ #toast {
+ position: fixed; bottom: 20px; right: 16px; z-index: 999;
+ background: #059669; color: #fff; padding: 10px 16px; border-radius: 12px;
+ font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #34d399;
+ }
+
+ @media print {
+ body * { visibility: hidden; }
+ #receipt-paper, #receipt-paper * { visibility: visible; }
+ #receipt-paper { position: fixed; left: 0; top: 0; width: 100%; max-width: 100%; box-shadow: none; }
+ }
+</style>
+</head>
+<body>
+
+<div id="toast" class="hidden"></div>
+
+<!-- ================= 1. หน้าล็อกอิน ================= -->
+<div id="login-screen" class="modal-backdrop" style="background:#0b0f19; z-index:200;">
+ <div class="card" style="width:100%; max-width:335px; padding:16px; border-color:rgba(245,158,11,0.4);">
+ <div style="text-align:center; margin-bottom:8px;">
+ <!-- โลโก้แบบดึงจากระบบ หรือแสดงไอคอนสีทองเริ่มต้น -->
+ <img id="login-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f59e0b'/><text x='50' y='55' font-size='50' text-anchor='middle' alignment-baseline='middle'>🏨</text></svg>" style="width:44px;height:44px;border-radius:14px;object-fit:cover;margin:0 auto 5px;display:flex;border:1px solid #334155;background:var(--amber);">
+ <div style="font-size:18px;font-weight:900;">ภูเบศร์อินเตอร์โฮเต็ล</div>
+ <div style="font-size:10px;color:var(--amber);font-weight:800;">PHUBESTH INTER HOTEL • PWA SYSTEM</div>
+ </div>
+
+ <!-- ปุ่มสำหรับอัปโหลดโลโก้ (จัดรูปแบบใหม่ให้เรียบร้อย) -->
+ <div class="between" style="background:#090d16;padding:6px 10px;border-radius:8px;border:1px solid #334155;margin-bottom:12px;">
+ <span style="font-size:11px;color:var(--amber);">เปลี่ยนโลโก้:</span>
+ <input type="file" accept="image/*" onchange="uploadHotelLogo(event)" style="width:170px;font-size:11px;">
+ </div>
+
+ <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:700;">1. เลือกตำแหน่งผู้เข้าใช้งาน</div>
+ <div class="grid-3" style="margin-bottom:8px;">
+ <button onclick="selectRole('front')" id="role-front" class="btn" style="flex-direction:column;padding:7px;border:2px solid var(--emerald);background:rgba(16,185,129,0.2);color:#fff;">🛎️<span>ฟร้อนท์</span></button>
+ <button onclick="selectRole('manager')" id="role-manager" class="btn btn-dark" style="flex-direction:column;padding:7px;">👔<span>ผู้จัดการ</span></button>
+ <button onclick="selectRole('owner')" id="role-owner" class="btn btn-dark" style="flex-direction:column;padding:7px;">👑<span>เจ้าของ</span></button>
+ </div>
+
+ <div class="between" style="font-size:11px;color:var(--muted);margin-bottom:4px;">
+ <span>2. กดรหัส PIN 4 หลัก</span>
+ <button onclick="alert('รหัสเริ่มต้น:
+
+- ฟร้อนท์: 1111
+
+- ผู้จัดการ: 8888
+
+- เจ้าของ: 9999')" style="background:none;color:var(--amber);text-decoration:underline;font-size:11px;">ลืมรหัส?</button>
+ </div>
+
+ <div id="pin-dots" style="background:#030712;border:1px solid #1f2937;border-radius:12px;height:40px;display:flex;align-items:center;justify-content:center;gap:18px;font-size:19px;color:var(--amber);margin-bottom:8px;font-weight:900;">
+ <span>○</span><span>○</span><span>○</span><span>○</span>
+ </div>
+
+ <div class="grid-3">
+ <button onclick="pressPin('1')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">1</button>
+ <button onclick="pressPin('2')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">2</button>
+ <button onclick="pressPin('3')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">3</button>
+ <button onclick="pressPin('4')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">4</button>
+ <button onclick="pressPin('5')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">5</button>
+ <button onclick="pressPin('6')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">6</button>
+ <button onclick="pressPin('7')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">7</button>
+ <button onclick="pressPin('8')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">8</button>
+ <button onclick="pressPin('9')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">9</button>
+ <button onclick="clearPin()" class="btn btn-rose" style="height:40px;font-size:12px;">ล้าง</button>
+ <button onclick="pressPin('0')" class="btn btn-dark" style="height:40px;font-size:17px;color:#fff;">0</button>
+ <button onclick="submitPin()" class="btn btn-amber" style="height:40px;font-size:12px;">เข้าสู่ระบบ</button>
+ </div>
+
+ <div class="grid-2" style="margin-top:8px;">
+ <button onclick="triggerPwaInstall()" class="btn btn-sky" style="font-size:11px;padding:8px;">📲 ติดตั้งแอปลงเครื่อง</button>
+ <button onclick="toggleFullScreenMode()" class="btn btn-dark" style="font-size:11px;padding:8px;color:#38bdf8;border-color:#0284c7;">⛶ ขยายเต็มจอไร้ขอบ</button>
+ </div>
+ </div>
+</div>
+
+<!-- ================= 2. หน้าหลักของโปรแกรม ================= -->
+<div id="app-screen" class="container hidden">
+ <div class="card">
+ <div class="between">
+ <div class="row">
+ <!-- โลโก้มุมซ้ายบน -->
+ <img id="header-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f59e0b'/><text x='50' y='55' font-size='50' text-anchor='middle' alignment-baseline='middle'>🏨</text></svg>" style="width:40px;height:40px;border-radius:12px;object-fit:cover;border:1px solid #334155;background:var(--amber);">
+
+ <div>
+ <div class="row">
+ <b id="hdr-hotel-name" style="font-size:16px;">ภูเบศร์อินเตอร์โฮเต็ล</b>
+ <span id="hdr-role-badge" style="font-size:11px;padding:2px 8px;border-radius:99px;background:#064e3b;color:#6ee7b7;font-weight:700;"></span>
+ <button onclick="openSyncModal()" class="btn" style="background:#030712;border:1px solid #10b981;color:#34d399;padding:3px 10px;border-radius:99px;font-size:11px;">
+ <span class="led-green"></span> <span>เชื่อมเครื่องออนไลน์ (ซิงค์)</span>
+ </button>
+ <button onclick="triggerPwaInstall()" class="btn btn-sky" style="padding:3px 10px;border-radius:99px;font-size:11px;">
+ 📲 ติดตั้งแอป (PWA)
+ </button>
+ <button onclick="toggleFullScreenMode()" class="btn btn-dark" style="padding:3px 10px;border-radius:99px;font-size:11px;color:#38bdf8;">
+ ⛶ เต็มจอ
+ </button>
+ </div>
+ <div id="hdr-hotel-desc" style="font-size:11px;color:var(--muted);margin-top:2px;">108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 | โทร: 037231232</div>
+
+ 
+ </div>
+ </div>
+ </div>
+
+ <div class="row" style="margin-top:10px;">
+ <button onclick="switchMainView('rooms')" id="tab-rooms" class="btn btn-amber">🏨 ห้องพัก (<span id="room-total-cnt">38</span>)</button>
+ <button onclick="switchMainView('booking')" id="tab-booking" class="btn btn-dark" style="color:#38bdf8;border-color:#0284c7;">📅 จองล่วงหน้า (<span id="book-total-cnt">0</span>)</button>
+
+ <button onclick="switchMainView('finance')" id="tab-finance" class="btn btn-dark">📊 รายรับ / รายจ่าย</button>
+ <button onclick="switchMainView('customers')" id="tab-customers" class="btn btn-dark">👥 ลูกค้า (<span id="cust-total-cnt">0</span>)</button>
+ <button onclick="switchMainView('receipts')" id="tab-receipts" class="btn btn-dark" style="color:#c084fc;border-color:#9333ea;">🧾 ประวัติใบเสร็จ (<span id="rcp-total-cnt">0</span>)</button>
+
+  <button onclick="kickDrawerOnly()" class="btn btn-emerald">🗄️ เปิดเก๊ะเก็บเงิน</button>
+ <button onclick="openHousekeepingModal()" class="btn btn-dark" style="color:#fbbf24;border-color:#f59e0b;">🧹 ประวัติแม่บ้าน</button>
+ <button onclick="openSettingsModal()" class="btn btn-dark" style="color:var(--amber);border-color:rgba(245,158,11,0.4);">⚙️ ตั้งค่าโรงแรม</button>
+
+ <button onclick="logout()" class="btn btn-rose">🚪 สลับผู้ใช้</button>
+ </div>
+ </div>
+
+ 
+ <!-- VIEW: ห้องพัก -->
+ <div id="view-rooms">
+ <div class="grid-4" style="margin-bottom:8px;">
+ <div class="card" style="margin:0;padding:8px 12px;background:#0f172a;border-color:#0284c7;">
+  <div style="font-size:11px;color:var(--muted);">อัตราการเข้าพัก (Occupancy)</div>
+  <div id="kpi-occ-rate" style="font-size:17px;font-weight:900;color:#38bdf8;">0%</div>
+ </div>
+ <div class="card" style="margin:0;padding:8px 12px;background:#082f49;border-color:#38bdf8;">
+  <div style="font-size:11px;color:#7dd3fc;">📅 จองเข้าพักวันนี้ (Due-In)</div>
+  <div id="kpi-reserved-today" style="font-size:17px;font-weight:900;color:#38bdf8;">0 ห้อง</div>
+ </div>
+ <div class="card" style="margin:0;padding:8px 12px;background:#064e3b;border-color:#10b981;">
+  <div style="font-size:11px;color:#a7f3d0;">ห้องพร้อมขายทันที (ว่างจริง)</div>
+  <div id="kpi-ready-cnt" style="font-size:17px;font-weight:900;color:#34d399;">0 ห้อง</div>
+ </div>
+ <div class="card" style="margin:0;padding:8px 12px;background:#451a03;border-color:#f59e0b;">
+  <div style="font-size:11px;color:#fde68a;">ห้องรอแม่บ้านเคลียร์</div>
+  <div id="kpi-cln-cnt" style="font-size:17px;font-weight:900;color:#fbbf24;">0 ห้อง</div>
+ </div>
+ </div>
+
+ <div class="card">
+ <div class="between" style="margin-bottom:8px;">
+  <div class="row">
+  <button onclick="setRoomFilter('all')" id="flt-all" class="btn" style="background:#fff;color:#000;border-radius:99px;padding:5px 12px;">ทั้งหมด (<span id="cnt-all">38</span>)</button>
+  <button onclick="setRoomFilter('vacant')" id="flt-vacant" class="btn" style="background:#064e3b;color:#6ee7b7;border-radius:99px;padding:5px 12px;">● ว่าง (<span id="cnt-vacant">38</span>)</button>
+  <button onclick="setRoomFilter('reserved')" id="flt-reserved" class="btn" style="background:#0369a1;color:#bae6fd;border-radius:99px;padding:5px 12px;">📌 จองวันนี้ (<span id="cnt-reserved">0</span>)</button>
+  <button onclick="setRoomFilter('occupied')" id="flt-occupied" class="btn" style="background:#4c0519;color:#fda4af;border-radius:99px;padding:5px 12px;">● มีผู้เข้าพัก (<span id="cnt-occupied">0</span>)</button>
+  <button onclick="setRoomFilter('cleaning')" id="flt-cleaning" class="btn" style="background:#451a03;color:#fcd34d;border-radius:99px;padding:5px 12px;">🧹 รอทำความสะอาด (<span id="cnt-cleaning">0</span>)</button>
+  </div>
+ </div>
+ <input type="text" id="room-search" oninput="renderRooms()" placeholder="🔍 ค้นหาเลขห้อง หรือ ชื่อผู้เข้าพัก...">
+ </div>
+ <div id="rooms-grid" class="rooms-grid"></div>
+ </div>
+ <!-- VIEW: ระบบจองล่วงหน้า & เช็คห้องว่าง (Reservation) -->
+ <div id="view-booking" class="hidden">
+ <!-- 1. แถบเช็คห้องว่างล่วงหน้าด่วน -->
+ <div class="card" style="background:#0f172a; border-color:#0284c7; padding:14px;">
+ <div style="font-weight:900; font-size:15px; color:#38bdf8; margin-bottom:8px;">🔍 ตรวจสอบห้องว่างล่วงหน้า (Check Availability)</div>
+ <div class="grid-3" style="margin-bottom:10px;">
+  <div>
+  <span style="font-size:11px; color:var(--muted);">เลือกวันที่ลูกค้าต้องการเข้าพัก:</span>
+  <input type="date" id="chk-book-date" onchange="checkAvailabilityPreview()" style="color:#34d399; font-weight:800;">
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">จำนวนคืนที่พัก:</span>
+  <input type="number" id="chk-book-nights" value="1" min="1" oninput="checkAvailabilityPreview()">
+  </div>
+  <div style="display:flex; align-items:flex-end;">
+  <button onclick="checkAvailabilityPreview()" class="btn btn-sky" style="width:100%; padding:9px;">🔎 ค้นหาสต็อกห้องว่าง</button>
+  </div>
+ </div>
+ <!-- การ์ดผลลัพธ์ห้องว่างแยกตามประเภท -->
+ <div id="avail-result-grid" class="grid-3"></div>
+ </div>
+
+ <!-- 2. ฟอร์มบันทึกการจองห้องล่วงหน้า -->
+ <div class="card" style="padding:14px; border-color:rgba(16,185,129,0.4);">
+ <div style="font-weight:900; font-size:15px; color:#34d399; margin-bottom:10px;">➕ บันทึกการจองห้องพักใหม่ (New Booking)</div>
+ <div class="grid-4" style="margin-bottom:8px;">
+  <div>
+  <span style="font-size:11px; color:var(--muted);">ชื่อผู้จอง / บริษัท *</span>
+  <input type="text" id="nb-guest" placeholder="เช่น คุณสมชาย (กรุ๊ปทัวร์)">
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">เบอร์โทรศัพท์</span>
+  <input type="text" id="nb-phone" placeholder="08x-xxx-xxxx">
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">วันที่เช็คอิน (เข้าพัก) *</span>
+  <input type="date" id="nb-checkin">
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">วันที่เช็คเอาท์ (ออก) *</span>
+  <input type="date" id="nb-checkout">
+  </div>
+ </div>
+
+ <div class="grid-4" style="margin-bottom:10px;">
+  <div>
+  <span style="font-size:11px; color:var(--muted);">ประเภทเตียงที่ต้องการ</span>
+  <select id="nb-type">
+  <option value="Twin Bed">Twin Bed (เตียงคู่)</option>
+  <option value="Double Bed">Double Bed (เตียงเดี่ยวใหญ่)</option>
+  <option value="Single Bed">Single Bed</option>
+  <option value="VIP Suite">VIP Suite</option>
+  </select>
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">จำนวนห้องที่จอง *</span>
+  <input type="number" id="nb-qty" value="1" min="1" style="font-weight:900; color:var(--amber);">
+  </div>
+  <div>
+  <span style="font-size:11px; color:var(--muted);">ราคาต่อห้อง/คืน (บาท)</span>
+  <input type="number" id="nb-rate" value="650">
+  </div>
+  <div>
+  <span style="font-size:11px; color:#c7d2fe;">💰 เงินมัดจำจองล่วงหน้า (บาท)</span>
+  <input type="number" id="nb-deposit" value="0" style="color:#a5b4fc; font-weight:900;">
+  </div>
+ </div>
+ <button onclick="saveNewReservation()" class="btn btn-emerald" style="width:100%; padding:12px; font-size:14px;">💾 ยืนยันบันทึกการจองลงระบบ</button>
+ </div>
+
+ <!-- 3. รายการจองล่วงหน้าทั้งหมด -->
+ <div class="card">
+ <div class="between" style="margin-bottom:8px;">
+  <b style="font-size:14px; color:var(--amber);">📋 รายการจองห้องพักล่วงหน้าทั้งหมด</b>
+  <input type="text" id="book-search-inp" oninput="renderBookingsList()" placeholder="🔍 ค้นชื่อผู้จอง, เบอร์โทร..." style="max-width:220px; font-size:11px; padding:5px 8px;">
+ </div>
+ <div id="bookings-list-box" style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;"></div>
+ </div>
+ </div>
+
+ <!-- VIEW: รายรับ / รายจ่าย -->
+ <div id="view-finance" class="hidden">
+ <div class="card between" style="margin-bottom:10px; padding:10px 14px; background:#0f172a; border-color:#0284c7;">
+ <b style="color:#38bdf8; font-size:14px;">📅 ดูยอดเงินย้อนหลัง</b>
+ <div class="row">
+ <span style="font-size:11px; color:var(--muted);">รายวัน:</span>
+ <input type="date" id="fin-filter-date" onchange="renderFinance()" style="width:auto; padding:4px 8px; font-size:12px;">
+ <span style="font-size:11px; color:var(--muted); margin-left:8px;">รายเดือน:</span>
+ <input type="month" id="fin-filter-month" onchange="renderFinance()" style="width:auto; padding:4px 8px; font-size:12px;">
+ <button onclick="resetFinanceFilter()" class="btn btn-dark" style="padding:4px 8px; font-size:11px;">กลับมาวันนี้</button>
+ </div>
+ </div>
+
+ <div class="grid-4" style="margin-bottom:10px;">
+ <div class="card" style="margin:0;"><div style="font-size:11px;color:var(--muted);" id="lbl-day-inc">รายรับวันนี้</div><div id="fin-day-inc" style="font-size:18px;font-weight:900;color:#34d399;">฿0</div></div>
+ <div class="card" style="margin:0;"><div style="font-size:11px;color:var(--muted);" id="lbl-day-exp">รายจ่าย/ซื้อของวันนี้</div><div id="fin-day-exp" style="font-size:18px;font-weight:900;color:#fda4af;">฿0</div></div>
+ <div class="card" style="margin:0;"><div style="font-size:11px;color:var(--muted);" id="lbl-day-net">คงเหลือสุทธิวันนี้</div><div id="fin-day-net" style="font-size:18px;font-weight:900;color:var(--amber);">฿0</div></div>
+ <div class="card" style="margin:0;"><div style="font-size:11px;color:var(--muted);" id="lbl-month-net">กำไรเดือนนี้ (ผจก./เจ้าของ)</div><div id="fin-month-net" style="font-size:18px;font-weight:900;color:#38bdf8;">฿0</div></div>
+ </div>
+
+ <div class="card">
+ <div style="font-weight:800;color:var(--amber);margin-bottom:8px;">📝 บันทึกซื้อของเข้าโรงแรม / รายจ่าย / รายรับเจ้าอื่นๆ</div>
+ <div class="grid-2" style="margin-bottom:8px;">
+ <button onclick="setTxType('expense')" id="btn-tx-exp" class="btn" style="background:#e11d48;color:#fff;">📉 รายจ่าย / ซื้อของเข้าโรงแรม</button>
+ <button onclick="setTxType('income')" id="btn-tx-inc" class="btn btn-dark">📈 รายรับ / เจ้าอื่นๆ</button>
+ </div>
+ <div class="grid-3" style="margin-bottom:8px;">
+ <div>
+ <div class="between" style="font-size:11px;color:var(--muted);margin-bottom:3px;">
+ <span>หมวดหมู่</span>
+ <button onclick="addCustomCategory()" style="background:none;color:var(--amber);text-decoration:underline;font-size:11px;font-weight:700;">+ เพิ่มหมวดหมู่ใหม่เอง</button>
+ </div>
+ <select id="tx-cat"></select>
+ </div>
+ <div>
+ <div style="font-size:11px;color:var(--muted);margin-bottom:3px;">รายละเอียด / ชื่อเจ้า</div>
+ <input type="text" id="tx-title" placeholder="เช่น ซื้อผงซักฟอก, Agoda โอน...">
+ </div>
+ <div>
+ <div style="font-size:11px;color:var(--muted);margin-bottom:3px;">จำนวนเงิน (บาท)</div>
+ <input type="number" id="tx-amount" placeholder="0.00">
+ </div>
+ </div>
+ <button onclick="saveTransaction()" class="btn btn-amber" style="width:100%;padding:10px;">+ บันทึกรายการเข้าบัญชี</button>
+ </div>
+
+ <div class="card">
+ <div style="font-weight:800;margin-bottom:8px;">รายการเดินบัญชี</div>
+ <div id="tx-list" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+ </div>
+ </div>
+
+ <!-- VIEW: ลูกค้า -->
+ <div id="view-customers" class="hidden">
+ <div class="card" style="padding: 16px;">
+ <div style="font-size: 15px; font-weight:800; color:var(--amber); margin-bottom:12px;">➕ เพิ่มรายชื่อลูกค้า / บริษัทคู่ค้า</div>
+ <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px;">
+ <input type="text" id="new-c-name" placeholder="ชื่อ-นามสกุล / บริษัท *" style="padding: 10px; font-size: 14px;">
+ <input type="text" id="new-c-phone" placeholder="เบอร์โทรศัพท์" style="padding: 10px; font-size: 14px;">
+ <input type="text" id="new-c-tax" placeholder="เลขบัตรประชาชน / ผู้เสียภาษี" style="padding: 10px; font-size: 14px;">
+ <input type="text" id="new-c-addr" placeholder="ที่อยู่ / หมายเหตุ" style="padding: 10px; font-size: 14px;">
+ </div>
+ <button onclick="addCustomerManual()" class="btn btn-emerald" style="width: 100%; padding: 12px; font-size: 14px;">+ บันทึกลูกค้าใหม่</button>
+ </div>
+ <div class="card" style="padding: 16px;">
+ <input type="text" id="cust-search-inp" oninput="renderCustomers()" placeholder="🔍 ค้นหาชื่อลูกค้า, เบอร์โทร..." style="margin-bottom:12px; padding: 10px; font-size: 14px;">
+ <div id="cust-list" style="display: grid; gap: 8px;"></div>
+ </div>
+ </div>
+
+ <!-- VIEW: ประวัติใบเสร็จรับเงินย้อนหลัง -->
+ <div id="view-receipts" class="hidden">
+ <div class="card" style="padding:16px;">
+  <div class="between" style="margin-bottom:12px;">
+  <div>
+  <b style="font-size:16px;color:#c084fc;">🧾 คลังประวัติใบเสร็จรับเงินย้อนหลัง</b>
+  <div style="font-size:11px;color:var(--muted);margin-top:2px;">เก็บบันทึกใบเสร็จอัตโนมัติทุกครั้งที่เช็คเอาท์ สามารถค้นหาและสั่งพิมพ์ซ้ำได้ตลอดเวลา</div>
+  </div>
+  <input type="text" id="rcp-search-inp" oninput="renderReceiptsArchive()" placeholder="🔍 ค้นหาเลขห้อง, ชื่อลูกค้า, วันที่..." style="max-width:260px;padding:8px 12px;font-size:12px;">
+  </div>
+  <div id="receipts-archive-list" style="display:flex;flex-direction:column;gap:8px;max-height:550px;overflow-y:auto;"></div>
+ </div>
+ </div>
+
+<!-- ================= MODAL: ห้องพัก & คิดเงิน & ใบเสร็จ ================= -->
+<div id="room-modal" class="modal-backdrop hidden">
+ <div class="modal-box">
+ <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;">
+ <div class="row">
+ <div style="background:var(--amber);color:#000;padding:4px 10px;border-radius:10px;font-weight:900;font-size:16px;">
+ ห้อง <input type="text" id="m-room-num" onchange="updateRoomNumberInline()" style="width:52px;background:transparent;color:#000;border:none;border-bottom:1.5px solid #000;font-weight:900;text-align:center;">
+ </div>
+ <select id="m-room-type" onchange="updateRoomTypeInline()" style="width:auto;">
+ <option value="Single Bed">Single Bed</option>
+ <option value="Double Bed">Double Bed (เตียงเดี่ยวใหญ่)</option>
+ <option value="Twin Bed">Twin Bed (เตียงคู่)</option>
+ <option value="VIP Suite">VIP Suite</option>
+ </select>
+ <button onclick="moveRoomToAnother()" class="btn btn-sky" style="font-size:12px;">🔄 ย้าย/สลับห้อง</button>
+ <button onclick="deleteCurrentRoom()" class="btn btn-rose">🗑️ ลบห้องนี้</button>
+
+ </div>
+ <div class="row">
+ <button onclick="kickDrawerOnly()" class="btn btn-emerald">🗄️ เปิดเก๊ะ</button>
+ <button onclick="toggleModalLight()" id="m-light-btn" class="btn btn-dark">💡 ไฟ</button>
+ <button onclick="closeRoomModal()" class="btn btn-dark">✕</button>
+ </div>
+ </div>
+
+ <div class="grid-3" style="margin-bottom:10px;">
+ <button onclick="switchRoomTab(1)" id="rtab-1" class="btn btn-amber">1. เข้าพัก / น้ำ-ไฟ</button>
+ <button onclick="switchRoomTab(2)" id="rtab-2" class="btn btn-dark">2. สั่งอาหาร & บริการ</button>
+ <button onclick="switchRoomTab(3)" id="rtab-3" class="btn btn-dark">3. คิดเงิน / ใบเสร็จ / QR</button>
+ </div>
+
+ <div id="rcontent-1">
+ <div class="subcard">
+ <div class="between" style="margin-bottom:6px;">
+ <b style="color:var(--amber);">👤 ข้อมูลผู้เข้าพัก</b>
+ <div style="position:relative; width:230px;">
+ <input type="text" id="m-cust-search-box" onfocus="searchCustomerQuickInline()" oninput="searchCustomerQuickInline()" placeholder="🔍 ค้นชื่อ / เลือกลูกค้าเก่า..." style="padding:5px 10px; font-size:12px; color:#6ee7b7; border-color:#059669; background:#030712; border-radius:8px;">
+ <div id="m-cust-search-res" class="hidden" style="position:absolute; top:100%; right:0; width:260px; background:#0f172a; border:1px solid #10b981; border-radius:10px; z-index:999; max-height:220px; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.8); margin-top:4px;"></div>
+ </div>
+
+ </div>
+ <!-- ป้ายแสดงระดับลูกค้า VIP ประจำห้อง -->
+ <div id="m-vip-badge-box" class="hidden" style="background:#451a03;border:1px solid #f59e0b;border-radius:10px;padding:6px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+ <span id="m-vip-badge-text" style="color:#fde68a;font-weight:800;font-size:12px;">⭐ ลูกค้าประจำ</span>
+ <span style="font-size:10px;color:#cbd5e1;">(ประวัติบันทึกในระบบ CRM)</span>
+ </div>
+
+ <div class="grid-3">
+ <input type="text" id="m-guest-name" oninput="checkGuestVipStatusInline();saveCurrentRoomData();" placeholder="ชื่อ-นามสกุล ลูกค้า">
+ <input type="text" id="m-guest-phone" oninput="saveCurrentRoomData()" placeholder="เบอร์โทรศัพท์">
+ <input type="text" id="m-guest-tax" oninput="saveCurrentRoomData()" placeholder="เลขบัตรประชาชน / ผู้เสียภาษี">
+ </div>
+
+ </div>
+
+ <div class="grid-4" style="margin-bottom:10px;">
+  <div class="subcard" style="margin:0;">
+  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">รูปแบบการพัก</div>
+  <select id="m-stay-type" onchange="onStayTypeChange()">
+  <option value="overnight">ค้างคืน (Overnight)</option>
+  <option value="short">ชั่วคราว (3 ชม.)</option>
+    <option value="monthly">รายเดือน (Monthly)</option>
+  <option value="complimentary">🎁 ห้องฟรี / อภินันทนาการ (฿0)</option>
+
+  </select>
+  </div>
+  <div class="subcard" style="margin:0;">
+  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">จำนวน (คืน/ครั้ง)</div>
+  <input type="number" id="m-nights" min="1" oninput="saveCurrentRoomData()">
+  </div>
+  <div class="subcard" style="margin:0;">
+  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ราคาห้อง (บาท)</div>
+  <input type="number" id="m-custom-rate" oninput="saveCurrentRoomData()" style="color:var(--amber);font-weight:800;">
+  </div>
+  <div class="subcard" style="margin:0;border-color:rgba(99,102,241,0.5);">
+  <div style="font-size:11px;color:#c7d2fe;margin-bottom:4px;">🔑 มัดจำกุญแจ (บาท)</div>
+  <input type="number" id="m-key-deposit" oninput="saveCurrentRoomData()" value="0" style="color:#a5b4fc;font-weight:900;">
+  </div>
+ </div>
+
+
+ <div class="subcard">
+ <b style="color:#38bdf8;display:block;margin-bottom:6px;">⚡💧 มิเตอร์น้ำ-ไฟ (กรณีห้องรายเดือน/คิดเพิ่ม)</b>
+ <div class="grid-4">
+ <div><span style="font-size:11px;color:var(--muted);">ไฟเก่า</span><input type="number" id="m-elec-old" oninput="saveCurrentRoomData()"></div>
+ <div><span style="font-size:11px;color:var(--muted);">ไฟใหม่</span><input type="number" id="m-elec-new" oninput="saveCurrentRoomData()"></div>
+ <div><span style="font-size:11px;color:var(--muted);">น้ำเก่า</span><input type="number" id="m-water-old" oninput="saveCurrentRoomData()"></div>
+ <div><span style="font-size:11px;color:var(--muted);">น้ำใหม่</span><input type="number" id="m-water-new" oninput="saveCurrentRoomData()"></div>
+ </div>
+ </div>
+
+ <div class="row">
+ <button onclick="checkInRoom()" class="btn btn-emerald" style="flex:1;padding:12px;">✅ บันทึกเข้าพัก (Check-In & เปิดไฟ)</button>
+ <button onclick="clearRoomToVacant()" class="btn btn-rose" style="padding:12px;">คืนห้องว่าง</button>
+ </div>
+ </div>
+
+ <div id="rcontent-2" class="hidden">
+ <div class="subcard">
+ <div class="between" style="margin-bottom:8px;">
+ <b style="color:var(--amber);">🍽️ เลือกเมนูอาหารและบริการ</b>
+ <button onclick="openSettingsModal()" style="background:none;color:#34d399;text-decoration:underline;font-size:12px;">+ แก้ไขเมนูหลัก</button>
+ </div>
+ <div id="m-menu-grid" class="grid-3" style="margin-bottom:10px;"></div>
+ <div class="row" style="border-top:1px solid var(--border);padding-top:8px;">
+ <input type="text" id="custom-item-name" placeholder="พิมพ์ชื่ออาหาร/บริการด่วน..." style="flex:1;">
+ <input type="number" id="custom-item-price" placeholder="ราคา" style="width:90px;">
+ <button onclick="addCustomOrderToRoom()" class="btn btn-amber">+ เพิ่มลงห้อง</button>
+ </div>
+ </div>
+ <div class="subcard">
+ <b style="display:block;margin-bottom:6px;">รายการที่สั่งในห้องนี้</b>
+ <div id="m-orders-list"></div>
+ </div>
+ </div>
+
+ <div id="rcontent-3" class="hidden split-2">
+ <div>
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:6px;">เลือกประเภท QR รับโอนเงินบนใบเสร็จ</b>
+ <div class="grid-2" style="margin-bottom:8px;">
+ <button onclick="setPaymentMode('promptpay')" id="pm-promptpay" class="btn btn-amber">📱 พร้อมเพย์ (ล็อกยอดเงิน)</button>
+ <button onclick="setPaymentMode('bank')" id="pm-bank" class="btn btn-dark">🏦 บัญชีธนาคาร / รูป QR</button>
+ </div>
+
+ <div id="box-cfg-pp" class="grid-2">
+ <div>
+ <span style="font-size:11px;color:var(--muted);">เบอร์พร้อมเพย์ / เลขผู้เสียภาษี</span>
+ <input type="text" id="cfg-pp-id" oninput="updatePaymentConfigInline()">
+ </div>
+ <div>
+ <span style="font-size:11px;color:var(--muted);">ชื่อบัญชีที่แสดง</span>
+ <input type="text" id="cfg-pp-name" oninput="updatePaymentConfigInline()">
+ </div>
+ </div>
+
+ <div id="box-cfg-bank" class="hidden">
+ <div class="grid-2" style="margin-bottom:6px;">
+ <div>
+ <span style="font-size:11px;color:var(--muted);">ธนาคาร</span>
+ <select id="cfg-bank-name" onchange="updatePaymentConfigInline()">
+ <option value="ธ.กสิกรไทย (KBANK)">ธ.กสิกรไทย (KBANK)</option>
+ <option value="ธ.ไทยพาณิชย์ (SCB)">ธ.ไทยพาณิชย์ (SCB)</option>
+ <option value="ธ.กรุงไทย (KTB)">ธ.กรุงไทย (KTB)</option>
+ <option value="ธ.กรุงเทพ (BBL)">ธ.กรุงเทพ (BBL)</option>
+ <option value="ธ.กรุงศรี (BAY)">ธ.กรุงศรี (BAY)</option>
+ <option value="ธ.ออมสิน (GSB)">ธ.ออมสิน (GSB)</option>
+ </select>
+ </div>
+ <div>
+ <span style="font-size:11px;color:var(--muted);">เลขที่บัญชี</span>
+ <input type="text" id="cfg-bank-acc" oninput="updatePaymentConfigInline()" placeholder="xxx-x-xxxxx-x">
+ </div>
+ </div>
+ <div class="between" style="background:#090d16;padding:6px 10px;border-radius:8px;border:1px solid #334155;">
+ <span style="font-size:11px;">แนบรูป QR จากแอปธนาคาร:</span>
+ <input type="file" accept="image/*" onchange="uploadBankQrImage(event)" style="width:170px;font-size:11px;">
+ </div>
+ </div>
+ </div>
+
+ <div class="subcard">
+ <div class="between" style="margin-bottom:8px;">
+ <label class="row" style="font-weight:700;cursor:pointer;">
+ <input type="checkbox" id="m-vat-chk" onchange="saveCurrentRoomData()" style="width:16px;height:16px;"> คำนวณ VAT 7%
+ </label>
+ <select id="m-vat-mode" onchange="saveCurrentRoomData()" style="width:auto;padding:4px 8px;color:var(--amber);">
+ <option value="exclude">+ บวก VAT เพิ่ม 7%</option>
+ <option value="include">รวม VAT ในราคาแล้ว</option>
+ </select>
+ </div>
+ <div class="between">
+ <span style="font-size:12px;color:var(--muted);">ส่วนลดพิเศษ (บาท):</span>
+ <input type="number" id="m-discount" oninput="saveCurrentRoomData()" value="0" style="width:110px;text-align:right;">
+ </div>
+ </div>
+
+
+   <!-- กล่องคิดค่าปรับเลทเช็คเอาท์ (ปรับแก้ได้) -->
+  <div id="m-late-box" class="subcard" style="border-color:#f43f5e;padding:10px 12px;margin-bottom:8px;">
+  <div class="between">
+  <label class="row" style="font-weight:800;color:#fda4af;cursor:pointer;">
+   <input type="checkbox" id="m-late-chk" onchange="toggleLateCheckout()" style="width:16px;height:16px;">
+   <span>🚨 ค่าเลทเช็คเอาท์ (เกินเที่ยง):</span>
+  </label>
+  <div class="row">
+   <span style="font-size:11px;color:var(--muted);">฿</span>
+   <input type="number" id="m-late-fee" oninput="saveCurrentRoomData()" value="299" style="width:90px;color:#fda4af;font-weight:900;text-align:right;">
+  </div>
+  </div>
+  <div id="m-late-hint" style="font-size:11px;color:#94a3b8;margin-top:4px;">* เช็คเอาท์ปกติก่อน 12:00 น. (สามารถติ๊กเปิด/ปิด หรือแก้ไขยอดเงินได้)</div>
+  </div>
+
+  <!-- ป้ายเตือนเงินมัดจำกุญแจก่อนรับเงิน -->
+  <div id="m-deposit-warn-box" class="hidden" style="background:#1e1b4b;border:1.5px solid #6366f1;border-radius:12px;padding:10px 14px;margin-bottom:8px;">
+  <div style="color:#c7d2fe;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">
+  <span>🔑 มีเงินมัดจำกุญแจถืออยู่:</span>
+  <b id="m-deposit-warn-amt" style="color:#a5b4fc;font-size:15px;">฿0</b>
+  </div>
+  <div style="font-size:11px;color:#94a3b8;margin-top:2px;">(เงินสดรับฝากแยก ไม่รวมในใบเสร็จ • คืนเงินสดให้ลูกค้า 100% เมื่อรับกุญแจ)</div>
+  </div>
+
+  <button onclick="openBigQrModal()" class="btn btn-sky" style="width:100%;padding:10px;margin-bottom:8px;">🔍 ขยาย QR Code เต็มจอให้ลูกค้าสแกน</button>
+
+ <button onclick="completeCheckOutAndPay()" class="btn btn-emerald" style="width:100%;padding:12px;margin-bottom:8px;font-size:14px;">💰 รับเงินเข้าบัญชี + เปิดเก๊ะ + คืนห้องว่าง</button>
+ <div class="grid-2">
+ <button onclick="saveReceiptImagePure()" class="btn btn-purple" style="padding:10px;">🖼️ บันทึกรูปใบเสร็จ (คมชัด 100%)</button>
+ <button onclick="printReceiptPaper()" class="btn btn-amber" style="padding:10px;">🖨️ สั่งพิมพ์ใบเสร็จ + เด้งเก๊ะ</button>
+ <button onclick="printRegCard()" class="btn btn-dark" style="padding:10px;color:#38bdf8;border-color:#0284c7;">📝 พิมพ์ใบลงทะเบียนแขก (Reg Card)</button>
+
+ </div>
+ </div>
+
+ <!-- ตัวอย่างใบเสร็จรับเงิน -->
+ <div>
+ <div id="receipt-paper">
+ <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px;">
+ <div style="font-size:20px;font-weight:900;">ภูเบศร์อินเตอร์โฮเต็ล</div>
+ <div style="font-size:11px;font-weight:700;">PHUBESTH INTER HOTEL</div>
+ <div style="font-size:11px;">108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120</div>
+ <div style="font-size:11px;">โทร: 037231232</div>
+ <div id="rcp-title-box" style="display:inline-block;margin-top:5px;padding:2px 12px;border:1.5px solid #000;border-radius:6px;font-size:12px;font-weight:800;">ใบเสร็จรับเงิน</div>
+ </div>
+
+ <div style="font-size:12px;border-bottom:1px dashed #666;padding-bottom:6px;margin-bottom:8px;">
+ <div class="between">
+ <span><b>ห้อง:</b> <span id="rcp-room">101</span></span>
+ <span><b>วันที่:</b> <span id="rcp-date"></span></span>
+ </div>
+ <div><b>ลูกค้า:</b> <span id="rcp-guest">ลูกค้าทั่วไป</span></div>
+ <div id="rcp-guest-tax-row" style="display:none;"><b>เลขผู้เสียภาษี:</b> <span id="rcp-guest-tax"></span></div>
+ </div>
+
+ <div id="rcp-items" style="font-size:12px;min-height:45px;"></div>
+
+ <div style="border-top:1.5px solid #000;margin-top:8px;padding-top:6px;font-size:12px;">
+ <div class="between"><span>รวมเป็นเงิน:</span><span id="rcp-subtotal">฿0.00</span></div>
+ <div id="rcp-disc-row" class="between" style="display:none;"><span>หักส่วนลด:</span><span id="rcp-disc">-฿0.00</span></div>
+ <div id="rcp-vat-row" class="between" style="display:none;"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span id="rcp-vat">฿0.00</span></div>
+ <div class="between" style="font-size:16px;font-weight:900;border-top:1px dashed #666;margin-top:4px;padding-top:4px;">
+ <span>ยอดสุทธิ (TOTAL):</span><span id="rcp-grand">฿0.00</span>
+ </div>
+ </div>
+
+ <div style="text-align:center;margin-top:10px;padding-top:8px;border-top:1px dashed #666;">
+ <div id="rcp-qr-title" style="font-size:11px;font-weight:800;margin-bottom:5px;">สแกนชำระเงินผ่าน Thai QR พร้อมเพย์</div>
+ <div id="rcp-qr-box" style="display:flex;justify-content:center;align-items:center;margin:0 auto;padding:6px;border:1px solid #ccc;border-radius:8px;width:156px;height:156px;background:#fff;"></div>
+ <div id="rcp-qr-amount" style="font-size:14px;font-weight:900;margin-top:5px;">ยอดโอน: ฿0.00</div>
+ <div id="rcp-qr-acc" style="font-size:11px;"></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+<!-- ================= MODAL: ขยาย QR เต็มจอ ================= -->
+<div id="big-qr-modal" class="modal-backdrop hidden" style="z-index:160;">
+ <div style="background:#fff;color:#000;border-radius:24px;max-width:340px;width:100%;padding:20px;text-align:center;">
+ <div style="font-size:11px;font-weight:700;color:#64748b;">ภูเบศร์อินเตอร์โฮเต็ล</div>
+ <div style="font-size:18px;font-weight:900;margin:4px 0 12px;color:#000;">สแกนชำระเงิน</div>
+ <div id="big-qr-box" style="display:flex;justify-content:center;align-items:center;margin:0 auto 12px;padding:10px;border:2px solid #e2e8f0;border-radius:16px;width:230px;height:230px;background:#fff;"></div>
+ <div id="big-qr-amt" style="font-size:24px;font-weight:900;color:#047857;">฿0.00</div>
+ <div id="big-qr-acc" style="font-size:12px;font-weight:700;color:#334155;margin:4px 0 14px;"></div>
+ <button onclick="document.getElementById('big-qr-modal').classList.add('hidden')" class="btn" style="width:100%;background:#0f172a;color:#fff;padding:12px;">ปิดหน้าต่าง</button>
+ </div>
+</div>
+
+<!-- ================= MODAL: ตั้งค่าโรงแรม ================= -->
+<div id="settings-modal" class="modal-backdrop hidden" style="z-index:150;">
+ <div class="modal-box" style="max-width:640px;">
+ <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
+ <b style="font-size:15px;color:var(--amber);">⚙️ ตั้งค่าโรงแรม & รหัสผ่าน & เมนูอาหาร</b>
+ <button onclick="closeSettingsModal()" class="btn btn-dark">✕</button>
+ </div>
+
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:6px;">🏨 ข้อมูลโรงแรม (แสดงบนหัวโปรแกรมและใบเสร็จ)</b>
+ <div class="grid-2" style="margin-bottom:6px;">
+ <div><span style="font-size:11px;color:var(--muted);">ชื่อโรงแรม (ไทย)</span><input type="text" id="set-hotel-name-th"></div>
+ <div><span style="font-size:11px;color:var(--muted);">ชื่อโรงแรม (อังกฤษ)</span><input type="text" id="set-hotel-name-en"></div>
+ </div>
+ <div class="grid-2">
+ <div><span style="font-size:11px;color:var(--muted);">ที่อยู่</span><input type="text" id="set-hotel-address"></div>
+ <div><span style="font-size:11px;color:var(--muted);">เบอร์โทรศัพท์</span><input type="text" id="set-hotel-phone"></div>
+ </div>
+ </div>
+
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:6px;">1. รหัสผ่าน PIN 3 ระดับ</b>
+ <div class="grid-3">
+ <div><span style="font-size:11px;color:var(--muted);">PIN ฟร้อนท์</span><input type="text" id="set-pin-front"></div>
+ <div><span style="font-size:11px;color:var(--muted);">PIN ผู้จัดการ</span><input type="text" id="set-pin-mgr"></div>
+ <div><span style="font-size:11px;color:var(--muted);">PIN เจ้าของ</span><input type="text" id="set-pin-own"></div>
+ </div>
+ </div>
+
+
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:6px;">2. เรทราคาห้องมาตรฐาน & น้ำ-ไฟ</b>
+ <div class="grid-4">
+ <div><span style="font-size:11px;color:var(--muted);">ชั่วคราว</span><input type="number" id="set-rate-short"></div>
+ <div><span style="font-size:11px;color:var(--muted);">ค้างคืน</span><input type="number" id="set-rate-over"></div>
+ <div><span style="font-size:11px;color:var(--muted);">ค่าไฟ/หน่วย</span><input type="number" id="set-rate-elec"></div>
+ <div><span style="font-size:11px;color:var(--muted);">ค่าน้ำ/หน่วย</span><input type="number" id="set-rate-water"></div>
+ </div>
+ </div>
+
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:6px;">3. จัดการเมนูอาหาร & บริการเสริม</b>
+ <div class="row" style="margin-bottom:8px;">
+ <input type="text" id="set-new-food-name" placeholder="ชื่อเมนูใหม่..." style="flex:1;">
+ <input type="number" id="set-new-food-price" placeholder="ราคา (ใส่ 0 ได้)" style="width:110px;">
+ <button onclick="addMenuFromSettings()" class="btn btn-emerald">+ เพิ่มเมนู</button>
+ </div>
+ <div id="set-menu-list" class="grid-2" style="max-height:140px;overflow-y:auto;"></div>
+ </div>
+
+ <div class="subcard">
+ <div class="between" style="margin-bottom:10px;">
+ <b style="color:var(--amber); font-size: 14px;">4. จัดการห้องพัก (เลขห้อง / ประเภท / ราคา)</b>
+ <button onclick="quickAddRoom()" class="btn btn-emerald" style="padding: 6px 12px;">+ เพิ่มห้องใหม่</button>
+ </div>
+ <div id="set-rooms-list" style="max-height: 350px; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px;"></div>
+ </div>
+
+ <button onclick="saveAllSettings()" class="btn btn-amber" style="width:100%;padding:12px;">💾 บันทึกการตั้งค่าทั้งหมด</button>
+ </div>
+</div>
+
+
+<!-- ================= MODAL: ซิงค์ข้อมูลข้ามเครื่อง (Cloud Real-time Engine) ================= -->
+<div id="sync-modal" class="modal-backdrop hidden" style="z-index:155;">
+ <div class="modal-box" style="max-width:440px;">
+ <div class="between" style="margin-bottom:10px;">
+ <b style="color:#34d399;display:flex;align-items:center;gap:6px;font-size:15px;"><span class="led-green"></span> Multi-Device Cloud Real-time</b>
+ <button onclick="document.getElementById('sync-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+ </div>
+ <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">ชื่อห้องเชื่อมต่อ Cloud (ตั้งให้ตรงกันทุกเครื่อง เช่น phubesth-hotel):</div>
+ <input type="text" id="cfgSyncRoom" class="input-box" style="margin-bottom:10px;font-weight:800;color:#38bdf8;" placeholder="เช่น phubesth-hotel">
+ 
+ <div class="grid-2" style="margin-bottom:8px;">
+ <button type="button" onclick="pushToCloud(true)" class="btn btn-emerald" style="padding:10px;">⬆️ ดันขึ้น Cloud ทันที</button>
+ <button type="button" onclick="pullFromCloud(true)" class="btn btn-sky" style="padding:10px;">⬇️ ดึงจาก Cloud ทันที</button>
+ </div>
+ <button type="button" onclick="testCloudConnection()" class="btn btn-dark" style="width:100%;color:#38bdf8;border-color:#0284c7;padding:10px;margin-bottom:10px;">📡 ทดสอบสัญญาณ Cloud Real-time</button>
+ 
+ <div style="border-top:1px dashed var(--border);padding-top:8px;">
+ <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">หรือสำรองข้อมูลแบบไฟล์ข้อความ (Manual):</div>
+ <div class="grid-2" style="margin-bottom:6px;">
+  <button onclick="exportSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📋 คัดลอกโค้ด</button>
+  <button onclick="importSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📥 นำเข้าโค้ด</button>
+ </div>
+ <textarea id="sync-textarea" rows="2" style="font-size:11px;" placeholder="วางโค้ดสำรองข้อมูลที่นี่..."></textarea>
+ </div>
+ </div>
+</div>
+
+
+<!-- ================= MODAL: ตัวติดตั้งโปรแกรม PWA (สำหรับทุกอุปกรณ์) ================= -->
+<div id="pwa-guide-modal" class="modal-backdrop hidden" style="z-index:250;">
+ <div class="modal-box" style="max-width:440px;">
+ <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
+ <b style="color:#38bdf8;font-size:15px;">📲 ตัวติดตั้งแอป ภูเบศร์โฮเต็ล (PWA Installer)</b>
+ <button onclick="document.getElementById('pwa-guide-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+ </div>
+
+ <div id="pwa-direct-box" class="subcard hidden" style="border-color:#10b981;">
+ <b style="color:#34d399;display:block;margin-bottom:6px;">✅ อุปกรณ์ของคุณพร้อมติดตั้งแอปทันที!</b>
+ <button onclick="runNativePrompt()" class="btn btn-emerald" style="width:100%;padding:12px;font-size:14px;">📲 กดปุ่มนี้เพื่อติดตั้งลงหน้าจอหลักทันที</button>
+ </div>
+
+ <div class="subcard">
+ <b style="color:var(--amber);display:block;margin-bottom:4px;">🍎 วิธีติดตั้งบน iPhone / iPad (Safari):</b>
+ <ol style="margin:0;padding-left:18px;color:var(--text);line-height:1.6;">
+ <li>แตะปุ่ม <b>แชร์ (Share ⬆️)</b> ด้านล่างหน้าจอ Safari</li>
+ <li>เลื่อนลงมาแล้วกดเลือก <b>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</b></li>
+ <li>กด <b>เพิ่ม (Add)</b> มุมขวาบน จะได้ไอคอนแอปบนหน้าจอโฮมทันที</li>
+ </ol>
+ </div>
+
+ <div class="subcard">
+ <b style="color:#34d399;display:block;margin-bottom:4px;">🤖 วิธีติดตั้งบน Android / แท็บเล็ต (ไม่ให้ค้างหน้าโลโก้):</b>
+ <ol style="margin:0;padding-left:18px;color:var(--text);line-height:1.6;">
+ <li>กดจุดสามจุด <b>(⋮)</b> ที่มุมขวาบนของเบราว์เซอร์ Chrome</li>
+ <li>เลือกเมนู <b>"เพิ่มลงในหน้าจอหลัก" (Add to Home screen)</b> หรือ <b>"ติดตั้งแอป" (Install app)</b></li>
+ <li><i>เคล็ดลับป้องกันค้าง:</i> หากเปิดจากแอปจัดการไฟล์ แนะนำให้เปิดไฟล์ด้วย <b>Google Chrome</b> โดยตรงก่อนกดติดตั้งครับ</li>
+ </ol>
+ </div>
+
+ <button onclick="document.getElementById('pwa-guide-modal').classList.add('hidden')" class="btn btn-amber" style="width:100%;padding:10px;">ตกลง / ปิดหน้าต่าง</button>
+ </div>
+</div>
+
+<script>
+let deferredPwaPrompt = null;
+
+function initSafePWA() {
+ if ('serviceWorker' in navigator) {
+ navigator.serviceWorker.getRegistrations().then(regs => {
+ for (let reg of regs) reg.unregister();
+ }).catch(() => {});
+ }
+ if (navigator.storage && navigator.storage.persist) {
+ navigator.storage.persist().catch(() => {});
+ }
+ 
+ try {
+ const manifestObj = {
+ id: 'phubesth-inter-hotel-pms-unique-app',
+ name: 'ภูเบศร์อินเตอร์โฮเต็ล - Smart PMS',
+ short_name: 'ภูเบศร์โฮเต็ล',
+ start_url: window.location.pathname,
+ scope: window.location.pathname,
+ display: 'standalone',
+ background_color: '#0b0f19',
+ theme_color: '#0b0f19',
+ icons: [
+ { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/512px-Emoji_u1f3e8.svg.png', sizes: '512x512', type: 'image/png' }
+ ]
+ };
+ const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+ document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
+ } catch(e) {}
+
+ window.addEventListener('beforeinstallprompt', (e) => {
+ e.preventDefault();
+ deferredPwaPrompt = e;
+ const directBox = document.getElementById('pwa-direct-box');
+ if (directBox) directBox.classList.remove('hidden');
+ });
+}
+
+function triggerPwaInstall() {
+ if (deferredPwaPrompt) {
+ deferredPwaPrompt.prompt();
+ deferredPwaPrompt.userChoice.then(() => { deferredPwaPrompt = null; });
+ } else {
+ document.getElementById('pwa-guide-modal').classList.remove('hidden');
+ }
+}
+
+function runNativePrompt() {
+ if (deferredPwaPrompt) {
+ deferredPwaPrompt.prompt();
+ deferredPwaPrompt.userChoice.then(() => {
+ deferredPwaPrompt = null;
+ document.getElementById('pwa-guide-modal').classList.add('hidden');
+ });
+ }
+}
+
+function toggleFullScreenMode() {
+ if (!document.fullscreenElement) {
+ document.documentElement.requestFullscreen?.().catch(() => {});
+ } else {
+ document.exitFullscreen?.().catch(() => {});
+ }
+}
+
+const STORAGE_KEY = 'PHUBESTH_MASTER_DB';
+let currentRole = 'front';
+let selectedLoginRole = 'front';
+let pinBuffer = '';
+let roomFilter = 'all';
+let currentTxType = 'expense';
+let activeRoomIndex = null;
+
+const defaultNumbers = [
+ '101','102','103','104','105','106','107','108','109','110',
+ '201','202','203','204','205','206','207','208','209','210',
+ '301','302','303','304','305','306','307','308','309','310',
+ '401','402','403','404','405','406','407','408'
+];
+
+let state = {
+ hotelLogo: '',
+ pins: { front: '1111', manager: '8888', owner: '9999' },
+ rates: { short: 299, overnight: 650, monthly: 4500, elec: 8, water: 18 },
+ payment: {
+ mode: 'promptpay',
+ promptPayId: '0847177566',
+ promptPayName: 'ภูเบศร์ อภัยวงศ์',
+ bankName: 'ธ.กสิกรไทย (KBANK)',
+ bankAcc: '',
+ bankQrImage: ''
+ },
+ expenseCategories: ['🛒 ซื้อของใช้เข้าโรงแรม', '🧺 ค่าซักรีด / แม่บ้าน', '🔧 ค่าซ่อมบำรุง', '⚡ ค่าน้ำ / ค่าไฟ / เน็ต', '📦 เบ็ดเตล็ดทั่วไป'],
+ incomeCategories: ['🏨 รายรับจาก Agoda / Booking', '🏢 ลูกค้าบริษัทโอนเหมา', '⚡💧 รายรับค่าน้ำ-ค่าไฟผู้เช่า', '🍽️ ขายอาหาร/เครื่องดื่มหน้าร้าน', '💰 รายรับค่ามัดจำ / อื่นๆ'],
+ menu: [
+ { name: 'ข้าวผัดกุ้ง', price: 120 },
+ { name: 'น้ำดื่ม / โค้ก / กาแฟสด', price: 60 },
+ { name: 'มาม่าคัพ / ขนมขบเคี้ยว', price: 35 },
+ { name: 'เตียงเสริม / ผ้าห่มเพิ่ม', price: 150 }
+ ],
+ rooms: defaultNumbers.map((num, idx) => ({
+ number: num,
+ type: idx % 2 === 0 ? 'Double Bed' : 'Twin Bed',
+ status: 'vacant',
+ light: false,
+ guestName: '', guestPhone: '', guestTax: '',
+ stayType: 'overnight', nights: 1, customRate: 650,
+ elecOld: 0, elecNew: 0, waterOld: 0, waterNew: 0,
+ orders: [], vatEnabled: false, vatMode: 'exclude', discount: 0
+ })),
+ transactions: [],
+ customers: []
+};
+
+function loadDatabase() {
+ const saved = localStorage.getItem(STORAGE_KEY);
+ if (saved) {
+ try { state = Object.assign({}, state, JSON.parse(saved)); } catch(e) {}
+ }
+}
+
+
+ function saveDatabase() {
+ try {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+ } catch (err) {
+ // ถ้าหน่วยความจำเต็มจากรูปเก่าที่ใหญ่เกินไป ให้เคลียร์เฉพาะรูปที่ค้างออกเพื่อให้ระบบทำงานต่อได้ทันที
+ state.hotelLogo = '';
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+ }
+}
+
+
+function showToast(msg) {
+ const t = document.getElementById('toast');
+ t.textContent = '✅ ' + msg;
+ t.classList.remove('hidden');
+ setTimeout(() => t.classList.add('hidden'), 2500);
+}
+
+function selectRole(role) {
+ selectedLoginRole = role;
+ ['front','manager','owner'].forEach(r => {
+ const btn = document.getElementById('role-' + r);
+ if (r === role) {
+ btn.style.border = '2px solid #10b981';
+ btn.style.background = 'rgba(16,185,129,0.2)';
+ btn.style.color = '#fff';
+ } else {
+ btn.style.border = '1px solid #334155';
+ btn.style.background = '#1e293b';
+ btn.style.color = '#cbd5e1';
+ }
+ });
+ clearPin();
+}
+
+function pressPin(d) {
+ if (pinBuffer.length < 4) {
+ pinBuffer += d;
+ updatePinDots();
+ if (pinBuffer.length === 4) setTimeout(submitPin, 100);
+ }
+}
+
+function clearPin() {
+ pinBuffer = '';
+ updatePinDots();
+}
+
+function updatePinDots() {
+ let html = '';
+ for (let i = 0; i < 4; i++) html += `<span>${i < pinBuffer.length ? '●' : '○'}</span>`;
+ document.getElementById('pin-dots').innerHTML = html;
+}
+
+function submitPin() {
+ const target = state.pins[selectedLoginRole] || '1111';
+ if (pinBuffer === target) {
+ currentRole = selectedLoginRole;
+ document.getElementById('login-screen').classList.add('hidden');
+ document.getElementById('app-screen').classList.remove('hidden');
+ const labels = { front: '🛎️ ฟร้อนท์', manager: '👔 ผู้จัดการ', owner: '👑 เจ้าของโรงแรม' };
+ document.getElementById('hdr-role-badge').textContent = labels[currentRole];
+ renderAll();
+ showToast('เข้าสู่ระบบสำเร็จ');
+ } else {
+ alert('รหัส PIN ไม่ถูกต้อง!');
+ clearPin();
+ }
+}
+
+function logout() {
+ clearPin();
+ document.getElementById('app-screen').classList.add('hidden');
+ document.getElementById('login-screen').classList.remove('hidden');
+}
+
+
+
+function switchMainView(v) {
+ ['rooms','booking','finance','customers','receipts'].forEach(k => {
+ const vEl = document.getElementById('view-' + k);
+ const tEl = document.getElementById('tab-' + k);
+ if (vEl) vEl.classList.toggle('hidden', k !== v);
+ if (tEl) tEl.className = (k === v) ? 'btn btn-amber' : 'btn btn-dark';
+ });
+ if (v === 'booking') {
+ initBookingDates();
+ renderBookingsList();
+ checkAvailabilityPreview();
+ }
+ if (v === 'receipts') {
+ renderReceiptsArchive();
+ }
+ renderAll();
+}
+
+
+
+function renderAll() {
+ renderRooms();
+ renderFinance();
+ renderCustomers();
+}
+
+ function setRoomFilter(f) {
+ roomFilter = f;
+ ['all','vacant','reserved','occupied','cleaning'].forEach(k => {
+ const el = document.getElementById('flt-' + k);
+ if (!el) return;
+ el.style.border = (k === f) ? '2px solid #fff' : 'none';
+ });
+ renderRooms();
+}
+
+
+ // ซ่อมข้อมูลอัตโนมัติ: ดึงห้องของคุณสมชายที่เผลอติดสีแดงกลับมาเป็นสถานะจอง (กรอบฟ้า) ทันที
+(function repairSomchaiRooms() {
+ let countRepaired = 0;
+ state.rooms.forEach(r => {
+ if (r.guestName === 'สมชาย' && r.status === 'occupied') {
+ r.status = 'vacant';
+ r.light = false;
+ r.guestName = '';
+ r.checkInTime = '';
+ r.checkInTimestamp = 0;
+ countRepaired++;
+ }
+ });
+ if (countRepaired > 0) {
+ if (!Array.isArray(state.reservations)) state.reservations = [];
+ let b = state.reservations.find(x => x.guest === 'สมชาย');
+ if (b) {
+ b.qty = 10;
+ b.status = 'confirmed';
+ }
+ saveDatabase();
+ }
+})();
+
+
+ function renderRooms() {
+ const q = (document.getElementById('room-search').value || '').trim().toLowerCase();
+ const d = new Date();
+ const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+ const now = Date.now();
+
+ const todayBookings = (state.reservations || []).filter(b => b.status === 'confirmed' && b.checkIn === todayStr);
+ 
+ let bookingQueues = {};
+ todayBookings.forEach(b => {
+ if (!bookingQueues[b.roomType]) bookingQueues[b.roomType] = [];
+ for (let i = 0; i < (Number(b.qty) || 1); i++) {
+ bookingQueues[b.roomType].push(b);
+ }
+ });
+
+ let totalReservedToday = 0;
+ const roomAssignedBooking = {};
+
+ state.rooms.forEach((r, idx) => {
+ if (r.status === 'vacant' && bookingQueues[r.type] && bookingQueues[r.type].length > 0) {
+ roomAssignedBooking[idx] = bookingQueues[r.type].shift();
+ totalReservedToday++;
+ }
+ });
+
+ const total = state.rooms.length;
+ const occ = state.rooms.filter(r => r.status === 'occupied').length;
+ const cln = state.rooms.filter(r => r.status === 'cleaning').length;
+ const rawVac = total - occ - cln;
+ const trueVacant = Math.max(0, rawVac - totalReservedToday);
+
+ const occRate = total > 0 ? (((occ + totalReservedToday) / total) * 100).toFixed(0) : 0;
+
+ if (document.getElementById('room-total-cnt')) document.getElementById('room-total-cnt').textContent = total;
+ if (document.getElementById('cnt-all')) document.getElementById('cnt-all').textContent = total;
+ if (document.getElementById('cnt-vacant')) document.getElementById('cnt-vacant').textContent = trueVacant;
+ if (document.getElementById('cnt-reserved')) document.getElementById('cnt-reserved').textContent = totalReservedToday;
+ if (document.getElementById('cnt-occupied')) document.getElementById('cnt-occupied').textContent = occ;
+ if (document.getElementById('cnt-cleaning')) document.getElementById('cnt-cleaning').textContent = cln;
+
+ if (document.getElementById('kpi-occ-rate')) document.getElementById('kpi-occ-rate').textContent = `${occRate}% (${occ + totalReservedToday}/${total})`;
+ if (document.getElementById('kpi-reserved-today')) document.getElementById('kpi-reserved-today').textContent = `${totalReservedToday} ห้อง`;
+ if (document.getElementById('kpi-ready-cnt')) document.getElementById('kpi-ready-cnt').textContent = `${trueVacant} ห้อง`;
+ if (document.getElementById('kpi-cln-cnt')) document.getElementById('kpi-cln-cnt').textContent = `${cln} ห้อง`;
+
+ let html = '';
+ state.rooms.forEach((r, idx) => {
+ const isOcc = r.status === 'occupied';
+ const isClean = r.status === 'cleaning';
+ const assignedB = roomAssignedBooking[idx];
+ const isRes = !isOcc && !isClean && !!assignedB;
+
+ if (roomFilter === 'vacant' && (isOcc || isClean || isRes)) return;
+ if (roomFilter === 'reserved' && !isRes) return;
+ if (roomFilter === 'occupied' && !isOcc) return;
+ if (roomFilter === 'cleaning' && !isClean) return;
+
+ if (q) {
+ const matchNum = r.number.toLowerCase().includes(q);
+ const matchGuest = (r.guestName || '').toLowerCase().includes(q);
+ const matchBook = isRes && (assignedB.guest || '').toLowerCase().includes(q);
+ if (!matchNum && !matchGuest && !matchBook) return;
+ }
+
+ let borderCol = '#10b981';
+ let overtimeStyle = '';
+ let countdownText = '';
+
+ if (isOcc) {
+ borderCol = '#f43f5e';
+ if (r.stayType === 'short' && r.checkInTimestamp) {
+  const passedMins = Math.floor((now - r.checkInTimestamp) / 60000);
+  const remainMins = 180 - passedMins;
+  if (remainMins <= 0) {
+  borderCol = '#ffffff';
+  overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
+  countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเวลาชั่วคราว ${Math.abs(remainMins)} น.</span>`;
+  } else {
+  const remH = Math.floor(remainMins / 60);
+  const remM = remainMins % 60;
+  countdownText = `<span style="color:#38bdf8;font-weight:800;">⏱️ ชั่วคราว เหลือ ${remH}:${String(remM).padStart(2,'0')} ชม.</span>`;
+  }
+ } else if (r.stayType === 'overnight') {
+  const curDate = new Date();
+  const curHour = curDate.getHours();
+  const curMin = curDate.getMinutes();
+  
+  // เตือน 11:00 - 11:59 น.
+  if (curHour === 11) {
+  borderCol = '#f59e0b';
+  countdownText = `<span style="color:#fbbf24;font-weight:800;">⚠️ เตือนเช็คเอาท์เที่ยง (เหลือ ${60 - curMin} น.)</span>`;
+  } else if (curHour >= 12 && curHour < 18) {
+  // เกินเที่ยง (12:00 - 17:59 น.) -> เปิดค่าเลทอัตโนมัติ
+  borderCol = '#ffffff';
+  overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
+  countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเที่ยง (เลทเช็คเอาท์ +฿299)</span>`;
+  if (r.lateEnabled === undefined) {
+  r.lateEnabled = true;
+  r.lateFee = 299;
+  }
+  }
+ }
+ } else if (isClean) {
+
+ borderCol = '#f59e0b';
+ } else if (isRes) {
+ borderCol = '#0284c7'; // สีฟ้า: รอเข้าพัก
+ }
+
+ const lightBg = r.light ? 'background:#f59e0b;color:#000;' : 'background:#1e293b;color:#94a3b8;';
+ const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : 'ค้างคืน';
+ const depositBadge = (r.keyDeposit > 0) ? `<span style="font-size:9.5px;background:#312e81;color:#c7d2fe;padding:1px 5px;border-radius:4px;margin-left:4px;">มัดจำ ฿${r.keyDeposit}</span>` : '';
+
+ html += `
+ <div onclick="openRoomModal(${idx})" class="card" style="margin:0;cursor:pointer;border:2px solid ${borderCol}; ${overtimeStyle}">
+  <div class="between" style="margin-bottom:6px;">
+  <div>
+  <div style="font-size:20px;font-weight:900;">${r.number}</div>
+  <span style="font-size:10px;background:#1e3a8a;color:#93c5fd;padding:2px 6px;border-radius:6px;font-weight:700;">${r.type}</span>
+  </div>
+  <button onclick="event.stopPropagation();toggleRoomLight(${idx})" style="width:36px;height:36px;border-radius:10px;font-size:10px;font-weight:900;${lightBg}">
+  💡<br>${r.light ? 'ON' : 'OFF'}
+  </button>
+  </div>
+  
+  <div class="between" style="border-top:1px solid var(--border);padding-top:6px;font-size:12px;">
+  ${isOcc
+  ? `<div style="display:flex;flex-direction:column;min-width:0;flex:1;">
+   <span style="color:#fda4af;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">👤 ${r.guestName || 'มีผู้เข้าพัก'}${depositBadge}</span>
+   <div style="font-size:10px;color:var(--muted);margin-top:1px;">${countdownText || (stayLabel + (r.checkInTime ? ' • ' + r.checkInTime : ''))}</div>
+   </div>
+   <b style="color:var(--amber);">฿${calcRoomTotal(r).grand}</b>`
+  : (isClean
+   ? `<div class="between" style="width:100%;">
+    <div>
+    <span style="color:#fcd34d;font-weight:800;">🧹 รอแม่บ้าน</span>
+    <div style="font-size:9.5px;color:var(--muted);">${r.dirtySince || ''}</div>
+    </div>
+    <button onclick="event.stopPropagation();markRoomCleaned(${idx})" class="btn btn-emerald" style="padding:2px 8px;font-size:11px;">เสร็จแล้ว</button>
+    </div>`
+   : (isRes
+    ? `<div class="between" style="width:100%;">
+    <div style="display:flex;flex-direction:column;min-width:0;">
+     <span style="color:#38bdf8;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 จอง: ${assignedB.guest}</span>
+     <span style="font-size:10px;color:var(--muted);">รอเช็คอิน (฿${assignedB.rate||650})</span>
+    </div>
+    <button onclick="event.stopPropagation();quickCheckInBooking(${idx}, '${assignedB.id}')" class="btn btn-sky" style="padding:3px 10px;font-size:11px;font-weight:800;">เช็คอิน</button>
+     </div>`
+    : `<span style="color:#34d399;font-weight:700;">✔ ห้องว่าง</span><span style="color:var(--muted);">฿${r.customRate || state.rates.overnight}</span>`
+   )
+   )
+  }
+  </div>
+ </div>
+ `;
+ });
+ document.getElementById('rooms-grid').innerHTML = html;
+}
+
+function quickCheckInBooking(roomIdx, bookingId) {
+ const b = (state.reservations || []).find(x => x.id === bookingId);
+ if (!b) return;
+ const r = state.rooms[roomIdx];
+
+ // กล่องถามชื่อผู้เข้าพักจริง โดยแสดงชื่อผู้จองเดิมเป็นค่าเริ่มต้น
+ const actualGuest = prompt(`🛎️ เช็คอินห้อง ${r.number} (กรุ๊ปจอง: ${b.guest})
+
+กรุณาระบุชื่อผู้เข้าพักจริงในห้องนี้:`, b.guest);
+ if (actualGuest === null) return; // กดยกเลิก ไม่ทำรายการ
+
+ const finalName = actualGuest.trim() || b.guest;
+ r.guestName = (finalName !== b.guest) ? `${finalName} (${b.guest})` : b.guest;
+ r.guestPhone = b.phone || '';
+ r.customRate = b.rate || state.rates.overnight;
+ r.status = 'occupied';
+ r.light = true;
+ const now = new Date();
+ r.checkInTimestamp = now.getTime();
+ r.checkInTime = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+
+ // ตัดยอดจองในระบบทีละ 1 ห้อง
+ if (b.qty > 1) {
+ b.qty--;
+ } else {
+ b.status = 'checked_in';
+ }
+
+ saveDatabase();
+ renderAll();
+ showToast(`เช็คอินห้อง ${r.number} ให้คุณ ${r.guestName} สำเร็จ!`);
+}
+
+ 
+
+ 
+ 
+
+// คำสั่งคืนค่าห้องที่เผลอกดเช็คอินไปแล้วให้กลับมาเป็นสถานะ "รอเข้าพัก" (กรอบฟ้า)
+function resetAccidentalCheckIn() {
+ state.rooms.forEach(r => {
+ if (r.guestName && r.guestName.includes('สมชาย')) {
+ r.status = 'vacant';
+ r.light = false;
+ r.guestName = '';
+ r.checkInTime = '';
+ r.checkInTimestamp = 0;
+ }
+ });
+ // คืนสต็อกการจองของสมชายให้กลับมาเป็น 10 ห้อง
+ const b = (state.reservations || []).find(x => x.guest.includes('สมชาย'));
+ if (b) {
+ b.qty = 10;
+ b.status = 'confirmed';
+ }
+ saveDatabase();
+ renderAll();
+}
+
+
+ function markRoomCleaned(idx) {
+ const r = state.rooms[idx];
+ const now = new Date();
+ const timeStr = now.toLocaleDateString('th-TH') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+ 
+ if (!Array.isArray(state.housekeepingLogs)) state.housekeepingLogs = [];
+ state.housekeepingLogs.unshift({
+ room: r.number,
+ time: timeStr,
+ duration: r.dirtySince ? 'แจ้งล้างตอน: ' + r.dirtySince : 'ทำความสะอาดเรียบร้อย'
+ });
+ if (state.housekeepingLogs.length > 50) state.housekeepingLogs = state.housekeepingLogs.slice(0, 50);
+
+ r.status = 'vacant';
+ r.light = false;
+ r.dirtySince = '';
+ saveDatabase();
+ renderRooms();
+ showToast('ห้อง ' + r.number + ' สะอาดพร้อมเปิดขายแล้ว');
+}
+
+function openHousekeepingModal() {
+ const logs = state.housekeepingLogs || [];
+ if (logs.length === 0) {
+ return alert('🧹 ประวัติแม่บ้าน:
+
+
+
+ยังไม่มีรายการทำความสะอาดที่บันทึกไว้');
+ }
+ const text = logs.slice(0, 10).map(l => `ห้อง ${l.room} - เสร็จ ${l.time} (${l.duration})`).join('
+
+');
+ alert('🧹 ประวัติการเคลียร์ห้องพักล่าสุด 10 รายการ:
+
+
+
+' + text);
+}
+
+
+function toggleRoomLight(idx) {
+ state.rooms[idx].light = !state.rooms[idx].light;
+ saveDatabase();
+ renderRooms();
+}
+
+function quickAddRoom() {
+ const num = prompt('กรอกหมายเลขห้องที่ต้องการเพิ่มใหม่:', (state.rooms.length + 101).toString());
+ if (!num) return;
+ state.rooms.push({
+ number: num.trim(), type: 'Double Bed', status: 'vacant', light: false,
+ guestName: '', guestPhone: '', guestTax: '', stayType: 'overnight', nights: 1,
+ customRate: state.rates.overnight, elecOld: 0, elecNew: 0, waterOld: 0, waterNew: 0,
+ orders: [], vatEnabled: false, vatMode: 'exclude', discount: 0, checkInTime: ''
+ });
+ saveDatabase();
+ renderAll();
+ showToast('เพิ่มห้อง ' + num + ' แล้ว');
+}
+
+function openRoomModal(idx) {
+ activeRoomIndex = idx;
+ const r = state.rooms[idx];
+ document.getElementById('m-room-num').value = r.number;
+ document.getElementById('m-room-type').value = r.type;
+ document.getElementById('m-guest-name').value = r.guestName || '';
+ document.getElementById('m-guest-phone').value = r.guestPhone || '';
+ document.getElementById('m-guest-tax').value = r.guestTax || '';
+ 
+ const st = r.stayType || 'overnight';
+ document.getElementById('m-stay-type').value = st;
+ document.getElementById('m-nights').value = r.nights || 1;
+ 
+ let currentPrice = state.rates.overnight;
+ if (st === 'short') currentPrice = r.rateShort || state.rates.short;
+ else if (st === 'overnight') currentPrice = r.rateOver || r.customRate || state.rates.overnight;
+ else if (st === 'monthly') currentPrice = state.rates.monthly;
+ 
+ document.getElementById('m-custom-rate').value = currentPrice;
+ if (document.getElementById('m-key-deposit')) document.getElementById('m-key-deposit').value = r.keyDeposit || 0; 
+ if (document.getElementById('m-late-chk')) {
+ document.getElementById('m-late-chk').checked = !!r.lateEnabled;
+ document.getElementById('m-late-fee').value = r.lateFee || 299;
+ }
+
+ 
+ document.getElementById('m-elec-old').value = r.elecOld || 0;
+ document.getElementById('m-elec-new').value = r.elecNew || 0;
+ document.getElementById('m-water-old').value = r.waterOld || 0;
+ document.getElementById('m-water-new').value = r.waterNew || 0;
+ document.getElementById('m-vat-chk').checked = !!r.vatEnabled;
+ document.getElementById('m-vat-mode').value = r.vatMode || 'exclude';
+ document.getElementById('m-discount').value = r.discount || 0;
+
+ const sBox = document.getElementById('m-cust-search-box');
+ const sRes = document.getElementById('m-cust-search-res');
+ if (sBox) sBox.value = '';
+ if (sRes) { sRes.innerHTML = ''; sRes.classList.add('hidden'); }
+
+
+ document.getElementById('cfg-pp-id').value = state.payment.promptPayId || '';
+ document.getElementById('cfg-pp-name').value = state.payment.promptPayName || '';
+ document.getElementById('cfg-bank-name').value = state.payment.bankName || 'ธ.กสิกรไทย (KBANK)';
+ document.getElementById('cfg-bank-acc').value = state.payment.bankAcc || '';
+
+ updateModalLightBtn();
+ renderModalMenuAndOrders();
+ setPaymentMode(state.payment.mode || 'promptpay');
+ checkGuestVipStatusInline(); // เคลียร์ป้าย VIP ทันทีถ้าเป็นห้องว่าง หรืออัปเดตให้ตรงกับลูกค้าห้องนั้น
+ switchRoomTab(1);
+ document.getElementById('room-modal').classList.remove('hidden');
+
+}
+
+function closeRoomModal() {
+ document.getElementById('room-modal').classList.add('hidden');
+ activeRoomIndex = null;
+ renderRooms();
+}
+
+function switchRoomTab(n) {
+ [1,2,3].forEach(i => {
+ document.getElementById('rcontent-' + i).classList.toggle('hidden', i !== n);
+ document.getElementById('rtab-' + i).className = i === n ? 'btn btn-amber' : 'btn btn-dark';
+ });
+ if (n === 3) {
+ updateReceiptPreview();
+ // ตรวจสอบยอดเงินมัดจำกุญแจของห้องนี้ ถ้ามีให้เปิดกล่องเตือนสีฟ้า
+ if (activeRoomIndex !== null) {
+ const r = state.rooms[activeRoomIndex];
+ const depBox = document.getElementById('m-deposit-warn-box');
+ const depAmt = document.getElementById('m-deposit-warn-amt');
+ if (depBox && depAmt) {
+  if (Number(r.keyDeposit) > 0) {
+  depAmt.textContent = '฿' + Number(r.keyDeposit).toLocaleString();
+  depBox.classList.remove('hidden');
+  } else {
+  depBox.classList.add('hidden');
+  }
+ }
+ }
+ }
+}
+
+
+function updateRoomNumberInline() {
+ if (activeRoomIndex === null) return;
+ state.rooms[activeRoomIndex].number = document.getElementById('m-room-num').value.trim();
+ saveDatabase();
+}
+
+function updateRoomTypeInline() {
+ if (activeRoomIndex === null) return;
+ state.rooms[activeRoomIndex].type = document.getElementById('m-room-type').value;
+ saveDatabase();
+}
+// ฟังก์ชันย้ายห้องพักโดยไม่คิดเงินซ้ำซ้อน (โอนข้อมูลแขก + ออเดอร์ + มัดจำ ไปห้องใหม่ 100%)
+
+function moveRoomToAnother() {
+ if (activeRoomIndex === null) return;
+ const oldRoom = state.rooms[activeRoomIndex];
+
+ const vacantRooms = state.rooms.filter(r => r.status === 'vacant');
+ if (vacantRooms.length === 0) {
+ return alert('⚠️ ขณะนี้ไม่มีห้องว่างสำหรับย้ายได้เลยครับ');
+ }
+
+ const vacantListText = vacantRooms.map(r => r.number).join(', ');
+ const targetNum = prompt(`🔄 ย้ายข้อมูลจากห้อง ${oldRoom.number} (${oldRoom.guestName || 'ผู้เข้าพัก'})
+
+
+
+ระบุหมายเลขห้องว่างปลายทาง:
+
+(ห้องว่าง: ${vacantListText})`);
+ if (!targetNum) return;
+
+ const newIdx = state.rooms.findIndex(r => r.number === targetNum.trim());
+ if (newIdx === -1) return alert(`ไม่พบห้องหมายเลข ${targetNum}`);
+ 
+ const newRoom = state.rooms[newIdx];
+ if (newRoom.status !== 'vacant') {
+ return alert(`⚠️ ห้อง ${targetNum} ไม่ว่าง (สถานะ: ${newRoom.status}) ไม่สามารถย้ายเข้าได้`);
+ }
+
+ // ถามเหตุผลในการย้ายห้องเพื่อแจ้งช่าง/แม่บ้าน
+ const moveReason = prompt(`🛠️ ระบุเหตุผลการย้ายห้อง ${oldRoom.number} (เพื่อแจ้งช่าง/แม่บ้าน):`, 'แอร์ไม่เย็น');
+ if (moveReason === null) return; // กดยกเลิก
+ const reasonText = moveReason.trim() || 'ลูกค้าขอย้ายห้อง';
+
+ // 1. ถ่ายโอนข้อมูลผู้เข้าพัก ออเดอร์ ค่าห้อง และเงินมัดจำไปยังห้องใหม่
+ newRoom.status = 'occupied';
+ newRoom.light = true;
+ newRoom.guestName = oldRoom.guestName;
+ newRoom.guestPhone = oldRoom.guestPhone;
+ newRoom.guestTax = oldRoom.guestTax;
+ newRoom.stayType = oldRoom.stayType;
+ newRoom.nights = oldRoom.nights;
+ newRoom.customRate = oldRoom.customRate;
+ newRoom.keyDeposit = oldRoom.keyDeposit || 0;
+ newRoom.orders = JSON.parse(JSON.stringify(oldRoom.orders || []));
+ newRoom.discount = oldRoom.discount || 0;
+ newRoom.vatEnabled = oldRoom.vatEnabled;
+ newRoom.vatMode = oldRoom.vatMode;
+ newRoom.checkInTime = oldRoom.checkInTime;
+ newRoom.checkInTimestamp = oldRoom.checkInTimestamp;
+
+ // 2. เคลียร์ห้องเดิม ดับไฟ และบันทึกเหตุผลที่ฟร้อนท์พิมพ์
+ const now = new Date();
+ const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+ oldRoom.status = 'cleaning';
+ oldRoom.light = false;
+ oldRoom.dirtySince = `ย้ายออก: ${reasonText} (${timeStr})`;
+ oldRoom.guestName = '';
+ oldRoom.guestPhone = '';
+ oldRoom.guestTax = '';
+ oldRoom.orders = [];
+ oldRoom.discount = 0;
+ oldRoom.checkInTime = '';
+ oldRoom.checkInTimestamp = 0;
+ oldRoom.keyDeposit = 0;
+
+ saveDatabase();
+ closeRoomModal();
+ renderAll();
+ showToast(`✅ ย้ายจากห้อง ${oldRoom.number} ➔ ห้อง ${newRoom.number} สำเร็จแล้ว (${reasonText})`);
+}
+
+
+function deleteCurrentRoom() {
+ if (activeRoomIndex === null || !confirm('ยืนยันการลบห้องนี้?')) return;
+ state.rooms.splice(activeRoomIndex, 1);
+ saveDatabase();
+ closeRoomModal();
+}
+
+function toggleModalLight() {
+ if (activeRoomIndex === null) return;
+ state.rooms[activeRoomIndex].light = !state.rooms[activeRoomIndex].light;
+ saveDatabase();
+ updateModalLightBtn();
+}
+
+function updateModalLightBtn() {
+ const r = state.rooms[activeRoomIndex];
+ const btn = document.getElementById('m-light-btn');
+ btn.textContent = r.light ? '💡 ไฟ: เปิด' : '💡 ไฟ: ปิด';
+ btn.className = r.light ? 'btn btn-amber' : 'btn btn-dark';
+}
+
+
+ function onStayTypeChange() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const st = document.getElementById('m-stay-type').value;
+ 
+ if (st === 'short') {
+ document.getElementById('m-custom-rate').value = r.rateShort || state.rates.short;
+ } else if (st === 'monthly') {
+ document.getElementById('m-custom-rate').value = state.rates.monthly;
+ } else if (st === 'complimentary') {
+ document.getElementById('m-custom-rate').value = 0; // ห้องฟรี 0 บาท
+ } else {
+ document.getElementById('m-custom-rate').value = r.rateOver || r.customRate || state.rates.overnight;
+ }
+ saveCurrentRoomData();
+}
+ 
+function checkGuestVipStatusInline() {
+ const name = (document.getElementById('m-guest-name')?.value || '').trim().toLowerCase();
+ const box = document.getElementById('m-vip-badge-box');
+ const txt = document.getElementById('m-vip-badge-text');
+ if (!box || !txt) return;
+
+ // ถ้าไม่มีชื่อลูกค้า หรือเป็นห้องว่าง ให้ปิดป้ายทิ้งทันที
+ if (!name || name === 'no name' || name === 'ลูกค้าทั่วไป') {
+ box.classList.add('hidden');
+ return;
+ }
+
+ const cust = (state.customers || []).find(c => (c.name || '').trim().toLowerCase() === name);
+ if (cust && Array.isArray(cust.stayHistory) && cust.stayHistory.length > 0) {
+ const totalStays = cust.stayHistory.length;
+ const totalNights = cust.stayHistory.reduce((s, x) => s + (Number(x.nights) || 1), 0);
+ const totalSpend = cust.stayHistory.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+
+ // เกณฑ์ VIP: ยอดสะสมต้องถึง 10,000 บาทขึ้นไป (หรือพัก 10 ครั้งขึ้นไป)
+ if (totalSpend >= 10000 || totalStays >= 10) {
+ txt.textContent = `⭐ ลูกค้า VIP: พักมาแล้ว ${totalStays} ครั้ง (${totalNights} คืน) • ยอดสะสม ฿${totalSpend.toLocaleString()}`;
+ box.classList.remove('hidden');
+ } else {
+ box.classList.add('hidden');
+ }
+ } else {
+ box.classList.add('hidden');
+ }
+}
+
+ 
+
+// ค้นหาลูกค้าเก่า: กดแตะจะโชว์ 5 คนล่าสุดทันที หรือพิมพ์เพื่อค้นหา
+function searchCustomerQuickInline() {
+ const q = (document.getElementById('m-cust-search-box')?.value || '').trim().toLowerCase();
+ const box = document.getElementById('m-cust-search-res');
+ if (!box) return;
+
+ // กรองรายชื่อจริง (ไม่เอา No Name)
+ const validCustomers = (state.customers || []).filter(c => {
+ const n = (c.name || '').trim().toLowerCase();
+ return n && n !== 'no name' && n !== 'ลูกค้าทั่วไป';
+ });
+
+ let matches = [];
+ if (!q) {
+ // ถ้ายังไม่ได้พิมพ์อะไร ให้ดึง 5 คนล่าสุดมาแสดงทันที
+ matches = validCustomers.slice(0, 5);
+ } else {
+ // ถ้าพิมพ์ค้นหา ให้กรองตามชื่อ เบอร์โทร หรือเลขบัตร ปชช.
+ matches = validCustomers.filter(c => 
+ (c.name || '').toLowerCase().includes(q) || 
+ (c.phone || '').includes(q) || 
+ (c.tax || '').includes(q)
+ ).slice(0, 5);
+ }
+
+ if (matches.length === 0) {
+ box.innerHTML = '<div style="padding:10px;font-size:11.5px;color:var(--muted);text-align:center;">ไม่พบข้อมูลลูกค้า</div>';
+ box.classList.remove('hidden');
+ return;
+ }
+
+ const headerHint = !q 
+ ? '<div style="padding:5px 10px;font-size:10px;color:var(--muted);background:#1e293b;border-bottom:1px solid #334155;">👥 ลูกค้าล่าสุด 5 ท่าน (หรือพิมพ์ค้นหาด้านบน):</div>' 
+ : '';
+
+ box.innerHTML = headerHint + matches.map(c => {
+ const realIdx = state.customers.indexOf(c);
+ const stays = (c.stayHistory || []).length;
+ return `
+ <div onclick="selectQuickCustomer(${realIdx})" style="padding:8px 10px;border-bottom:1px solid #1e293b;cursor:pointer;font-size:12px;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='transparent'">
+  <div class="between">
+  <b style="color:#fff;">👤 ${c.name}</b>
+  ${stays > 0 ? `<span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">พัก ${stays} ครั้ง</span>` : ''}
+  </div>
+  <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">
+  📞 ${c.phone || '-'} ${c.addr ? '• 🏠 ' + c.addr : ''}
+  </div>
+ </div>
+ `;
+ }).join('');
+ 
+ box.classList.remove('hidden');
+}
+
+// ปิดกล่องผลลัพธ์อัตโนมัติเมื่อกดแตะพื้นที่อื่น
+document.addEventListener('click', function(e) {
+ const box = document.getElementById('m-cust-search-res');
+ const inp = document.getElementById('m-cust-search-box');
+ if (box && inp && !box.contains(e.target) && e.target !== inp) {
+ box.classList.add('hidden');
+ }
+});
+
+// เมื่อเลือกชื่อลูกค้า ให้ดึงค่าลงฟอร์มอัตโนมัติทันที
+function selectQuickCustomer(idx) {
+ const c = state.customers[idx];
+ if (!c) return;
+
+ document.getElementById('m-guest-name').value = c.name || '';
+ document.getElementById('m-guest-phone').value = c.phone || '';
+ document.getElementById('m-guest-tax').value = c.tax || '';
+ 
+ // ล้างกล่องค้นหาและปิดป๊อปอัป
+ const sBox = document.getElementById('m-cust-search-box');
+ const sRes = document.getElementById('m-cust-search-res');
+ if (sBox) sBox.value = '';
+ if (sRes) { sRes.innerHTML = ''; sRes.classList.add('hidden'); }
+
+ if (typeof checkGuestVipStatusInline === 'function') checkGuestVipStatusInline();
+ saveCurrentRoomData();
+ showToast(`ดึงข้อมูลคุณ ${c.name} สำเร็จ`);
+}
+
+
+
+
+// ฟังก์ชันพิมพ์ใบลงทะเบียนผู้เข้าพัก (Guest Registration Card)
+function printRegCard() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const win = window.open('', '_blank');
+ const todayStr = new Date().toLocaleDateString('th-TH');
+
+ win.document.write(`
+ <!DOCTYPE html>
+ <html>
+ <head>
+ <meta charset="utf-8">
+ <title>บัตรทะเบียนผู้พัก - ห้อง ${r.number}</title>
+ <style>
+  body { font-family: Sarabun, Tahoma, sans-serif; padding: 25px; color: #000; font-size: 13px; line-height: 1.6; }
+  .box { border: 1.5px solid #000; border-radius: 8px; padding: 16px; max-width: 650px; margin: 0 auto; }
+  .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+  .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .line { border-bottom: 1px dotted #333; flex: 1; margin: 0 6px; }
+  .sign { margin-top: 40px; display: flex; justify-content: space-around; text-align: center; }
+ </style>
+ </head>
+ <body>
+ <div class="box">
+  <div class="hdr">
+  <h2 style="margin:0;">ภูเบศร์อินเตอร์โฮเต็ล (PHUBESTH INTER HOTEL)</h2>
+  <div>108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 | โทร: 037231232</div>
+  <h3 style="margin:6px 0 0 0; text-decoration:underline;">บัตรทะเบียนผู้พัก (GUEST REGISTRATION CARD)</h3>
+  </div>
+  <div class="row">
+  <div><b>หมายเลขห้อง (Room No.):</b> <span style="font-size:16px;font-weight:bold;">${r.number}</span> (${r.type})</div>
+  <div><b>วันที่เข้าพัก (Date):</b> ${todayStr}</div>
+  </div>
+  <div class="row">
+  <div style="flex:1;display:flex;"><b>ชื่อ-สกุล (Name):</b> <span class="line">${r.guestName || ''}</span></div>
+  <div style="width:200px;display:flex;"><b>โทร (Phone):</b> <span class="line">${r.guestPhone || ''}</span></div>
+  </div>
+  <div class="row">
+  <div style="flex:1;display:flex;"><b>เลขบัตร ปชช./Passport:</b> <span class="line">${r.guestTax || ''}</span></div>
+  </div>
+  <div class="row">
+  <div><b>รูปแบบการพัก:</b> ${r.stayType === 'short' ? 'ชั่วคราว (3 ชม.)' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน')}</div>
+  <div><b>มัดจำกุญแจ:</b> ฿${r.keyDeposit || 0} บาท</div>
+  </div>
+  <div style="font-size:11px;color:#555;margin-top:14px;border:1px dashed #888;padding:8px;border-radius:6px;">
+  * โปรดเก็บรักษาทรัพย์สินมีค่าของท่าน ทางโรงแรมไม่รับผิดชอบกรณีสูญหายในห้องพัก<br>
+  * เวลาเช็คเอาท์ปกติไม่เกิน 12:00 น. หากเกินกำหนดคิดค่าบริการตามระเบียบโรงแรม
+  </div>
+  <div class="sign">
+  <div>
+  <div>ลงชื่อผู้เข้าพัก (Guest Signature)</div>
+  <div style="margin-top:40px;">(......................................................)</div>
+  </div>
+  <div>
+  <div>เจ้าหน้าที่ผู้รับลงทะเบียน (Front Desk)</div>
+  <div style="margin-top:40px;">(......................................................)</div>
+  </div>
+  </div>
+ </div>
+ <script>window.onload = function() { window.print(); }</script>
+ </body>
+ </html>
+ `);
+ win.document.close();
+}
+
+
+function saveCurrentRoomData() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ r.guestName = document.getElementById('m-guest-name').value.trim();
+ r.guestPhone = document.getElementById('m-guest-phone').value.trim();
+ r.guestTax = document.getElementById('m-guest-tax').value.trim();
+ r.stayType = document.getElementById('m-stay-type').value;
+ r.nights = Math.max(1, Number(document.getElementById('m-nights').value) || 1);
+ r.customRate = Number(document.getElementById('m-custom-rate').value) || 0;
+ if (document.getElementById('m-key-deposit')) r.keyDeposit = Number(document.getElementById('m-key-deposit').value) || 0;
+ if (document.getElementById('m-late-chk')) {
+ r.lateEnabled = document.getElementById('m-late-chk').checked;
+ r.lateFee = Number(document.getElementById('m-late-fee').value) || 299;
+ }
+
+ r.elecOld = Number(document.getElementById('m-elec-old').value) || 0;
+ r.elecNew = Number(document.getElementById('m-elec-new').value) || 0;
+ r.waterOld = Number(document.getElementById('m-water-old').value) || 0;
+ r.waterNew = Number(document.getElementById('m-water-new').value) || 0;
+ 
+ // ตรวจจับ VAT อัตโนมัติ: ถ้ากดติ๊ก หรือเลือกโหมด VAT หรือลูกค้ามีเลขประจำตัวผู้เสียภาษี ให้เปิด VAT ทันที
+ const vatChk = document.getElementById('m-vat-chk');
+ r.vatMode = document.getElementById('m-vat-mode')?.value || 'exclude';
+ 
+ // ยึดตามการติ๊กจริงของผู้ใช้ 100% ติ๊กออกคือปิด VAT ทันที
+ r.vatEnabled = vatChk ? vatChk.checked : false;
+
+
+ r.discount = Number(document.getElementById('m-discount')?.value) || 0;
+
+ saveDatabase();
+ updateReceiptPreview();
+ renderRooms();
+}
+
+
+
+
+function checkInRoom() {
+ if (activeRoomIndex === null) return;
+ saveCurrentRoomData();
+ const r = state.rooms[activeRoomIndex];
+ r.status = 'occupied';
+ r.light = true;
+ 
+ // บันทึกเวลาและ Timestamp ตัวเลขนับถอยหลัง 3 ชม.
+ const now = new Date();
+ r.checkInTimestamp = now.getTime();
+ r.checkInTime = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+ 
+ if (r.guestName && !state.customers.some(c => c.name === r.guestName)) {
+ state.customers.unshift({ name: r.guestName, phone: r.guestPhone, tax: r.guestTax, addr: 'ห้อง ' + r.number });
+ }
+ saveDatabase();
+ updateModalLightBtn();
+ renderRooms();
+ showToast('เช็คอินห้อง ' + r.number + ' สำเร็จ (' + r.checkInTime + ')');
+}
+
+function clearRoomToVacant() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ r.status = 'vacant';
+ r.light = false;
+ r.guestName = ''; r.guestPhone = ''; r.guestTax = '';
+ r.orders = []; r.discount = 0;
+ saveDatabase();
+ closeRoomModal();
+ showToast('คืนห้องว่างเรียบร้อย');
+}
+
+function renderModalMenuAndOrders() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ document.getElementById('m-menu-grid').innerHTML = state.menu.map((m, i) => `
+ <button onclick="addOrderFromMenu(${i})" class="btn btn-dark" style="justify-content:space-between;padding:10px;">
+ <span>${m.name}</span><b style="color:var(--amber);">+฿${m.price}</b>
+ </button>
+ `).join('');
+
+ const list = document.getElementById('m-orders-list');
+ if (!r.orders || r.orders.length === 0) {
+ list.innerHTML = '<div style="color:var(--muted);font-size:12px;">ยังไม่มีรายการอาหาร/บริการ</div>';
+ } else {
+ list.innerHTML = r.orders.map((o, i) => `
+ <div class="between" style="background:#090d16;padding:6px 10px;border-radius:8px;margin-bottom:4px;">
+ <span>${o.name} (฿${o.price} x ${o.qty})</span>
+ <div class="row">
+ <b style="color:var(--amber);">฿${o.price * o.qty}</b>
+ <button onclick="changeOrderQty(${i},-1)" class="btn btn-dark" style="padding:2px 8px;">-</button>
+ <button onclick="changeOrderQty(${i},1)" class="btn btn-dark" style="padding:2px 8px;">+</button>
+ </div>
+ </div>
+ `).join('');
+ }
+}
+
+function addOrderFromMenu(i) {
+ const m = state.menu[i];
+ const r = state.rooms[activeRoomIndex];
+ const ex = r.orders.find(o => o.name === m.name && o.price === m.price);
+ if (ex) ex.qty++;
+ else r.orders.push({ name: m.name, price: Number(m.price), qty: 1 });
+ saveDatabase();
+ renderModalMenuAndOrders();
+}
+
+function addCustomOrderToRoom() {
+ const name = document.getElementById('custom-item-name').value.trim();
+ const priceInput = document.getElementById('custom-item-price').value;
+ if (!name || priceInput === '') return;
+ const price = Number(priceInput);
+ state.rooms[activeRoomIndex].orders.push({ name, price, qty: 1 });
+ document.getElementById('custom-item-name').value = '';
+ document.getElementById('custom-item-price').value = '';
+ saveDatabase();
+ renderModalMenuAndOrders();
+}
+
+function changeOrderQty(i, d) {
+ const r = state.rooms[activeRoomIndex];
+ r.orders[i].qty += d;
+ if (r.orders[i].qty <= 0) r.orders.splice(i, 1);
+ saveDatabase();
+ renderModalMenuAndOrders();
+}
+
+
+ function calcRoomTotal(r) {
+ const roomCost = (Number(r.customRate) || 0) * (Number(r.nights) || 1);
+ const elecUnits = Math.max(0, (Number(r.elecNew) || 0) - (Number(r.elecOld) || 0));
+ const waterUnits = Math.max(0, (Number(r.waterNew) || 0) - (Number(r.waterOld) || 0));
+ const elecCost = elecUnits * (Number(state.rates.elec) || 8);
+ const waterCost = waterUnits * (Number(state.rates.water) || 18);
+ const foodCost = (r.orders || []).reduce((s, o) => s + (o.price * o.qty), 0);
+ const lateCost = (r.lateEnabled && Number(r.lateFee) > 0) ? Number(r.lateFee) : 0;
+ const subtotal = roomCost + elecCost + waterCost + foodCost + lateCost;
+ const afterDisc = Math.max(0, subtotal - (Number(r.discount) || 0));
+ let vat = 0, grand = afterDisc;
+ if (r.vatEnabled) {
+ if (r.vatMode === 'include') { vat = afterDisc * 7 / 107; grand = afterDisc; }
+ else { vat = afterDisc * 0.07; grand = afterDisc + vat; }
+ }
+ return { roomCost, elecUnits, elecCost, waterUnits, waterCost, foodCost, lateCost, subtotal, vat, grand: Number(grand.toFixed(2)) };
+}
+
+function toggleLateCheckout() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ r.lateEnabled = document.getElementById('m-late-chk').checked;
+ r.lateFee = Number(document.getElementById('m-late-fee').value) || 299;
+ saveCurrentRoomData();
+}
+
+
+function crc16ccitt(str) {
+ let crc = 0xFFFF;
+ for (let i = 0; i < str.length; i++) {
+ crc ^= str.charCodeAt(i) << 8;
+ for (let j = 0; j < 8; j++) {
+ if ((crc & 0x8000) !== 0) crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+ else crc = (crc << 1) & 0xFFFF;
+ }
+ }
+ return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function buildPromptPayPayload(id, amount) {
+ const clean = (id || '').replace(/[^0-9]/g, '');
+ const target = clean.length >= 13 ? '0213' + clean.substring(0, 13) : '0113' + (clean.length === 10 ? '0066' + clean.substring(1) : '0066847177566');
+ const merch = '0016A000000677010111' + target;
+ let p = '00020101021229' + String(merch.length).padStart(2, '0') + merch + '5802TH5303764';
+ if (amount && amount > 0) {
+ const a = Number(amount).toFixed(2);
+ p += '54' + String(a.length).padStart(2, '0') + a;
+ }
+ p += '6304';
+ return p + crc16ccitt(p);
+}
+
+function setPaymentMode(mode) {
+ state.payment.mode = mode;
+ document.getElementById('box-cfg-pp').classList.toggle('hidden', mode !== 'promptpay');
+ document.getElementById('box-cfg-bank').classList.toggle('hidden', mode !== 'bank');
+ document.getElementById('pm-promptpay').className = mode === 'promptpay' ? 'btn btn-amber' : 'btn btn-dark';
+ document.getElementById('pm-bank').className = mode === 'bank' ? 'btn btn-amber' : 'btn btn-dark';
+ saveDatabase();
+ updateReceiptPreview();
+}
+
+function updatePaymentConfigInline() {
+ state.payment.promptPayId = document.getElementById('cfg-pp-id').value.trim();
+ state.payment.promptPayName = document.getElementById('cfg-pp-name').value.trim();
+ state.payment.bankName = document.getElementById('cfg-bank-name').value;
+ state.payment.bankAcc = document.getElementById('cfg-bank-acc').value.trim();
+ saveDatabase();
+ updateReceiptPreview();
+}
+
+function uploadBankQrImage(e) {
+ const f = e.target.files[0];
+ if (!f) return;
+ const reader = new FileReader();
+ reader.onload = ev => {
+ state.payment.bankQrImage = ev.target.result;
+ saveDatabase();
+ updateReceiptPreview();
+ showToast('แนบรูป QR ธนาคารสำเร็จ');
+ };
+ reader.readAsDataURL(f);
+}
+
+function renderQrElement(boxId, size, grand) {
+ const box = document.getElementById(boxId);
+ box.innerHTML = '';
+ if (state.payment.mode === 'bank' && state.payment.bankQrImage) {
+ const img = document.createElement('img');
+ img.src = state.payment.bankQrImage;
+ img.style.width = size + 'px';
+ img.style.height = size + 'px';
+ img.style.objectFit = 'contain';
+ box.appendChild(img);
+ } else {
+ const payload = buildPromptPayPayload(state.payment.promptPayId || '0847177566', grand);
+ const img = document.createElement('img');
+ img.crossOrigin = 'anonymous';
+ img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(payload);
+ img.style.width = size + 'px';
+ img.style.height = size + 'px';
+ box.appendChild(img);
+ }
+}
+
+function updateReceiptPreview() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const calc = calcRoomTotal(r);
+
+ document.getElementById('rcp-title-box').textContent = r.vatEnabled ? 'ใบเสร็จรับเงิน / ใบกำกับภาษี' : 'ใบเสร็จรับเงิน';
+ document.getElementById('rcp-room').textContent = r.number + ' (' + r.type + ')';
+ document.getElementById('rcp-date').textContent = new Date().toISOString().slice(0, 10);
+ document.getElementById('rcp-guest').textContent = r.guestName || 'ลูกค้าทั่วไป';
+
+ const taxRow = document.getElementById('rcp-guest-tax-row');
+ if (r.guestTax) { taxRow.style.display = 'block'; document.getElementById('rcp-guest-tax').textContent = r.guestTax; }
+ else taxRow.style.display = 'none';
+
+ const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
+ let html = `<div class="between" style="margin-bottom:4px;"><span>ค่าห้องพัก (${stayLabel} x${r.nights})</span><b>฿${calc.roomCost.toFixed(0)}</b></div>`;
+ if (calc.elecCost > 0) html += `<div class="between" style="margin-bottom:4px;"><span>ค่าไฟ (${calc.elecUnits} หน่วย)</span><b>฿${calc.elecCost.toFixed(0)}</b></div>`;
+ if (calc.waterCost > 0) html += `<div class="between" style="margin-bottom:4px;"><span>ค่าน้ำ (${calc.waterUnits} หน่วย)</span><b>฿${calc.waterCost.toFixed(0)}</b></div>`;
+ if (calc.lateCost > 0) html += `<div class="between" style="margin-bottom:4px;color:#b91c1c;"><span>ค่าเลทเช็คเอาท์ (เกินเที่ยง)</span><b>฿${calc.lateCost.toFixed(0)}</b></div>`;
+ (r.orders || []).forEach(o => {
+
+ html += `<div class="between" style="margin-bottom:4px;"><span>${o.name} (x${o.qty})</span><b>฿${(o.price * o.qty).toFixed(0)}</b></div>`;
+ });
+ document.getElementById('rcp-items').innerHTML = html;
+
+ const preVat = (r.vatEnabled && r.vatMode === 'include') ? (calc.grand - calc.vat) : calc.subtotal;
+ document.getElementById('rcp-subtotal').textContent = '฿' + preVat.toFixed(2);
+
+ document.getElementById('rcp-disc-row').style.display = r.discount > 0 ? 'flex' : 'none';
+ document.getElementById('rcp-disc').textContent = '-฿' + Number(r.discount).toFixed(2);
+ document.getElementById('rcp-vat-row').style.display = r.vatEnabled ? 'flex' : 'none';
+ document.getElementById('rcp-vat').textContent = '฿' + calc.vat.toFixed(2);
+ document.getElementById('rcp-grand').textContent = '฿' + calc.grand.toFixed(2);
+ document.getElementById('rcp-qr-amount').textContent = 'ยอดโอน: ฿' + calc.grand.toFixed(2);
+
+ if (state.payment.mode === 'bank') {
+ document.getElementById('rcp-qr-title').textContent = 'สแกนโอนเข้าบัญชีธนาคาร';
+ document.getElementById('rcp-qr-acc').textContent = `${state.payment.bankName} ${state.payment.bankAcc || ''} (${state.payment.promptPayName || ''})`;
+ } else {
+ document.getElementById('rcp-qr-title').textContent = 'สแกนชำระเงินผ่าน Thai QR พร้อมเพย์';
+ document.getElementById('rcp-qr-acc').textContent = `${state.payment.promptPayName || ''} (${state.payment.promptPayId || ''})`;
+ }
+ renderQrElement('rcp-qr-box', 140, calc.grand);
+}
+
+function openBigQrModal() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const calc = calcRoomTotal(r);
+ document.getElementById('big-qr-amt').textContent = 'ยอดโอน ฿' + calc.grand.toFixed(2);
+ document.getElementById('big-qr-acc').textContent = state.payment.mode === 'bank'
+ ? `${state.payment.bankName} เลขบัญชี: ${state.payment.bankAcc || '-'}`
+ : `พร้อมเพย์: ${state.payment.promptPayId} (${state.payment.promptPayName})`;
+ renderQrElement('big-qr-box', 200, calc.grand);
+ document.getElementById('big-qr-modal').classList.remove('hidden');
+}
+
+function saveReceiptImagePure() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const calc = calcRoomTotal(r);
+ const canvas = document.createElement('canvas');
+ const w = 680;
+ const itemLines = 1 + (calc.elecCost > 0 ? 1 : 0) + (calc.waterCost > 0 ? 1 : 0) + (r.orders ? r.orders.length : 0);
+ const h = 760 + itemLines * 40;
+ canvas.width = w;
+ canvas.height = h;
+ const ctx = canvas.getContext('2d');
+
+ ctx.fillStyle = '#ffffff';
+ ctx.fillRect(0, 0, w, h);
+ ctx.fillStyle = '#000000';
+ ctx.textAlign = 'center';
+
+ let y = 55;
+ ctx.font = 'bold 36px Tahoma, sans-serif';
+ ctx.fillText('ภูเบศร์อินเตอร์โฮเต็ล', w / 2, y);
+ y += 30;
+ ctx.font = 'bold 20px Tahoma, sans-serif';
+ ctx.fillText('PHUBESTH INTER HOTEL', w / 2, y);
+ y += 28;
+ ctx.font = '18px Tahoma, sans-serif';
+ ctx.fillText('108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 | โทร: 037231232', w / 2, y);
+ y += 35;
+ ctx.font = 'bold 22px Tahoma, sans-serif';
+ ctx.fillText(r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี ]' : '[ ใบเสร็จรับเงิน ]', w / 2, y);
+
+ y += 25;
+ ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(w - 40, y); ctx.lineWidth = 2; ctx.stroke();
+
+ y += 35;
+ ctx.textAlign = 'left';
+ ctx.font = 'bold 22px Tahoma, sans-serif';
+ ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 40, y);
+ ctx.textAlign = 'right';
+ ctx.font = '20px Tahoma, sans-serif';
+ ctx.fillText('วันที่: ' + new Date().toISOString().slice(0, 10), w - 40, y);
+
+ y += 32;
+ ctx.textAlign = 'left';
+ ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 40, y);
+
+ y += 22;
+ ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(w - 40, y); ctx.lineWidth = 1; ctx.stroke();
+
+ const drawRow = (label, val, bold = false) => {
+ y += 38;
+ ctx.font = (bold ? 'bold ' : '') + '22px Tahoma, sans-serif';
+ ctx.textAlign = 'left'; ctx.fillText(label, 40, y);
+ ctx.textAlign = 'right'; ctx.fillText(val, w - 40, y);
+ };
+
+ const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
+ drawRow(`ค่าห้องพัก (${stayLabel} x${r.nights})`, '฿' + calc.roomCost.toFixed(0));
+ if (calc.elecCost > 0) drawRow(`ค่าไฟ (${calc.elecUnits} หน่วย)`, '฿' + calc.elecCost.toFixed(0));
+ if (calc.waterCost > 0) drawRow(`ค่าน้ำ (${calc.waterUnits} หน่วย)`, '฿' + calc.waterCost.toFixed(0));
+ (r.orders || []).forEach(o => drawRow(`${o.name} (x${o.qty})`, '฿' + (o.price * o.qty).toFixed(0)));
+
+ y += 22;
+ ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(w - 40, y); ctx.lineWidth = 2; ctx.stroke();
+
+ if (r.discount > 0) drawRow('หักส่วนลดพิเศษ', '-฿' + Number(r.discount).toFixed(2));
+ if (r.vatEnabled) drawRow('ภาษีมูลค่าเพิ่ม (VAT 7%)', '฿' + calc.vat.toFixed(2));
+ drawRow('ยอดสุทธิ (GRAND TOTAL)', '฿' + calc.grand.toFixed(2), true);
+
+ y += 45;
+ ctx.textAlign = 'center';
+ ctx.font = 'bold 22px Tahoma, sans-serif';
+ ctx.fillText('ยอดโอนชำระ: ฿' + calc.grand.toFixed(2), w / 2, y);
+ y += 30;
+ ctx.font = '19px Tahoma, sans-serif';
+ ctx.fillText(state.payment.mode === 'bank'
+ ? `${state.payment.bankName} เลขบัญชี: ${state.payment.bankAcc || '-'}`
+ : `พร้อมเพย์: ${state.payment.promptPayId} (${state.payment.promptPayName})`, w / 2, y);
+
+ const qrImg = document.querySelector('#rcp-qr-box img');
+ const finishDownload = () => {
+ const a = document.createElement('a');
+ a.download = 'Receipt_Room_' + r.number + '.png';
+ a.href = canvas.toDataURL('image/png');
+ a.click();
+ showToast('บันทึกรูปใบเสร็จคมชัดเรียบร้อย');
+ };
+
+ if (qrImg && qrImg.complete) {
+ try { ctx.drawImage(qrImg, (w - 220) / 2, y + 20, 220, 220); } catch(e) {}
+ finishDownload();
+ } else {
+ finishDownload();
+ }
+}
+
+function printReceiptPaper() {
+ kickDrawerOnly();
+ window.print();
+}
+
+function kickDrawerOnly() {
+ showToast('ส่งสัญญาณเปิดเก๊ะเก็บเงินแล้ว');
+}
+
+
+ function completeCheckOutAndPay() {
+ if (activeRoomIndex === null) return;
+ const r = state.rooms[activeRoomIndex];
+ const calc = calcRoomTotal(r);
+ const now = new Date();
+ const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+ const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+
+ // แจ้งเตือนคืนเงินมัดจำกุญแจให้ลูกค้าก่อนคืนห้อง
+ if (r.keyDeposit > 0) {
+ alert(`🔑 แจ้งเตือนฟร้อนท์:
+
+ห้อง ${r.number} มีเงินมัดจำกุญแจค้างอยู่ ฿${r.keyDeposit}
+
+กรุณารับกุญแจคืนและคืนเงินมัดจำให้ลูกค้าครับ`);
+ }
+
+ // 1. บันทึกบัญชีรายรับ-รายจ่าย
+ if (calc.grand > 0) {
+ state.transactions.unshift({
+ type: 'income',
+ category: '🏨 รายรับค่าห้องพัก',
+ title: `ค่าห้อง ${r.number} (${r.guestName || 'ลูกค้าทั่วไป'})`,
+ amount: calc.grand,
+ date: todayStr
+ });
+ }
+ // 2. สะสมประวัติการเข้าพักลงในโปรไฟล์ลูกค้า (Stay History CRM)
+ // ดักจับ: ถ้าเป็น No Name, ไม่ระบุชื่อ, หรือลูกค้าทั่วไป จะไม่นำมาสร้าง Profile ให้รกหน้าลูกค้า
+ const gName = (r.guestName || '').trim().toLowerCase();
+ const isAnonymous = !gName || gName === 'no name' || gName === 'ลูกค้าทั่วไป' || gName === '-';
+
+ if (!isAnonymous) {
+ let cust = state.customers.find(c => c.name.trim().toLowerCase() === gName);
+ if (!cust) {
+ cust = { name: r.guestName.trim(), phone: r.guestPhone || '', tax: r.guestTax || '', addr: 'ห้อง ' + r.number, stayHistory: [] };
+ state.customers.unshift(cust);
+ }
+ if (!Array.isArray(cust.stayHistory)) cust.stayHistory = [];
+ cust.stayHistory.unshift({
+ date: todayStr,
+ room: r.number,
+ stayType: r.stayType,
+ nights: r.nights || 1,
+ amount: calc.grand
+ });
+ }
+
+ // 3. จัดเก็บสำเนาใบเสร็จรับเงินฉบับสมบูรณ์ลงในคลังประวัติ (Receipt Archive รวมเลทเช็คเอาท์)
+ if (!Array.isArray(state.receiptsArchive)) state.receiptsArchive = [];
+ const receiptSnapshot = {
+ receiptId: 'RCP-' + Date.now().toString().slice(-7),
+ roomNumber: r.number,
+ roomType: r.type,
+ guestName: r.guestName || 'ลูกค้าทั่วไป',
+ guestPhone: r.guestPhone || '',
+ guestTax: r.guestTax || '',
+ date: todayStr,
+ time: timeStr,
+ stayType: r.stayType,
+ nights: r.nights || 1,
+ calc: JSON.parse(JSON.stringify(calc)), // บันทึกยอดเงินรวมทุกอย่าง (ทั้งค่าห้อง, อาหาร, และค่าเลทเช็คเอาท์)
+ orders: JSON.parse(JSON.stringify(r.orders || [])),
+ discount: r.discount || 0,
+ vatEnabled: !!r.vatEnabled,
+ vatMode: r.vatMode || 'exclude'
+ };
+ state.receiptsArchive.unshift(receiptSnapshot);
+ if (state.receiptsArchive.length > 300) state.receiptsArchive = state.receiptsArchive.slice(0, 300);
+
+ kickDrawerOnly();
+
+ // 4. ส่งห้องไปรอแม่บ้านทำความสะอาด + รีเซ็ตค่าเลทเช็คเอาท์
+ r.status = 'cleaning';
+ r.light = false;
+ r.dirtySince = timeStr;
+ r.guestName = ''; r.guestPhone = ''; r.guestTax = '';
+ r.orders = []; r.discount = 0; r.checkInTime = ''; r.checkInTimestamp = 0; r.keyDeposit = 0;
+ r.lateEnabled = false; r.lateFee = 299;
+ 
+ saveDatabase();
+ closeRoomModal();
+ renderAll();
+ showToast('เช็คเอาท์สำเร็จ • จัดเก็บสำเนาใบเสร็จเรียบร้อย');
+}
+
+// ฟังก์ชันแสดงรายการประวัติใบเสร็จย้อนหลัง
+function renderReceiptsArchive() {
+ const list = state.receiptsArchive || [];
+ const cntBadge = document.getElementById('rcp-total-cnt');
+ if (cntBadge) cntBadge.textContent = list.length;
+
+ const box = document.getElementById('receipts-archive-list');
+ if (!box) return;
+
+ const q = (document.getElementById('rcp-search-inp')?.value || '').trim().toLowerCase();
+ const filtered = list.filter(r => !q || (r.receiptId||'').toLowerCase().includes(q) || (r.roomNumber||'').includes(q) || (r.guestName||'').toLowerCase().includes(q) || (r.date||'').includes(q));
+
+ if (filtered.length === 0) {
+ box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px;">ไม่พบประวัติใบเสร็จรับเงิน</div>';
+ return;
+ }
+
+ box.innerHTML = filtered.map((r, idx) => `
+ <div class="between" style="background:#030712;border:1px solid #1f2937;border-radius:12px;padding:12px 16px;">
+ <div>
+  <div class="row">
+  <b style="font-size:14px;color:#c084fc;">📄 ${r.receiptId}</b>
+  <span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:2px 7px;border-radius:6px;font-weight:800;">ห้อง ${r.roomNumber} (${r.roomType})</span>
+  <span style="font-size:11px;color:#cbd5e1;">👤 ${r.guestName}</span>
+  </div>
+  <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">
+  📅 วันที่: <b>${r.date} ${r.time||''}</b> | ยอดสุทธิ: <b style="color:#34d399;font-size:13px;">฿${(r.calc?.grand || 0).toLocaleString()}</b> ${r.vatEnabled ? '<span style="color:#fde68a;">(มี VAT)</span>' : ''}
+  </div>
+ </div>
+ <div class="row">
+  <button onclick="reprintArchivedReceipt(${idx})" class="btn btn-amber" style="padding:6px 12px;font-size:11px;">🖨️ พิมพ์ซ้ำ / ดูบิล</button>
+  <button onclick="if(confirm('ลบประวัติใบเสร็จนี้?')){state.receiptsArchive.splice(${idx},1);saveDatabase();renderReceiptsArchive();}" class="btn btn-dark" style="padding:6px 8px;font-size:11px;color:#fda4af;">🗑️</button>
+ </div>
+ </div>
+ `).join('');
+}
+
+// ฟังก์ชันเปิดดูบิลย้อนหลัง (ใบเสร็จขนาดใหญ่ คมชัด 100% กึ่งกลางจอ)
+function reprintArchivedReceipt(idx) {
+ const r = (state.receiptsArchive || [])[idx];
+ if (!r) return;
+ const calc = r.calc || {};
+ const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน');
+
+ let itemsHtml = `<div class="row" style="margin-bottom:6px;"><span>ค่าห้องพัก (${stayLabel} x${r.nights})</span><b>฿${(calc.roomCost||0).toFixed(0)}</b></div>`;
+ if (calc.elecCost > 0) itemsHtml += `<div class="row" style="margin-bottom:6px;"><span>ค่าไฟ (${calc.elecUnits} หน่วย)</span><b>฿${calc.elecCost.toFixed(0)}</b></div>`;
+ if (calc.waterCost > 0) itemsHtml += `<div class="row" style="margin-bottom:6px;"><span>ค่าน้ำ (${calc.waterUnits} หน่วย)</span><b>฿${calc.waterCost.toFixed(0)}</b></div>`;
+ if (calc.lateCost > 0) itemsHtml += `<div class="row" style="margin-bottom:6px;color:#dc2626;"><span>ค่าเลทเช็คเอาท์ (เกินเที่ยง)</span><b>฿${calc.lateCost.toFixed(0)}</b></div>`;
+ (r.orders || []).forEach(o => {
+ itemsHtml += `<div class="row" style="margin-bottom:6px;"><span>${o.name} (x${o.qty})</span><b>฿${(o.price * o.qty).toFixed(0)}</b></div>`;
+ });
+
+ const hotelNameTh = state.hotelInfo?.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล';
+ const hotelNameEn = state.hotelInfo?.nameEn || 'PHUBESTH INTER HOTEL';
+ const hotelAddress = state.hotelInfo?.address || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120';
+ const hotelPhone = state.hotelInfo?.phone || '037231232';
+
+ const win = window.open('', '_blank');
+ win.document.write(`
+ <!DOCTYPE html>
+ <html lang="th">
+ <head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+ <title>ใบเสร็จรับเงิน ${r.receiptId} - ห้อง ${r.roomNumber}</title>
+ <style>
+  * { box-sizing: border-box; }
+  body {
+  font-family: -apple-system, BlinkMacSystemFont, "Sarabun", Tahoma, sans-serif;
+  background: #0b0f19;
+  margin: 0;
+  padding: 24px 12px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  }
+  .action-bar {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  }
+  .action-btn {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  }
+  .btn-print { background: #f59e0b; color: #000; }
+  .btn-close { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+  
+  /* กล่องใบเสร็จขยายใหญ่ ชัดเจนเต็มตา */
+  .receipt-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 18px;
+  padding: 28px 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+  font-size: 15px;
+  line-height: 1.6;
+  }
+  .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 12px; }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  
+  @media print {
+  body { background: #fff; padding: 0; }
+  .action-bar { display: none !important; }
+  .receipt-card {
+  border: none;
+  box-shadow: none;
+  max-width: 100%;
+  padding: 10px;
+  font-size: 13px;
+  }
+  }
+ </style>
+ </head>
+ <body>
+ <div class="action-bar">
+  <button onclick="window.print()" class="action-btn btn-print">🖨️ สั่งพิมพ์ใบเสร็จ</button>
+  <button onclick="window.close()" class="action-btn btn-close">✕ ปิดหน้าต่าง</button>
+ </div>
+
+ <div class="receipt-card" id="receipt-box">
+  <div class="hdr">
+  <div style="font-size:24px; font-weight:900; color:#000;">${hotelNameTh}</div>
+  <div style="font-size:13px; font-weight:800; letter-spacing:0.5px; color:#333;">${hotelNameEn}</div>
+  <div style="font-size:12px; color:#555; margin-top:3px;">${hotelAddress} | โทร: ${hotelPhone}</div>
+  <div style="margin-top:8px; display:inline-block; border:1.8px solid #000; border-radius:6px; padding:3px 14px; font-size:13.5px; font-weight:900;">
+  ${r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี (สำเนา) ]' : '[ ใบเสร็จรับเงิน (สำเนา) ]'}
+  </div>
+  <div style="font-size:12px; margin-top:4px; color:#666;">เลขที่บิล: <b>${r.receiptId}</b></div>
+  </div>
+
+  <div style="border-bottom:1.5px dashed #444; padding-bottom:10px; margin-bottom:12px; font-size:14px;">
+  <div class="row">
+  <span><b>ห้องพัก:</b> <b style="font-size:17px;">${r.roomNumber}</b> (${r.roomType})</span>
+  <span><b>วันที่:</b> ${r.date} ${r.time ? '• ' + r.time : ''}</span>
+  </div>
+  <div style="margin-top:4px;"><b>ชื่อลูกค้า:</b> ${r.guestName}</div>
+  ${r.guestTax ? `<div style="font-size:12.5px; color:#444;"><b>เลขประจำตัวผู้เสียภาษี:</b> ${r.guestTax}</div>` : ''}
+  </div>
+
+  <div style="min-height:70px; font-size:14.5px;">
+  ${itemsHtml}
+  </div>
+
+  <div style="border-top:2px solid #000; margin-top:12px; padding-top:8px; font-size:14.5px;">
+    <div class="row"><span>รวมเป็นเงิน:</span><span>฿${((r.vatEnabled && r.vatMode === 'include') ? (calc.grand - (calc.vat || 0)) : (calc.subtotal || 0)).toFixed(2)}</span></div>
+ 
+  ${r.discount > 0 ? `<div class="row" style="color:#059669;"><span>ส่วนลดพิเศษ:</span><span>-฿${Number(r.discount).toFixed(2)}</span></div>` : ''}
+  ${r.vatEnabled ? `<div class="row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span>฿${(calc.vat||0).toFixed(2)}</span></div>` : ''}
+  <div class="row" style="font-size:20px; font-weight:900; border-top:1.5px dashed #000; margin-top:6px; padding-top:8px; color:#000;">
+  <span>ยอดสุทธิ (TOTAL):</span>
+  <span>฿${(calc.grand||0).toFixed(2)}</span>
+  </div>
+  </div>
+
+  <div style="text-align:center; margin-top:20px; padding-top:12px; border-top:1px dashed #777; font-size:12px; color:#555;">
+  🙏 ขอบคุณที่ไว้วางใจใช้บริการ ${hotelNameTh}<br>
+  <span style="font-size:11px; color:#888;">(เอกสารสำเนาประวัติย้อนหลัง • ระบบ Smart PMS)</span>
+  </div>
+ </div>
+ </body>
+ </html>
+ `);
+ win.document.close();
+}
+
+
+ 
+
+ 
+
+
+
+function setTxType(t) {
+ currentTxType = t;
+ document.getElementById('btn-tx-exp').style.background = t === 'expense' ? '#e11d48' : '#1e293b';
+ document.getElementById('btn-tx-inc').style.background = t === 'income' ? '#059669' : '#1e293b';
+ renderCategorySelect();
+}
+
+function renderCategorySelect() {
+ const list = currentTxType === 'expense' ? state.expenseCategories : state.incomeCategories;
+ document.getElementById('tx-cat').innerHTML = list.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function addCustomCategory() {
+ const name = prompt('พิมพ์ชื่อหมวดหมู่ที่ต้องการเพิ่มใหม่:');
+ if (!name) return;
+ if (currentTxType === 'expense') state.expenseCategories.push(name.trim());
+ else state.incomeCategories.push(name.trim());
+ saveDatabase();
+ renderCategorySelect();
+ showToast('เพิ่มหมวดหมู่ใหม่แล้ว');
+}
+
+function saveTransaction() {
+ const cat = document.getElementById('tx-cat').value;
+ const title = document.getElementById('tx-title').value.trim() || cat;
+ const amount = Number(document.getElementById('tx-amount').value) || 0;
+ if (amount <= 0) return alert('กรุณากรอกจำนวนเงิน');
+ 
+ let targetDate = document.getElementById('fin-filter-date').value;
+ if(!targetDate) targetDate = new Date().toISOString().slice(0, 10);
+
+ state.transactions.unshift({ type: currentTxType, category: cat, title, amount, date: targetDate });
+ document.getElementById('tx-title').value = '';
+ document.getElementById('tx-amount').value = '';
+ saveDatabase();
+ renderFinance();
+ showToast('บันทึกรายการเรียบร้อย');
+}
+
+function resetFinanceFilter() {
+ const today = new Date().toISOString().slice(0, 10);
+ document.getElementById('fin-filter-date').value = today;
+ document.getElementById('fin-filter-month').value = today.slice(0, 7);
+ renderFinance();
+}
+
+function renderFinance() {
+ renderCategorySelect();
+ 
+ const realToday = new Date().toISOString().slice(0, 10);
+ let dateInput = document.getElementById('fin-filter-date');
+ let monthInput = document.getElementById('fin-filter-month');
+ 
+ if (!dateInput.value) dateInput.value = realToday;
+ if (!monthInput.value) monthInput.value = realToday.slice(0, 7);
+
+ const selDate = dateInput.value;
+ const selMonth = monthInput.value;
+
+ let dInc = 0, dExp = 0, mNet = 0;
+ let filteredTx = [];
+
+ state.transactions.forEach(t => {
+ if (t.date === selDate) { 
+ if (t.type === 'income') dInc += t.amount; else dExp += t.amount; 
+ }
+ if ((t.date || '').startsWith(selMonth)) { 
+ mNet += (t.type === 'income' ? t.amount : -t.amount); 
+ filteredTx.push(t);
+ }
+ });
+
+ document.getElementById('lbl-day-inc').textContent = (selDate === realToday) ? 'รายรับวันนี้' : `รายรับ (${selDate})`;
+ document.getElementById('lbl-day-exp').textContent = (selDate === realToday) ? 'รายจ่ายวันนี้' : `รายจ่าย (${selDate})`;
+ document.getElementById('lbl-day-net').textContent = (selDate === realToday) ? 'คงเหลือสุทธิวันนี้' : `สุทธิ (${selDate})`;
+ document.getElementById('lbl-month-net').textContent = (selMonth === realToday.slice(0,7)) ? 'กำไรเดือนนี้ (ผจก./เจ้าของ)' : `กำไร (${selMonth})`;
+
+ document.getElementById('fin-day-inc').textContent = '฿' + dInc.toLocaleString();
+ document.getElementById('fin-day-exp').textContent = '฿' + dExp.toLocaleString();
+ document.getElementById('fin-day-net').textContent = '฿' + (dInc - dExp).toLocaleString();
+ document.getElementById('fin-month-net').textContent = currentRole === 'front' ? '🔒 ล็อกสิทธิ์' : '฿' + mNet.toLocaleString();
+
+ document.getElementById('tx-list').innerHTML = filteredTx.map((t) => {
+ const realIdx = state.transactions.indexOf(t);
+ return `
+ <div class="between" style="background:#030712;padding:8px 12px;border-radius:10px;margin-bottom:6px;border:1px solid var(--border);">
+ <div>
+ <b style="color:${t.type==='income'?'#34d399':'#fda4af'};">[${t.category}]</b> ${t.title}
+ <span style="font-size:11px;color:var(--muted);margin-left:6px;">${t.date}</span>
+ </div>
+ <div class="row">
+ <b style="color:${t.type==='income'?'#34d399':'#fda4af'};">${t.type==='income'?'+':'-'}฿${t.amount.toLocaleString()}</b>
+ ${currentRole !== 'front' ? `<button onclick="state.transactions.splice(${realIdx},1);saveDatabase();renderFinance();" class="btn btn-rose" style="padding:2px 6px;">🗑️</button>` : ''}
+ </div>
+ </div>
+ `;
+ }).join('') || '<div style="color:var(--muted); padding: 10px;">ยังไม่มีรายการในเดือนนี้</div>';
+}
+
+function addCustomerManual() {
+ const name = document.getElementById('new-c-name').value.trim();
+ const phone = document.getElementById('new-c-phone').value.trim();
+ const tax = document.getElementById('new-c-tax').value.trim();
+ const addr = document.getElementById('new-c-addr').value.trim();
+ if (!name) return alert('กรุณากรอกชื่อลูกค้า');
+ state.customers.unshift({ name, phone, tax, addr });
+ document.getElementById('new-c-name').value = '';
+ document.getElementById('new-c-phone').value = '';
+ document.getElementById('new-c-tax').value = '';
+ document.getElementById('new-c-addr').value = '';
+ saveDatabase();
+ renderCustomers();
+ showToast('เพิ่มรายชื่อลูกค้าแล้ว');
+}
+
+function renderCustomers() {
+ const box = document.getElementById('cust-list');
+ if (!box) return;
+
+ box.style.maxHeight = '480px';
+ box.style.overflowY = 'auto';
+ box.style.paddingRight = '4px';
+
+ const validCustomers = (state.customers || []).filter(c => {
+ const n = (c.name || '').trim().toLowerCase();
+ return n && n !== 'no name' && n !== 'ลูกค้าทั่วไป';
+ });
+
+ document.getElementById('cust-total-cnt').textContent = validCustomers.length;
+ const q = (document.getElementById('cust-search-inp')?.value || '').trim().toLowerCase();
+ 
+ const filtered = validCustomers.filter(c => 
+ !q || (c.name||'').toLowerCase().includes(q) || (c.phone||'').includes(q) || (c.tax||'').toLowerCase().includes(q)
+ );
+
+ if (filtered.length === 0) {
+ box.innerHTML = '<div style="color:var(--muted); padding: 20px; text-align: center;">ไม่พบรายชื่อลูกค้า</div>';
+ return;
+ }
+
+ box.innerHTML = filtered.map((c) => {
+ const realIdx = state.customers.indexOf(c);
+ const stays = c.stayHistory || [];
+ const totalStays = stays.length;
+ const totalNights = stays.reduce((sum, s) => sum + (Number(s.nights) || 1), 0);
+ const totalSpend = stays.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+ const isVip = totalStays >= 5 || totalSpend >= 5000;
+
+ return `
+ <div class="between" style="background:#030712;padding:8px 12px;border-radius:10px;margin-bottom:6px;border:1px solid ${isVip ? 'rgba(245,158,11,0.6)' : '#1f2937'};">
+ <div style="min-width:0;flex:1;">
+  <div class="row" style="gap:6px;">
+  <b style="font-size:13.5px;color:#fff;">👤 ${c.name}</b>
+  ${isVip ? `<span style="font-size:9.5px;background:#78350f;color:#fde68a;padding:1px 5px;border-radius:4px;font-weight:900;">⭐ VIP</span>` : ''}
+  <span style="font-size:9.5px;background:#1e293b;color:#94a3b8;padding:1px 5px;border-radius:4px;">${totalStays} ครั้ง (${totalNights} คืน)</span>
+  <span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">สะสม ฿${totalSpend.toLocaleString()}</span>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+  📞 ${c.phone || '-'} ${c.tax ? '| 📝 ' + c.tax : ''} ${c.addr ? '| 🏠 ' + c.addr : ''}
+  </div>
+ </div>
+ <div class="row" style="gap:4px;margin-left:8px;">
+  <button onclick="viewCustomerHistory(${realIdx})" class="btn btn-amber" style="padding:4px 8px;font-size:10.5px;">📜 ประวัติ</button>
+  <button onclick="editCustomer(${realIdx})" class="btn btn-sky" style="padding:4px 8px;font-size:10.5px;">✏️</button>
+  <button onclick="deleteCustomerSecure(${realIdx})" class="btn btn-rose" style="padding:4px 7px;font-size:10.5px;">🗑️</button>
+ </div>
+ </div>
+ `;
+ }).join('');
+}
+
+// ระบบความปลอดภัย: ยืนยัน 2 ชั้น + ตรวจสอบรหัส PIN ก่อนลบข้อมูลลูกค้า
+function deleteCustomerSecure(idx) {
+ const c = state.customers[idx];
+ if (!c) return;
+
+ // ชั้นที่ 1: ตรวจสอบความตั้งใจ
+ if (!confirm(`⚠️ คำเตือนความปลอดภัย:
+
+คุณต้องการลบประวัติของ "${c.name}" ใช่หรือไม่?
+
+(ข้อมูลประวัติการเข้าพักและยอดสะสมจะหายถาวร)`)) {
+ return;
+ }
+
+ // ชั้นที่ 2: ให้กรอกรหัส PIN ผู้จัดการหรือเจ้าของ (เช่น 8888 หรือ 9999)
+ const pinInput = prompt(`🔒 กรุณากรอกรหัส PIN ผู้จัดการหรือเจ้าของ เพื่อยืนยันการลบ:`);
+ if (pinInput === null) return; // กดยกเลิก
+
+ const mgrPin = state.pins?.manager || '8888';
+ const ownPin = state.pins?.owner || '9999';
+
+ if (pinInput.trim() === mgrPin || pinInput.trim() === ownPin) {
+ state.customers.splice(idx, 1);
+ saveDatabase();
+ renderCustomers();
+ showToast(`ลบข้อมูลคุณ ${c.name} เรียบร้อยแล้ว`);
+ } else {
+ alert('❌ รหัส PIN ไม่ถูกต้อง! ยกเลิกการลบข้อมูล');
+ }
+}
+
+
+function viewCustomerHistory(idx) {
+ const c = state.customers[idx];
+ if (!c) return;
+ const stays = c.stayHistory || [];
+ if (stays.length === 0) {
+ return alert(`📜 ประวัติการเข้าพักของคุณ ${c.name}:
+
+
+
+ยังไม่มีรายการประวัติการเช็คเอาท์ที่บันทึกไว้ในระบบ`);
+ }
+ 
+ const text = stays.map((s, n) => `${n+1}. วันที่ ${s.date} | ห้อง ${s.room} (${s.stayType || 'ค้างคืน'}) x${s.nights || 1} คืน | ยอดเงิน: ฿${Number(s.amount).toLocaleString()}`).join('
+
+');
+ const totalSpend = stays.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+ alert(`📜 ประวัติการเข้าพักของ: ${c.name}
+
+ยอดใช้จ่ายสะสมทั้งหมด: ฿${totalSpend.toLocaleString()} บาท
+
+------------------------------------
+
+${text}`);
+}
+
+function editCustomer(idx) {
+ const c = state.customers[idx];
+ if (!c) return;
+ const newName = prompt('แก้ไขชื่อ-นามสกุล / บริษัท:', c.name);
+ if (newName === null) return;
+ const newPhone = prompt('แก้ไขเบอร์โทรศัพท์:', c.phone || '');
+ if (newPhone === null) return;
+ const newTax = prompt('แก้ไขเลขบัตรประชาชน / ผู้เสียภาษี:', c.tax || '');
+ if (newTax === null) return;
+ const newAddr = prompt('แก้ไขที่อยู่ / หมายเหตุ:', c.addr || '');
+ if (newAddr === null) return;
+
+ c.name = newName.trim() || c.name;
+ c.phone = newPhone.trim();
+ c.tax = newTax.trim();
+ c.addr = newAddr.trim();
+
+ saveDatabase();
+ renderCustomers();
+ showToast('อัปเดตข้อมูลลูกค้าสำเร็จ');
+}
+
+function applyHotelProfile() {
+ const info = state.hotelInfo || {
+ nameTh: 'ภูเบศร์อินเตอร์โฮเต็ล',
+ nameEn: 'PHUBESTH INTER HOTEL',
+ address: '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120',
+ phone: '037231232'
+ };
+ const nameEl = document.getElementById('hdr-hotel-name');
+ const descEl = document.getElementById('hdr-hotel-desc');
+ if (nameEl) nameEl.textContent = info.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล';
+ if (descEl) descEl.textContent = `${info.address || ''} | โทร: ${info.phone || ''}`;
+}
+
+function openSettingsModal() {
+ if (currentRole === 'front') return alert('เฉพาะผู้จัดการและเจ้าของโรงแรมเท่านั้น');
+ const info = state.hotelInfo || {
+ nameTh: 'ภูเบศร์อินเตอร์โฮเต็ล',
+ nameEn: 'PHUBESTH INTER HOTEL',
+ address: '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120',
+ phone: '037231232'
+ };
+ document.getElementById('set-hotel-name-th').value = info.nameTh || '';
+ document.getElementById('set-hotel-name-en').value = info.nameEn || '';
+ document.getElementById('set-hotel-address').value = info.address || '';
+ document.getElementById('set-hotel-phone').value = info.phone || '';
+
+ document.getElementById('set-pin-front').value = state.pins.front;
+ document.getElementById('set-pin-mgr').value = state.pins.manager;
+ document.getElementById('set-pin-own').value = state.pins.owner;
+ document.getElementById('set-rate-short').value = state.rates.short;
+ document.getElementById('set-rate-over').value = state.rates.overnight;
+ document.getElementById('set-rate-elec').value = state.rates.elec;
+ document.getElementById('set-rate-water').value = state.rates.water;
+ renderSettingsMenuAndRooms();
+ document.getElementById('settings-modal').classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+ document.getElementById('settings-modal').classList.add('hidden');
+}
+
+function renderSettingsMenuAndRooms() {
+ document.getElementById('set-menu-list').innerHTML = state.menu.map((m, i) => `
+ <div class="between" style="background:#090d16;padding:8px 12px;border-radius:10px;border: 1px solid #334155;">
+ <span style="font-weight:bold;">${m.name} <span style="color:var(--amber);">(฿${m.price})</span></span>
+ <button onclick="state.menu.splice(${i},1);saveDatabase();renderSettingsMenuAndRooms();" class="btn btn-rose" style="padding:4px 10px;">ลบ</button>
+ </div>
+ `).join('');
+
+ document.getElementById('set-rooms-list').innerHTML = state.rooms.map((r, i) => `
+ <div style="background:#090d16; padding: 10px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+ <div style="display: flex; gap: 6px; flex: 1; min-width: 280px; align-items: center; flex-wrap: wrap;">
+ <span style="font-size:11px; color:var(--muted);">ห้อง:</span>
+ <input type="text" value="${r.number}" onchange="state.rooms[${i}].number=this.value; saveDatabase(); renderRooms();" style="width: 55px; font-weight: 900; text-align: center; padding: 6px; background: var(--card); border: 1px solid #1f2937; color: #fff; border-radius: 6px;">
+ <select onchange="state.rooms[${i}].type=this.value; saveDatabase(); renderRooms();" style="width: 100px; padding: 6px; background: var(--card); border: 1px solid #1f2937; color: #6ee7b7; font-weight: bold; border-radius: 6px; font-size: 11px;">
+ <option value="Single Bed" ${r.type === 'Single Bed' ? 'selected' : ''}>Single Bed</option>
+ <option value="Double Bed" ${r.type === 'Double Bed' ? 'selected' : ''}>Double Bed</option>
+ <option value="Twin Bed" ${r.type === 'Twin Bed' ? 'selected' : ''}>Twin Bed</option>
+ <option value="VIP Suite" ${r.type === 'VIP Suite' ? 'selected' : ''}>VIP Suite</option>
+ </select>
+ <span style="font-size:11px; color:var(--muted);">ชั่วคราว:</span>
+ <input type="number" value="${r.rateShort || state.rates.short}" onchange="state.rooms[${i}].rateShort=Number(this.value); saveDatabase(); renderRooms();" style="width: 65px; font-weight: 900; text-align: right; padding: 6px; background: var(--card); border: 1px solid #1f2937; color: #38bdf8; border-radius: 6px;">
+ <span style="font-size:11px; color:var(--muted);">ค้างคืน:</span>
+ <input type="number" value="${r.rateOver || r.customRate || state.rates.overnight}" onchange="state.rooms[${i}].rateOver=Number(this.value); saveDatabase(); renderRooms();" style="width: 65px; font-weight: 900; text-align: right; padding: 6px; background: var(--card); border: 1px solid #1f2937; color: var(--amber); border-radius: 6px;">
+ </div>
+ <button onclick="if(confirm('ลบห้อง ${r.number}?')){ state.rooms.splice(${i},1); saveDatabase(); renderSettingsMenuAndRooms(); renderRooms(); }" style="background: rgba(244,63,94,0.2); color: #fda4af; border-radius: 8px; padding: 6px 10px; font-weight: bold; border: 1px solid rgba(244,63,94,0.4); font-size: 11px;">ลบ</button>
+ </div>
+ `).join('');
+}
+ 
+function addMenuFromSettings() {
+ const name = document.getElementById('set-new-food-name').value.trim();
+ const priceInput = document.getElementById('set-new-food-price').value;
+ if (!name || priceInput === '') return;
+ const price = Number(priceInput);
+ state.menu.push({ name, price });
+ document.getElementById('set-new-food-name').value = '';
+ document.getElementById('set-new-food-price').value = '';
+ saveDatabase();
+ renderSettingsMenuAndRooms();
+}
+ 
+function saveAllSettings() {
+ state.hotelInfo = {
+ nameTh: document.getElementById('set-hotel-name-th').value.trim() || 'ภูเบศร์อินเตอร์โฮเต็ล',
+ nameEn: document.getElementById('set-hotel-name-en').value.trim() || 'PHUBESTH INTER HOTEL',
+ address: document.getElementById('set-hotel-address').value.trim() || '',
+ phone: document.getElementById('set-hotel-phone').value.trim() || ''
+ };
+ state.pins.front = document.getElementById('set-pin-front').value.trim() || '1111';
+ state.pins.manager = document.getElementById('set-pin-mgr').value.trim() || '8888';
+ state.pins.owner = document.getElementById('set-pin-own').value.trim() || '9999';
+ state.rates.short = Number(document.getElementById('set-rate-short').value) || 299;
+ state.rates.overnight = Number(document.getElementById('set-rate-over').value) || 650;
+ state.rates.elec = Number(document.getElementById('set-rate-elec').value) || 8;
+ state.rates.water = Number(document.getElementById('set-rate-water').value) || 18;
+ saveDatabase();
+ applyHotelProfile();
+ closeSettingsModal();
+ renderAll();
+ showToast('บันทึกการตั้งค่าเรียบร้อย');
+}
+
+ 
+
+
+
+ // ================= ระบบ Real-time Cloud Sync (มาตรฐานถอดจาก POS Engine) =================
+const DEVICE_ID = 'HOTEL_DEV_' + Math.random().toString(36).slice(2, 10);
+let isSyncBusy = false;
+let lastLocalEditTime = Date.now();
+let rtSource = null;
+let rtRoom = '';
+let lastRtTime = 0;
+let lastRtMsgId = '';
+
+const hotelBc = ('BroadcastChannel' in window) ? new BroadcastChannel('phubesth_hotel_channel') : null;
+if (hotelBc) {
+ hotelBc.onmessage = (ev) => {
+ if (ev.data && Number(ev.data.updatedAt || 0) > Number(state.updatedAt || 0)) {
+ state = Object.assign({}, state, ev.data);
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+ renderAll();
+ applyHotelLogo();
+ }
+ };
+}
+
+function openSyncModal() {
+ const roomEl = document.getElementById('cfgSyncRoom');
+ if (roomEl) roomEl.value = state.syncRoom || 'phubesth-hotel';
+ document.getElementById('sync-modal').classList.remove('hidden');
+}
+
+function exportSyncData() {
+ const s = JSON.stringify(state);
+ document.getElementById('sync-textarea').value = s;
+ navigator.clipboard?.writeText(s);
+ showToast('คัดลอกโค้ดข้อมูลแล้ว ส่งเข้า LINE ได้เลย');
+}
+
+function importSyncData() {
+ const raw = document.getElementById('sync-textarea').value.trim();
+ if (!raw) return alert('กรุณาวางโค้ดข้อมูลก่อน');
+ try {
+ state = Object.assign({}, state, JSON.parse(raw));
+ state.updatedAt = Date.now();
+ saveDatabase();
+ renderAll();
+ applyHotelLogo();
+ document.getElementById('sync-modal').classList.add('hidden');
+ pushFastRealtimeNow();
+ showToast('ซิงค์ข้อมูลสำเร็จ!');
+ } catch(e) { alert('ข้อมูลไม่ถูกต้อง'); }
+}
+
+async function pushFastRealtimeNow() {
+ const roomEl = document.getElementById('cfgSyncRoom');
+ if (roomEl && roomEl.value.trim()) state.syncRoom = roomEl.value.trim();
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ if (!room) return;
+
+ const nowTs = Date.now();
+ state.updatedAt = nowTs;
+ lastRtTime = nowTs;
+
+ const miniPayload = {
+ t: nowTs,
+ dev: DEVICE_ID,
+ rooms: state.rooms,
+ tx: (state.transactions || []).slice(0, 20),
+ rates: state.rates,
+ menu: state.menu,
+ payment: {
+ mode: state.payment.mode,
+ promptPayId: state.payment.promptPayId,
+ promptPayName: state.payment.promptPayName,
+ bankName: state.payment.bankName,
+ bankAcc: state.payment.bankAcc
+ }
+ };
+
+ try {
+ const url = 'https://ntfy.sh/phubesth_rt_fast_' + encodeURIComponent(room);
+ await fetch(url, {
+ method: 'POST',
+ headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+ body: JSON.stringify(miniPayload)
+ });
+ } catch (e) {}
+}
+
+async function processFastRealtimeEnv(env) {
+ if (!env || env.event !== 'message') return;
+ if (env.id && env.id === lastRtMsgId) return;
+
+ let rawTxt = '';
+ try {
+ if (env.message && env.message.includes('"rooms"')) {
+ rawTxt = env.message;
+ } else if (env.attachment && env.attachment.url) {
+ const attUrl = env.attachment.url.startsWith('http')
+  ? env.attachment.url
+  : ('https://ntfy.sh' + (env.attachment.url.startsWith('/') ? '' : '/') + env.attachment.url);
+ const r = await fetch(attUrl);
+ if (r.ok) rawTxt = await r.text();
+ }
+ } catch (e) { return; }
+
+ if (env.id) lastRtMsgId = env.id;
+ if (!rawTxt || !rawTxt.includes('"rooms"')) return;
+
+ try {
+ const data = JSON.parse(rawTxt);
+ if (!data || data.dev === DEVICE_ID) return;
+ if (Number(data.t || 0) <= lastRtTime) return;
+
+ lastRtTime = Number(data.t);
+ state.updatedAt = lastRtTime;
+
+ if (Array.isArray(data.rooms)) state.rooms = data.rooms;
+ if (data.rates) state.rates = data.rates;
+ if (Array.isArray(data.menu)) state.menu = data.menu;
+ if (data.payment) state.payment = Object.assign({}, state.payment, data.payment);
+ if (Array.isArray(data.tx)) {
+ const incomingIds = new Set(data.tx.map(x => x.date + x.title + x.amount));
+ const rest = (state.transactions || []).filter(x => !incomingIds.has(x.date + x.title + x.amount));
+ state.transactions = [...data.tx, ...rest].slice(0, 50);
+ }
+
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+ renderAll();
+ showToast('⚡ ซิงค์เรียลไทม์อัตโนมัติสำเร็จ!');
+ } catch (e) {}
+}
+
+async function pushToCloud(manual = false) {
+ const roomEl = document.getElementById('cfgSyncRoom');
+ if (roomEl && roomEl.value.trim()) state.syncRoom = roomEl.value.trim();
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ if (!room) return;
+
+ isSyncBusy = true;
+ state.updatedAt = Date.now();
+ state.lastDeviceId = DEVICE_ID;
+ lastLocalEditTime = state.updatedAt;
+
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+ if (manual) showToast('⏳ กำลังดันข้อมูลโรงแรมขึ้น Cloud...');
+
+ const dataStr = JSON.stringify(state);
+ const dataKB = (new Blob([dataStr]).size / 1024).toFixed(1);
+
+ try {
+ const url = 'https://ntfy.sh/phubesth_master_sync_v1_' + encodeURIComponent(room);
+ const res = await fetch(url, { method: 'POST', body: dataStr });
+ await pushFastRealtimeNow();
+ if (res.ok) {
+ if (manual) showToast(`☁️ ดันขึ้น Cloud สำเร็จ! (${dataKB} KB)`);
+ } else {
+ if (manual) alert('⚠️ Cloud ขัดข้อง แนะนำให้ลองเปลี่ยนชื่อห้อง');
+ }
+ } catch (e) {
+ if (manual) alert('⚠️ ขาดการเชื่อมต่ออินเทอร์เน็ต');
+ }
+ isSyncBusy = false;
+ initSseListener(room);
+}
+
+async function pullFromCloud(manual = false) {
+ const roomEl = document.getElementById('cfgSyncRoom');
+ if (roomEl && roomEl.value.trim()) state.syncRoom = roomEl.value.trim();
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ if (!room) return;
+
+ if (manual) showToast('⏳ กำลังดึงข้อมูลจาก Cloud...');
+
+ try {
+ const res = await fetch('https://ntfy.sh/phubesth_master_sync_v1_' + encodeURIComponent(room) + '/json?poll=1');
+ if (!res.ok) { if (manual) alert('ดึงข้อมูลไม่สำเร็จ'); return; }
+ const txt = (await res.text()).trim();
+ if (!txt) { if (manual) showToast('⚠️ ห้องนี้ยังไม่มีข้อมูล'); return; }
+
+ const lines = txt.split(String.fromCharCode(10)).filter(Boolean);
+ let remoteData = null;
+ for (let i = lines.length - 1; i >= 0; i--) {
+ try {
+  const item = JSON.parse(lines[i]);
+  let raw = null;
+  if (item.message && item.message.includes('rooms')) raw = item.message;
+  else if (item.attachment && item.attachment.url) {
+  const ar = await fetch(item.attachment.url);
+  if (ar.ok) raw = await ar.text();
+  }
+  if (raw) {
+  const p = JSON.parse(raw);
+  if (p && Array.isArray(p.rooms)) { remoteData = p; break; }
+  }
+ } catch (err) {}
+ }
+
+ if (remoteData) {
+ const oldLogo = state.hotelLogo;
+ state = Object.assign({}, state, remoteData);
+ if (!state.hotelLogo && oldLogo) state.hotelLogo = oldLogo;
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+ renderAll();
+ applyHotelLogo();
+ if (manual) showToast('✅ ดึงข้อมูลสำเร็จ ข้อมูลตรงกันแล้ว!');
+ } else {
+ if (manual) showToast('⚠️ ไม่พบข้อมูลที่สมบูรณ์บน Cloud');
+ }
+ } catch (e) {
+ if (manual) alert('⚠️ ไม่สามารถเชื่อมต่อ Cloud ได้');
+ }
+}
+
+function initSseListener(room) {
+ room = (room || state.syncRoom || 'phubesth-hotel').trim();
+ if (!room || !('EventSource' in window)) return;
+
+ if (rtSource && rtRoom === room && rtSource.readyState === 1) return;
+ if (rtSource) {
+ try { rtSource.close(); } catch (e) {}
+ rtSource = null;
+ }
+ rtRoom = room;
+
+ try {
+ rtSource = new EventSource('https://ntfy.sh/phubesth_rt_fast_' + encodeURIComponent(room) + '/sse');
+ rtSource.onmessage = (ev) => {
+ try { processFastRealtimeEnv(JSON.parse(ev.data)); } catch (err) {}
+ };
+ rtSource.onerror = () => {
+ try { if (rtSource) rtSource.close(); } catch (e) {}
+ rtSource = null;
+ };
+ } catch (e) {}
+}
+
+async function testCloudConnection() {
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ showToast('📡 กำลังทดสอบสัญญาณ...');
+ try {
+ const res = await fetch('https://ntfy.sh/phubesth_rt_fast_' + encodeURIComponent(room), {
+ method: 'POST',
+ body: '{"message":"PING"}'
+ });
+ if (res.ok) {
+ alert(`✅ สัญญาณ Real-time เชื่อมต่อสมบูรณ์!
+
+ห้อง: ${room}
+
+สถานะ: พร้อมซิงค์ทุกเครื่องทันที`);
+ } else {
+ alert('❌ เชื่อมต่อไม่สำเร็จ (Error: ' + res.status + ')');
+ }
+ } catch (e) {
+ alert('❌ ขาดการเชื่อมต่ออินเทอร์เน็ต');
+ }
+}
+
+// ดักจับการแก้ไขข้อมูลทุกจุดในระบบโรงแรม ให้ยิง Real-time อัตโนมัติทันที
+const _origSaveDB = saveDatabase;
+saveDatabase = function() {
+ state.updatedAt = Date.now();
+ state.lastDeviceId = DEVICE_ID;
+ _origSaveDB();
+ if (hotelBc) { try { hotelBc.postMessage(state); } catch (e) {} }
+ clearTimeout(window._hotelPushTimer);
+ window._hotelPushTimer = setTimeout(() => { pushFastRealtimeNow(); }, 300);
+};
+
+// เช็กสัญญาณหลุดเมื่อสลับแอปหรือปลุกหน้าจอ
+setInterval(() => {
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ if (!rtSource || rtSource.readyState !== 1) initSseListener(room);
+}, 8000);
+
+document.addEventListener('visibilitychange', () => {
+ if (document.visibilityState === 'visible') {
+ const room = (state.syncRoom || 'phubesth-hotel').trim();
+ initSseListener(room);
+ }
+});
+
+// ================= ระบบเปลี่ยนโลโก้โรงแรมอัตโนมัติ (บีบอัดรูปกันค้าง) =================
+function uploadHotelLogo(e) {
+ const f = e.target.files[0];
+ if (!f) return;
+ const reader = new FileReader();
+ reader.onload = ev => {
+ const img = new Image();
+ img.onload = () => {
+ const canvas = document.createElement('canvas');
+ const maxSize = 200;
+ let w = img.width, h = img.height;
+ if (w > h) { if (w > maxSize) { h *= maxSize / w; w = maxSize; } }
+ else { if (h > maxSize) { w *= maxSize / h; h = maxSize; } }
+ canvas.width = w;
+ canvas.height = h;
+ const ctx = canvas.getContext('2d');
+ ctx.drawImage(img, 0, 0, w, h);
+ 
+ state.hotelLogo = canvas.toDataURL('image/jpeg', 0.85);
+ saveDatabase();
+ applyHotelLogo();
+ showToast('เปลี่ยนโลโก้โรงแรมสำเร็จ!');
+ };
+ img.src = ev.target.result;
+ };
+ reader.readAsDataURL(f);
+}
+
+function applyHotelLogo() {
+ if (state.hotelLogo) {
+ const lg1 = document.getElementById('login-logo');
+ const lg2 = document.getElementById('header-logo');
+ if (lg1) lg1.src = state.hotelLogo;
+ if (lg2) lg2.src = state.hotelLogo;
+ }
+}
+// ================= ระบบจองห้องพักล่วงหน้า (Reservation Engine) =================
+ // ฟังก์ชันตัวช่วยดึงวันที่ตามเวลาประเทศไทย (YYYY-MM-DD)
+function getThaiLocalDateStr(offsetDays = 0) {
+ const d = new Date();
+ if (offsetDays !== 0) d.setDate(d.getDate() + offsetDays);
+ const year = d.getFullYear();
+ const month = String(d.getMonth() + 1).padStart(2, '0');
+ const day = String(d.getDate()).padStart(2, '0');
+ return `${year}-${month}-${day}`;
+}
+
+function initBookingDates() {
+ const today = getThaiLocalDateStr(0); // วันนี้ตามเวลาไทยเป๊ะๆ
+ const tomorrow = getThaiLocalDateStr(1); // พรุ่งนี้ตามเวลาไทยเป๊ะๆ
+
+ const chkDate = document.getElementById('chk-book-date');
+ if (chkDate) chkDate.value = today;
+
+ const nbIn = document.getElementById('nb-checkin');
+ const nbOut = document.getElementById('nb-checkout');
+ if (nbIn) nbIn.value = today;
+ if (nbOut) nbOut.value = tomorrow;
+}
+
+// ตรวจสอบจำนวนห้องว่างแยกตามประเภทในวันที่กำหนด
+function getAvailableRoomsOnDate(targetDateStr, roomType) {
+ const allRoomsOfType = state.rooms.filter(r => !roomType || r.type === roomType);
+ const totalCount = allRoomsOfType.length;
+ 
+ const todayStr = getThaiLocalDateStr(0);
+ let occupiedNow = 0;
+
+ // ถ้าระบุดูสต็อกของ "วันนี้" ให้นับห้องที่มีแขกพักจริง และห้องรอทำความสะอาดด้วย
+ if (targetDateStr === todayStr) {
+ occupiedNow = allRoomsOfType.filter(r => r.status === 'occupied' || r.status === 'cleaning').length;
+ }
+
+ const bookings = state.reservations || [];
+ let bookedCount = 0;
+
+ bookings.forEach(b => {
+ if (b.status === 'cancelled') return;
+ if (roomType && b.roomType !== roomType) return;
+ if (targetDateStr >= b.checkIn && targetDateStr < b.checkOut) {
+ bookedCount += (Number(b.qty) || 1);
+ }
+ });
+
+ const totalOccupied = Math.max(occupiedNow, bookedCount);
+ return { 
+ total: totalCount, 
+ booked: totalOccupied, 
+ available: Math.max(0, totalCount - totalOccupied) 
+ };
+}
+
+
+
+function checkAvailabilityPreview() {
+ const targetDate = document.getElementById('chk-book-date')?.value || new Date().toISOString().slice(0, 10);
+ const types = ['Twin Bed', 'Double Bed', 'Single Bed', 'VIP Suite'];
+ 
+ const box = document.getElementById('avail-result-grid');
+ if (!box) return;
+
+ box.innerHTML = types.map(t => {
+ const stat = getAvailableRoomsOnDate(targetDate, t);
+ const isAvail = stat.available > 0;
+ return `
+ <div style="background:#090d16; border:1px solid ${isAvail ? '#10b981' : '#f43f5e'}; border-radius:12px; padding:10px;">
+  <div style="font-size:12px; font-weight:800; color:#fff;">${t}</div>
+  <div class="between" style="margin-top:4px;">
+  <span style="font-size:11px; color:var(--muted);">ทั้งหมด: ${stat.total}</span>
+  <b style="font-size:16px; color:${isAvail ? '#34d399' : '#f43f5e'};">ว่าง ${stat.available} ห้อง</b>
+  </div>
+ </div>
+ `;
+ }).join('');
+}
+
+function saveNewReservation() {
+ const guest = document.getElementById('nb-guest').value.trim();
+ const phone = document.getElementById('nb-phone').value.trim();
+ const checkIn = document.getElementById('nb-checkin').value;
+ const checkOut = document.getElementById('nb-checkout').value;
+ const roomType = document.getElementById('nb-type').value;
+ const qty = Number(document.getElementById('nb-qty').value) || 1;
+ const rate = Number(document.getElementById('nb-rate').value) || 650;
+ const deposit = Number(document.getElementById('nb-deposit').value) || 0;
+
+ if (!guest) return alert('กรุณากรอกชื่อผู้จอง');
+ if (!checkIn || !checkOut || checkIn >= checkOut) return alert('กรุณาเลือกวันเช็คอินและเช็คเอาท์ให้ถูกต้อง');
+
+ // ตรวจสอบสต็อกห้องว่างในวันดังกล่าว
+ const stat = getAvailableRoomsOnDate(checkIn, roomType);
+ if (qty > stat.available) {
+ return alert(`⚠️ ห้องพักประเภท ${roomType} ในวันที่ ${checkIn} ว่างเพียง ${stat.available} ห้อง (ไม่พอสำหรับ ${qty} ห้อง)`);
+ }
+
+ if (!Array.isArray(state.reservations)) state.reservations = [];
+
+ const newBooking = {
+ id: 'BK-' + Date.now().toString().slice(-6),
+ guest, phone, checkIn, checkOut, roomType, qty, rate, deposit,
+ status: 'confirmed',
+ createdAt: new Date().toLocaleDateString('th-TH')
+ };
+
+ state.reservations.unshift(newBooking);
+ saveDatabase();
+ renderBookingsList();
+ checkAvailabilityPreview();
+ showToast(`✅ บันทึกการจอง ${roomType} ${qty} ห้อง สำเร็จ!`);
+
+ // ล้างค่าช่องชื่อ
+ document.getElementById('nb-guest').value = '';
+ document.getElementById('nb-phone').value = '';
+ document.getElementById('nb-deposit').value = '0';
+}
+
+
+function renderBookingsList() {
+ const list = state.reservations || [];
+ const totalBadge = document.getElementById('book-total-cnt');
+ if (totalBadge) totalBadge.textContent = list.filter(b => b.status === 'confirmed').length;
+
+ const box = document.getElementById('bookings-list-box');
+ if (!box) return;
+
+ const q = (document.getElementById('book-search-inp')?.value || '').trim().toLowerCase();
+ const filtered = list.filter(b => !q || (b.guest||'').toLowerCase().includes(q) || (b.phone||'').includes(q) || (b.roomType||'').toLowerCase().includes(q) || (b.checkIn||'').includes(q));
+
+ if (filtered.length === 0) {
+ box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:16px;">ไม่พบรายการจองที่ตรงกับการค้นหา</div>';
+ return;
+ }
+
+ box.innerHTML = filtered.map((b) => {
+ const realIdx = state.reservations.indexOf(b);
+ const isCancelled = b.status === 'cancelled';
+
+ return `
+ <div class="between" style="background:#030712; border:1px solid ${isCancelled ? '#334155' : 'var(--border)'}; border-radius:12px; padding:12px; opacity:${isCancelled ? '0.7' : '1'};">
+ <div>
+  <div class="row">
+  <b style="font-size:14px; color:#fff;">👤 ${b.guest}</b>
+  <span style="font-size:10px; background:#1e3a8a; color:#93c5fd; padding:2px 6px; border-radius:6px; font-weight:700;">${b.roomType} x${b.qty} ห้อง</span>
+  ${b.deposit > 0 ? `<span style="font-size:10px; background:#064e3b; color:#6ee7b7; padding:2px 6px; border-radius:6px; font-weight:700;">มัดจำ ฿${b.deposit}</span>` : ''}
+  <span style="font-size:10px; color:${!isCancelled ? '#34d399' : '#fda4af'}; font-weight:800;">[${!isCancelled ? 'ยืนยัน' : 'ยกเลิก'}]</span>
+  </div>
+  <div style="font-size:11.5px; color:var(--muted); margin-top:4px;">
+  📅 เข้า: <b>${b.checkIn}</b> ➔ ออก: <b>${b.checkOut}</b> | 📞 โทร: <b>${b.phone || '-'}</b> | ราคา: ฿${b.rate || 650}
+  </div>
+ </div>
+ <div class="row">
+  <!-- ปุ่มแก้ไขแสดงเสมอ ไม่ว่าจะสถานะไหน -->
+  <button onclick="editReservation(${realIdx})" class="btn btn-sky" style="font-size:11px; padding:5px 9px;">✏️ แก้ไข</button>
+  ${!isCancelled 
+  ? `<button onclick="cancelReservation(${realIdx})" class="btn btn-rose" style="font-size:11px; padding:5px 9px;">ยกเลิก</button>` 
+  : `<button onclick="state.reservations[${realIdx}].status='confirmed'; saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms(); showToast('กู้คืนสถานะการจองสำเร็จ');" class="btn btn-emerald" style="font-size:11px; padding:5px 9px;">🔄 กู้คืน</button>`
+  }
+  <button onclick="if(confirm('ลบรายการจองนี้ถาวร?')){state.reservations.splice(${realIdx},1); saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms();}" class="btn btn-dark" style="font-size:11px; padding:5px 8px; color:#fda4af;">🗑️</button>
+ </div>
+ </div>
+ `;
+ }).join('');
+}
+
+ 
+
+function editReservation(idx) {
+ const b = state.reservations[idx];
+ if (!b) return;
+
+ const newGuest = prompt('แก้ไขชื่อผู้จอง / บริษัท:', b.guest);
+ if (newGuest === null) return;
+ const newPhone = prompt('แก้ไขเบอร์โทรศัพท์:', b.phone || '');
+ if (newPhone === null) return;
+ const newQty = prompt('แก้ไขจำนวนห้องพักที่จอง:', b.qty || 1);
+ if (newQty === null) return;
+ const newDeposit = prompt('แก้ไขยอดเงินมัดจำล่วงหน้า (บาท):', b.deposit || 0);
+ if (newDeposit === null) return;
+
+ b.guest = newGuest.trim() || b.guest;
+ b.phone = newPhone.trim();
+ b.qty = Math.max(1, Number(newQty) || 1);
+ b.deposit = Number(newDeposit) || 0;
+
+ saveDatabase();
+ renderBookingsList();
+ checkAvailabilityPreview();
+ renderRooms();
+ showToast('อัปเดตข้อมูลการจองสำเร็จ!');
+}
+
+
+function cancelReservation(idx) {
+ if (!confirm('ยืนยันการยกเลิกการจองนี้?')) return;
+ state.reservations[idx].status = 'cancelled';
+ saveDatabase();
+ renderBookingsList();
+ checkAvailabilityPreview();
+ showToast('ยกเลิกรายการจองเรียบร้อย');
+}
+
+
+initSafePWA();
+loadDatabase();
+
+// ล้างห้องของคุณสมชายที่ค้างสีแดง คืนกลับมาเป็น "รอเช็คอิน (กรอบฟ้า)" 10 ห้องทันที
+(function fixSomchaiReservationNow() {
+ let foundOccupied = false;
+ state.rooms.forEach(r => {
+ if (r.guestName && r.guestName.includes('สมชาย')) {
+ r.status = 'vacant';
+ r.light = false;
+ r.guestName = '';
+ r.checkInTime = '';
+ r.checkInTimestamp = 0;
+ foundOccupied = true;
+ }
+ });
+
+ // สร้างหรือคืนค่าใบจอง 10 ห้องของคุณสมชาย
+ if (!Array.isArray(state.reservations)) state.reservations = [];
+ let b = state.reservations.find(x => x.guest && x.guest.includes('สมชาย'));
+ const todayStr = new Date().toLocaleDateString('en-CA'); // ดึงวันที่ปัจจุบันแบบเวลาไทยเป๊ะๆ (YYYY-MM-DD)
+ const tomorrowStr = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
+
+ if (b) {
+ b.qty = 10;
+ b.status = 'confirmed';
+ b.checkIn = todayStr;
+ b.roomType = 'Twin Bed';
+ } else {
+ state.reservations.unshift({
+ id: 'BK-' + Date.now().toString().slice(-6),
+ guest: 'สมชาย',
+ phone: '08x-xxx-xxxx',
+ checkIn: todayStr,
+ checkOut: tomorrowStr,
+ roomType: 'Twin Bed',
+ qty: 10,
+ rate: 650,
+ deposit: 6500,
+ status: 'confirmed'
+ });
+ }
+ saveDatabase();
+})();
+
+applyHotelLogo();
+applyHotelProfile();
+initSseListener((state.syncRoom || 'phubesth-hotel').trim());
+
+
+</script>
+ 
+
+
+</body>
+</html>
