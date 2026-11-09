@@ -787,31 +787,25 @@ let deferredPwaPrompt = null;
 
 function initSafePWA() {
   if ('serviceWorker' in navigator) {
-    const swCode = `
-      self.addEventListener('install', e => self.skipWaiting());
-      self.addEventListener('activate', e => self.clients.claim());
-      self.addEventListener('fetch', e => {}); 
-    `;
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(() => {});
+    // เรียกใช้ Service Worker จากไฟล์ภายนอก
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
-
   if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().catch(() => {});
   }
-
+  
   try {
     const manifestObj = {
-      id: 'phubesth-inter-hotel-pms-unique-app',
-      name: 'ภูเบศร์อินเตอร์โฮเต็ล - Smart PMS',
+      id: 'phubesth-hotel-app',
+      name: 'ภูเบศร์อินเตอร์โฮเต็ล',
       short_name: 'ภูเบศร์โฮเต็ล',
-      start_url: window.location.pathname,
-      scope: window.location.pathname,
+      start_url: '/',
+      scope: '/',
       display: 'standalone',
       background_color: '#0b0f19',
       theme_color: '#0b0f19',
       icons: [
+        { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/192px-Emoji_u1f3e8.svg.png', sizes: '192x192', type: 'image/png' },
         { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/512px-Emoji_u1f3e8.svg.png', sizes: '512x512', type: 'image/png' }
       ]
     };
@@ -827,6 +821,7 @@ function initSafePWA() {
     if (directBox) directBox.classList.remove('hidden');
   });
 }
+
 
 function triggerPwaInstall() {
   if (deferredPwaPrompt) {
