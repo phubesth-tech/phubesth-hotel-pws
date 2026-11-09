@@ -151,10 +151,11 @@
  <button onclick="submitPin()" class="btn btn-amber" style="height:40px;font-size:12px;">เข้าสู่ระบบ</button>
  </div>
 
- <div class="grid-2" style="margin-top:8px;">
- <button onclick="triggerPwaInstall()" class="btn btn-sky" style="font-size:11px;padding:8px;">📲 ติดตั้งแอปลงเครื่อง</button>
+  <div class="grid-2" style="margin-top:8px;">
+ <button onclick="forceInstallApp()" class="btn btn-emerald" style="font-size:11px;padding:8px;font-weight:900;">📥 ติดตั้งแอป (คลิกที่นี่)</button>
  <button onclick="toggleFullScreenMode()" class="btn btn-dark" style="font-size:11px;padding:8px;color:#38bdf8;border-color:#0284c7;">⛶ ขยายเต็มจอไร้ขอบ</button>
  </div>
+
  </div>
 </div>
 
@@ -3222,9 +3223,26 @@ loadDatabase();
   saveDatabase();
 })();
 
+
 applyHotelLogo();
 applyHotelProfile();
 initSseListener((state.syncRoom || 'phubesth-hotel').trim());
+
+// 📥 เพิ่มฟังก์ชันติดตั้งแอปตรงนี้ครับ
+function forceInstallApp() {
+  if (deferredPwaPrompt) {
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        showToast('ติดตั้งแอปสำเร็จ!');
+      }
+      deferredPwaPrompt = null;
+    });
+  } else {
+    const guideModal = document.getElementById('pwa-guide-modal');
+    if (guideModal) guideModal.classList.remove('hidden');
+  }
+}
 
 </script>
 </body>
