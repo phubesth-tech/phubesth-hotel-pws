@@ -787,12 +787,10 @@ let deferredPwaPrompt = null;
 
 function initSafePWA() {
   if ('serviceWorker' in navigator) {
-    // เรียกใช้ Service Worker จากไฟล์ภายนอก
+    // ดึงไฟล์ sw.js ของจริงที่คุณสร้างไว้ใน GitHub มาใช้งาน
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
-  if (navigator.storage && navigator.storage.persist) {
-    navigator.storage.persist().catch(() => {});
-  }
+
   
   try {
     const manifestObj = {
