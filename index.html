@@ -11,9 +11,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ภูเบศร์โฮเต็ล">
-<link id="pwa-apple-icon" rel="apple-touch-icon" href="">
-<link id="pwa-favicon" rel="icon" type="image/png" href="">
-<link id="pwa-manifest" rel="manifest" href="">
+<link id="pwa-apple-icon" rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/192px-Emoji_u1f3e8.svg.png">
+<link id="pwa-favicon" rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/192px-Emoji_u1f3e8.svg.png">
+<link id="pwa-manifest" rel="manifest" href="/manifest.json">
+
 
 <style>
  :root {
@@ -209,32 +210,32 @@
  <div id="view-rooms">
  <div class="grid-4" style="margin-bottom:8px;">
  <div class="card" style="margin:0;padding:8px 12px;background:#0f172a;border-color:#0284c7;">
-  <div style="font-size:11px;color:var(--muted);">อัตราการเข้าพัก (Occupancy)</div>
-  <div id="kpi-occ-rate" style="font-size:17px;font-weight:900;color:#38bdf8;">0%</div>
+ <div style="font-size:11px;color:var(--muted);">อัตราการเข้าพัก (Occupancy)</div>
+ <div id="kpi-occ-rate" style="font-size:17px;font-weight:900;color:#38bdf8;">0%</div>
  </div>
  <div class="card" style="margin:0;padding:8px 12px;background:#082f49;border-color:#38bdf8;">
-  <div style="font-size:11px;color:#7dd3fc;">📅 จองเข้าพักวันนี้ (Due-In)</div>
-  <div id="kpi-reserved-today" style="font-size:17px;font-weight:900;color:#38bdf8;">0 ห้อง</div>
+ <div style="font-size:11px;color:#7dd3fc;">📅 จองเข้าพักวันนี้ (Due-In)</div>
+ <div id="kpi-reserved-today" style="font-size:17px;font-weight:900;color:#38bdf8;">0 ห้อง</div>
  </div>
  <div class="card" style="margin:0;padding:8px 12px;background:#064e3b;border-color:#10b981;">
-  <div style="font-size:11px;color:#a7f3d0;">ห้องพร้อมขายทันที (ว่างจริง)</div>
-  <div id="kpi-ready-cnt" style="font-size:17px;font-weight:900;color:#34d399;">0 ห้อง</div>
+ <div style="font-size:11px;color:#a7f3d0;">ห้องพร้อมขายทันที (ว่างจริง)</div>
+ <div id="kpi-ready-cnt" style="font-size:17px;font-weight:900;color:#34d399;">0 ห้อง</div>
  </div>
  <div class="card" style="margin:0;padding:8px 12px;background:#451a03;border-color:#f59e0b;">
-  <div style="font-size:11px;color:#fde68a;">ห้องรอแม่บ้านเคลียร์</div>
-  <div id="kpi-cln-cnt" style="font-size:17px;font-weight:900;color:#fbbf24;">0 ห้อง</div>
+ <div style="font-size:11px;color:#fde68a;">ห้องรอแม่บ้านเคลียร์</div>
+ <div id="kpi-cln-cnt" style="font-size:17px;font-weight:900;color:#fbbf24;">0 ห้อง</div>
  </div>
  </div>
 
  <div class="card">
  <div class="between" style="margin-bottom:8px;">
-  <div class="row">
-  <button onclick="setRoomFilter('all')" id="flt-all" class="btn" style="background:#fff;color:#000;border-radius:99px;padding:5px 12px;">ทั้งหมด (<span id="cnt-all">38</span>)</button>
-  <button onclick="setRoomFilter('vacant')" id="flt-vacant" class="btn" style="background:#064e3b;color:#6ee7b7;border-radius:99px;padding:5px 12px;">● ว่าง (<span id="cnt-vacant">38</span>)</button>
-  <button onclick="setRoomFilter('reserved')" id="flt-reserved" class="btn" style="background:#0369a1;color:#bae6fd;border-radius:99px;padding:5px 12px;">📌 จองวันนี้ (<span id="cnt-reserved">0</span>)</button>
-  <button onclick="setRoomFilter('occupied')" id="flt-occupied" class="btn" style="background:#4c0519;color:#fda4af;border-radius:99px;padding:5px 12px;">● มีผู้เข้าพัก (<span id="cnt-occupied">0</span>)</button>
-  <button onclick="setRoomFilter('cleaning')" id="flt-cleaning" class="btn" style="background:#451a03;color:#fcd34d;border-radius:99px;padding:5px 12px;">🧹 รอทำความสะอาด (<span id="cnt-cleaning">0</span>)</button>
-  </div>
+ <div class="row">
+ <button onclick="setRoomFilter('all')" id="flt-all" class="btn" style="background:#fff;color:#000;border-radius:99px;padding:5px 12px;">ทั้งหมด (<span id="cnt-all">38</span>)</button>
+ <button onclick="setRoomFilter('vacant')" id="flt-vacant" class="btn" style="background:#064e3b;color:#6ee7b7;border-radius:99px;padding:5px 12px;">● ว่าง (<span id="cnt-vacant">38</span>)</button>
+ <button onclick="setRoomFilter('reserved')" id="flt-reserved" class="btn" style="background:#0369a1;color:#bae6fd;border-radius:99px;padding:5px 12px;">📌 จองวันนี้ (<span id="cnt-reserved">0</span>)</button>
+ <button onclick="setRoomFilter('occupied')" id="flt-occupied" class="btn" style="background:#4c0519;color:#fda4af;border-radius:99px;padding:5px 12px;">● มีผู้เข้าพัก (<span id="cnt-occupied">0</span>)</button>
+ <button onclick="setRoomFilter('cleaning')" id="flt-cleaning" class="btn" style="background:#451a03;color:#fcd34d;border-radius:99px;padding:5px 12px;">🧹 รอทำความสะอาด (<span id="cnt-cleaning">0</span>)</button>
+ </div>
  </div>
  <input type="text" id="room-search" oninput="renderRooms()" placeholder="🔍 ค้นหาเลขห้อง หรือ ชื่อผู้เข้าพัก...">
  </div>
@@ -246,17 +247,17 @@
  <div class="card" style="background:#0f172a; border-color:#0284c7; padding:14px;">
  <div style="font-weight:900; font-size:15px; color:#38bdf8; margin-bottom:8px;">🔍 ตรวจสอบห้องว่างล่วงหน้า (Check Availability)</div>
  <div class="grid-3" style="margin-bottom:10px;">
-  <div>
-  <span style="font-size:11px; color:var(--muted);">เลือกวันที่ลูกค้าต้องการเข้าพัก:</span>
-  <input type="date" id="chk-book-date" onchange="checkAvailabilityPreview()" style="color:#34d399; font-weight:800;">
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">จำนวนคืนที่พัก:</span>
-  <input type="number" id="chk-book-nights" value="1" min="1" oninput="checkAvailabilityPreview()">
-  </div>
-  <div style="display:flex; align-items:flex-end;">
-  <button onclick="checkAvailabilityPreview()" class="btn btn-sky" style="width:100%; padding:9px;">🔎 ค้นหาสต็อกห้องว่าง</button>
-  </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">เลือกวันที่ลูกค้าต้องการเข้าพัก:</span>
+ <input type="date" id="chk-book-date" onchange="checkAvailabilityPreview()" style="color:#34d399; font-weight:800;">
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">จำนวนคืนที่พัก:</span>
+ <input type="number" id="chk-book-nights" value="1" min="1" oninput="checkAvailabilityPreview()">
+ </div>
+ <div style="display:flex; align-items:flex-end;">
+ <button onclick="checkAvailabilityPreview()" class="btn btn-sky" style="width:100%; padding:9px;">🔎 ค้นหาสต็อกห้องว่าง</button>
+ </div>
  </div>
  <div id="avail-result-grid" class="grid-3"></div>
  </div>
@@ -264,54 +265,54 @@
  <div class="card" style="padding:14px; border-color:rgba(16,185,129,0.4);">
  <div style="font-weight:900; font-size:15px; color:#34d399; margin-bottom:10px;">➕ บันทึกการจองห้องพักใหม่ (New Booking)</div>
  <div class="grid-4" style="margin-bottom:8px;">
-  <div>
-  <span style="font-size:11px; color:var(--muted);">ชื่อผู้จอง / บริษัท *</span>
-  <input type="text" id="nb-guest" placeholder="เช่น คุณสมชาย (กรุ๊ปทัวร์)">
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">เบอร์โทรศัพท์</span>
-  <input type="text" id="nb-phone" placeholder="08x-xxx-xxxx">
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">วันที่เช็คอิน (เข้าพัก) *</span>
-  <input type="date" id="nb-checkin">
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">วันที่เช็คเอาท์ (ออก) *</span>
-  <input type="date" id="nb-checkout">
-  </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">ชื่อผู้จอง / บริษัท *</span>
+ <input type="text" id="nb-guest" placeholder="เช่น คุณสมชาย (กรุ๊ปทัวร์)">
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">เบอร์โทรศัพท์</span>
+ <input type="text" id="nb-phone" placeholder="08x-xxx-xxxx">
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">วันที่เช็คอิน (เข้าพัก) *</span>
+ <input type="date" id="nb-checkin">
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">วันที่เช็คเอาท์ (ออก) *</span>
+ <input type="date" id="nb-checkout">
+ </div>
  </div>
 
  <div class="grid-4" style="margin-bottom:10px;">
-  <div>
-  <span style="font-size:11px; color:var(--muted);">ประเภทเตียงที่ต้องการ</span>
-  <select id="nb-type">
-  <option value="Twin Bed">Twin Bed (เตียงคู่)</option>
-  <option value="Double Bed">Double Bed (เตียงเดี่ยวใหญ่)</option>
-  <option value="Single Bed">Single Bed</option>
-  <option value="VIP Suite">VIP Suite</option>
-  </select>
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">จำนวนห้องที่จอง *</span>
-  <input type="number" id="nb-qty" value="1" min="1" style="font-weight:900; color:var(--amber);">
-  </div>
-  <div>
-  <span style="font-size:11px; color:var(--muted);">ราคาต่อห้อง/คืน (บาท)</span>
-  <input type="number" id="nb-rate" value="650">
-  </div>
-  <div>
-  <span style="font-size:11px; color:#c7d2fe;">💰 เงินมัดจำจองล่วงหน้า (บาท)</span>
-  <input type="number" id="nb-deposit" value="0" style="color:#a5b4fc; font-weight:900;">
-  </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">ประเภทเตียงที่ต้องการ</span>
+ <select id="nb-type">
+ <option value="Twin Bed">Twin Bed (เตียงคู่)</option>
+ <option value="Double Bed">Double Bed (เตียงเดี่ยวใหญ่)</option>
+ <option value="Single Bed">Single Bed</option>
+ <option value="VIP Suite">VIP Suite</option>
+ </select>
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">จำนวนห้องที่จอง *</span>
+ <input type="number" id="nb-qty" value="1" min="1" style="font-weight:900; color:var(--amber);">
+ </div>
+ <div>
+ <span style="font-size:11px; color:var(--muted);">ราคาต่อห้อง/คืน (บาท)</span>
+ <input type="number" id="nb-rate" value="650">
+ </div>
+ <div>
+ <span style="font-size:11px; color:#c7d2fe;">💰 เงินมัดจำจองล่วงหน้า (บาท)</span>
+ <input type="number" id="nb-deposit" value="0" style="color:#a5b4fc; font-weight:900;">
+ </div>
  </div>
  <button onclick="saveNewReservation()" class="btn btn-emerald" style="width:100%; padding:12px; font-size:14px;">💾 ยืนยันบันทึกการจองลงระบบ</button>
  </div>
 
  <div class="card">
  <div class="between" style="margin-bottom:8px;">
-  <b style="font-size:14px; color:var(--amber);">📋 รายการจองห้องพักล่วงหน้าทั้งหมด</b>
-  <input type="text" id="book-search-inp" oninput="renderBookingsList()" placeholder="🔍 ค้นชื่อผู้จอง, เบอร์โทร..." style="max-width:220px; font-size:11px; padding:5px 8px;">
+ <b style="font-size:14px; color:var(--amber);">📋 รายการจองห้องพักล่วงหน้าทั้งหมด</b>
+ <input type="text" id="book-search-inp" oninput="renderBookingsList()" placeholder="🔍 ค้นชื่อผู้จอง, เบอร์โทร..." style="max-width:220px; font-size:11px; padding:5px 8px;">
  </div>
  <div id="bookings-list-box" style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;"></div>
  </div>
@@ -390,14 +391,14 @@
  <!-- VIEW: ประวัติใบเสร็จรับเงินย้อนหลัง -->
  <div id="view-receipts" class="hidden">
  <div class="card" style="padding:16px;">
-  <div class="between" style="margin-bottom:12px;">
-  <div>
-  <b style="font-size:16px;color:#c084fc;">🧾 คลังประวัติใบเสร็จรับเงินย้อนหลัง</b>
-  <div style="font-size:11px;color:var(--muted);margin-top:2px;">เก็บบันทึกใบเสร็จอัตโนมัติทุกครั้งที่เช็คเอาท์ สามารถค้นหาและสั่งพิมพ์ซ้ำได้ตลอดเวลา</div>
-  </div>
-  <input type="text" id="rcp-search-inp" oninput="renderReceiptsArchive()" placeholder="🔍 ค้นหาเลขห้อง, ชื่อลูกค้า, วันที่..." style="max-width:260px;padding:8px 12px;font-size:12px;">
-  </div>
-  <div id="receipts-archive-list" style="display:flex;flex-direction:column;gap:8px;max-height:550px;overflow-y:auto;"></div>
+ <div class="between" style="margin-bottom:12px;">
+ <div>
+ <b style="font-size:16px;color:#c084fc;">🧾 คลังประวัติใบเสร็จรับเงินย้อนหลัง</b>
+ <div style="font-size:11px;color:var(--muted);margin-top:2px;">เก็บบันทึกใบเสร็จอัตโนมัติทุกครั้งที่เช็คเอาท์ สามารถค้นหาและสั่งพิมพ์ซ้ำได้ตลอดเวลา</div>
+ </div>
+ <input type="text" id="rcp-search-inp" oninput="renderReceiptsArchive()" placeholder="🔍 ค้นหาเลขห้อง, ชื่อลูกค้า, วันที่..." style="max-width:260px;padding:8px 12px;font-size:12px;">
+ </div>
+ <div id="receipts-archive-list" style="display:flex;flex-direction:column;gap:8px;max-height:550px;overflow-y:auto;"></div>
  </div>
  </div>
 
@@ -454,27 +455,27 @@
  </div>
 
  <div class="grid-4" style="margin-bottom:10px;">
-  <div class="subcard" style="margin:0;">
-  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">รูปแบบการพัก</div>
-  <select id="m-stay-type" onchange="onStayTypeChange()">
-  <option value="overnight">ค้างคืน (Overnight)</option>
-  <option value="short">ชั่วคราว (3 ชม.)</option>
-  <option value="monthly">รายเดือน (Monthly)</option>
-  <option value="complimentary">🎁 ห้องฟรี / อภินันทนาการ (฿0)</option>
-  </select>
-  </div>
-  <div class="subcard" style="margin:0;">
-  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">จำนวน (คืน/ครั้ง)</div>
-  <input type="number" id="m-nights" min="1" oninput="saveCurrentRoomData()">
-  </div>
-  <div class="subcard" style="margin:0;">
-  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ราคาห้อง (บาท)</div>
-  <input type="number" id="m-custom-rate" oninput="saveCurrentRoomData()" style="color:var(--amber);font-weight:800;">
-  </div>
-  <div class="subcard" style="margin:0;border-color:rgba(99,102,241,0.5);">
-  <div style="font-size:11px;color:#c7d2fe;margin-bottom:4px;">🔑 มัดจำกุญแจ (บาท)</div>
-  <input type="number" id="m-key-deposit" oninput="saveCurrentRoomData()" value="0" style="color:#a5b4fc;font-weight:900;">
-  </div>
+ <div class="subcard" style="margin:0;">
+ <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">รูปแบบการพัก</div>
+ <select id="m-stay-type" onchange="onStayTypeChange()">
+ <option value="overnight">ค้างคืน (Overnight)</option>
+ <option value="short">ชั่วคราว (3 ชม.)</option>
+ <option value="monthly">รายเดือน (Monthly)</option>
+ <option value="complimentary">🎁 ห้องฟรี / อภินันทนาการ (฿0)</option>
+ </select>
+ </div>
+ <div class="subcard" style="margin:0;">
+ <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">จำนวน (คืน/ครั้ง)</div>
+ <input type="number" id="m-nights" min="1" oninput="saveCurrentRoomData()">
+ </div>
+ <div class="subcard" style="margin:0;">
+ <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ราคาห้อง (บาท)</div>
+ <input type="number" id="m-custom-rate" oninput="saveCurrentRoomData()" style="color:var(--amber);font-weight:800;">
+ </div>
+ <div class="subcard" style="margin:0;border-color:rgba(99,102,241,0.5);">
+ <div style="font-size:11px;color:#c7d2fe;margin-bottom:4px;">🔑 มัดจำกุญแจ (บาท)</div>
+ <input type="number" id="m-key-deposit" oninput="saveCurrentRoomData()" value="0" style="color:#a5b4fc;font-weight:900;">
+ </div>
  </div>
 
  <div class="subcard">
@@ -574,31 +575,31 @@
  </div>
 
 
-  <!-- กล่องคิดค่าปรับเลทเช็คเอาท์ -->
-  <div id="m-late-box" class="subcard" style="border-color:#f43f5e;padding:10px 12px;margin-bottom:8px;">
-  <div class="between">
-  <label class="row" style="font-weight:800;color:#fda4af;cursor:pointer;">
-   <input type="checkbox" id="m-late-chk" onchange="toggleLateCheckout()" style="width:16px;height:16px;">
-   <span>🚨 ค่าเลทเช็คเอาท์ (เกินเที่ยง):</span>
-  </label>
-  <div class="row">
-   <span style="font-size:11px;color:var(--muted);">฿</span>
-   <input type="number" id="m-late-fee" oninput="saveCurrentRoomData()" value="299" style="width:90px;color:#fda4af;font-weight:900;text-align:right;">
-  </div>
-  </div>
-  <div id="m-late-hint" style="font-size:11px;color:#94a3b8;margin-top:4px;">* เช็คเอาท์ปกติก่อน 12:00 น. (สามารถติ๊กเปิด/ปิด หรือแก้ไขยอดเงินได้)</div>
-  </div>
+ <!-- กล่องคิดค่าปรับเลทเช็คเอาท์ -->
+ <div id="m-late-box" class="subcard" style="border-color:#f43f5e;padding:10px 12px;margin-bottom:8px;">
+ <div class="between">
+ <label class="row" style="font-weight:800;color:#fda4af;cursor:pointer;">
+ <input type="checkbox" id="m-late-chk" onchange="toggleLateCheckout()" style="width:16px;height:16px;">
+ <span>🚨 ค่าเลทเช็คเอาท์ (เกินเที่ยง):</span>
+ </label>
+ <div class="row">
+ <span style="font-size:11px;color:var(--muted);">฿</span>
+ <input type="number" id="m-late-fee" oninput="saveCurrentRoomData()" value="299" style="width:90px;color:#fda4af;font-weight:900;text-align:right;">
+ </div>
+ </div>
+ <div id="m-late-hint" style="font-size:11px;color:#94a3b8;margin-top:4px;">* เช็คเอาท์ปกติก่อน 12:00 น. (สามารถติ๊กเปิด/ปิด หรือแก้ไขยอดเงินได้)</div>
+ </div>
 
-  <!-- ป้ายเตือนเงินมัดจำกุญแจก่อนรับเงิน -->
-  <div id="m-deposit-warn-box" class="hidden" style="background:#1e1b4b;border:1.5px solid #6366f1;border-radius:12px;padding:10px 14px;margin-bottom:8px;">
-  <div style="color:#c7d2fe;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">
-  <span>🔑 มีเงินมัดจำกุญแจถืออยู่:</span>
-  <b id="m-deposit-warn-amt" style="color:#a5b4fc;font-size:15px;">฿0</b>
-  </div>
-  <div style="font-size:11px;color:#94a3b8;margin-top:2px;">(เงินสดรับฝากแยก ไม่รวมในใบเสร็จ • คืนเงินสดให้ลูกค้า 100% เมื่อรับกุญแจ)</div>
-  </div>
+ <!-- ป้ายเตือนเงินมัดจำกุญแจก่อนรับเงิน -->
+ <div id="m-deposit-warn-box" class="hidden" style="background:#1e1b4b;border:1.5px solid #6366f1;border-radius:12px;padding:10px 14px;margin-bottom:8px;">
+ <div style="color:#c7d2fe;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">
+ <span>🔑 มีเงินมัดจำกุญแจถืออยู่:</span>
+ <b id="m-deposit-warn-amt" style="color:#a5b4fc;font-size:15px;">฿0</b>
+ </div>
+ <div style="font-size:11px;color:#94a3b8;margin-top:2px;">(เงินสดรับฝากแยก ไม่รวมในใบเสร็จ • คืนเงินสดให้ลูกค้า 100% เมื่อรับกุญแจ)</div>
+ </div>
 
-  <button onclick="openBigQrModal()" class="btn btn-sky" style="width:100%;padding:10px;margin-bottom:8px;">🔍 ขยาย QR Code เต็มจอให้ลูกค้าสแกน</button>
+ <button onclick="openBigQrModal()" class="btn btn-sky" style="width:100%;padding:10px;margin-bottom:8px;">🔍 ขยาย QR Code เต็มจอให้ลูกค้าสแกน</button>
 
  <button onclick="completeCheckOutAndPay()" class="btn btn-emerald" style="width:100%;padding:12px;margin-bottom:8px;font-size:14px;">💰 รับเงินเข้าบัญชี + เปิดเก๊ะ + คืนห้องว่าง</button>
  <div class="grid-2">
@@ -746,17 +747,17 @@
  <div style="border-top:1px dashed var(--border);padding-top:8px;">
  <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">หรือสำรองข้อมูลแบบไฟล์ข้อความ (Manual):</div>
  <div class="grid-2" style="margin-bottom:6px;">
-  <button onclick="exportSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📋 คัดลอกโค้ด</button>
-  <button onclick="importSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📥 นำเข้าโค้ด</button>
+ <button onclick="exportSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📋 คัดลอกโค้ด</button>
+ <button onclick="importSyncData()" class="btn btn-dark" style="font-size:11px;padding:6px;">📥 นำเข้าโค้ด</button>
  </div>
  <textarea id="sync-textarea" rows="2" style="font-size:11px;" placeholder="วางโค้ดสำรองข้อมูลที่นี่..."></textarea>
  </div>
  </div>
 </div>
 
-
 <!-- ================= MODAL: ตัวติดตั้งโปรแกรม PWA ================= -->
-<div id="pwa-guide-modal" class="modal-backdrop hidden" style="z-index:250;">
+<div id="pwa-guide-modal" class="modal-backdrop hidden" style="z-index:9999 !important;">
+
  <div class="modal-box" style="max-width:440px;">
  <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
  <b style="color:#38bdf8;font-size:15px;">📲 ตัวติดตั้งแอป ภูเบศร์โฮเต็ล (PWA Installer)</b>
@@ -791,6 +792,7 @@
 
 <script>
 let deferredPwaPrompt = null;
+
 
 function initSafePWA() {
  if ('serviceWorker' in navigator) {
@@ -1127,34 +1129,34 @@ function renderAll() {
  if (isOcc) {
  borderCol = '#f43f5e';
  if (r.stayType === 'short' && r.checkInTimestamp) {
-  const passedMins = Math.floor((now - r.checkInTimestamp) / 60000);
-  const remainMins = 180 - passedMins;
-  if (remainMins <= 0) {
-  borderCol = '#ffffff';
-  overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
-  countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเวลาชั่วคราว ${Math.abs(remainMins)} น.</span>`;
-  } else {
-  const remH = Math.floor(remainMins / 60);
-  const remM = remainMins % 60;
-  countdownText = `<span style="color:#38bdf8;font-weight:800;">⏱️ ชั่วคราว เหลือ ${remH}:${String(remM).padStart(2,'0')} ชม.</span>`;
-  }
+ const passedMins = Math.floor((now - r.checkInTimestamp) / 60000);
+ const remainMins = 180 - passedMins;
+ if (remainMins <= 0) {
+ borderCol = '#ffffff';
+ overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
+ countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเวลาชั่วคราว ${Math.abs(remainMins)} น.</span>`;
+ } else {
+ const remH = Math.floor(remainMins / 60);
+ const remM = remainMins % 60;
+ countdownText = `<span style="color:#38bdf8;font-weight:800;">⏱️ ชั่วคราว เหลือ ${remH}:${String(remM).padStart(2,'0')} ชม.</span>`;
+ }
  } else if (r.stayType === 'overnight') {
-  const curDate = new Date();
-  const curHour = curDate.getHours();
-  const curMin = curDate.getMinutes();
-  
-  if (curHour === 11) {
-  borderCol = '#f59e0b';
-  countdownText = `<span style="color:#fbbf24;font-weight:800;">⚠️ เตือนเช็คเอาท์เที่ยง (เหลือ ${60 - curMin} น.)</span>`;
-  } else if (curHour >= 12 && curHour < 18) {
-  borderCol = '#ffffff';
-  overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
-  countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเที่ยง (เลทเช็คเอาท์ +฿299)</span>`;
-  if (r.lateEnabled === undefined) {
-  r.lateEnabled = true;
-  r.lateFee = 299;
-  }
-  }
+ const curDate = new Date();
+ const curHour = curDate.getHours();
+ const curMin = curDate.getMinutes();
+ 
+ if (curHour === 11) {
+ borderCol = '#f59e0b';
+ countdownText = `<span style="color:#fbbf24;font-weight:800;">⚠️ เตือนเช็คเอาท์เที่ยง (เหลือ ${60 - curMin} น.)</span>`;
+ } else if (curHour >= 12 && curHour < 18) {
+ borderCol = '#ffffff';
+ overtimeStyle = 'border:2.5px solid #f43f5e; box-shadow:0 0 12px rgba(244,63,94,0.9);';
+ countdownText = `<span style="color:#f43f5e;font-weight:900;">🚨 เกินเที่ยง (เลทเช็คเอาท์ +฿299)</span>`;
+ if (r.lateEnabled === undefined) {
+ r.lateEnabled = true;
+ r.lateFee = 299;
+ }
+ }
  }
  } else if (isClean) {
 
@@ -1169,44 +1171,44 @@ function renderAll() {
 
  html += `
  <div onclick="openRoomModal(${idx})" class="card" style="margin:0;cursor:pointer;border:2px solid ${borderCol}; ${overtimeStyle}">
-  <div class="between" style="margin-bottom:6px;">
-  <div>
-  <div style="font-size:20px;font-weight:900;">${r.number}</div>
-  <span style="font-size:10px;background:#1e3a8a;color:#93c5fd;padding:2px 6px;border-radius:6px;font-weight:700;">${r.type}</span>
-  </div>
-  <button onclick="event.stopPropagation();toggleRoomLight(${idx})" style="width:36px;height:36px;border-radius:10px;font-size:10px;font-weight:900;${lightBg}">
-  💡<br>${r.light ? 'ON' : 'OFF'}
-  </button>
-  </div>
-  
-  <div class="between" style="border-top:1px solid var(--border);padding-top:6px;font-size:12px;">
-  ${isOcc
-  ? `<div style="display:flex;flex-direction:column;min-width:0;flex:1;">
-   <span style="color:#fda4af;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">👤 ${r.guestName || 'มีผู้เข้าพัก'}${depositBadge}</span>
-   <div style="font-size:10px;color:var(--muted);margin-top:1px;">${countdownText || (stayLabel + (r.checkInTime ? ' • ' + r.checkInTime : ''))}</div>
-   </div>
-   <b style="color:var(--amber);">฿${calcRoomTotal(r).grand}</b>`
-  : (isClean
-   ? `<div class="between" style="width:100%;">
-    <div>
-    <span style="color:#fcd34d;font-weight:800;">🧹 รอแม่บ้าน</span>
-    <div style="font-size:9.5px;color:var(--muted);">${r.dirtySince || ''}</div>
-    </div>
-    <button onclick="event.stopPropagation();markRoomCleaned(${idx})" class="btn btn-emerald" style="padding:2px 8px;font-size:11px;">เสร็จแล้ว</button>
-    </div>`
-   : (isRes
-    ? `<div class="between" style="width:100%;">
-    <div style="display:flex;flex-direction:column;min-width:0;">
-     <span style="color:#38bdf8;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 จอง: ${assignedB.guest}</span>
-     <span style="font-size:10px;color:var(--muted);">รอเช็คอิน (฿${assignedB.rate||650})</span>
-    </div>
-    <button onclick="event.stopPropagation();quickCheckInBooking(${idx}, '${assignedB.id}')" class="btn btn-sky" style="padding:3px 10px;font-size:11px;font-weight:800;">เช็คอิน</button>
-     </div>`
-    : `<span style="color:#34d399;font-weight:700;">✔ ห้องว่าง</span><span style="color:var(--muted);">฿${r.customRate || state.rates.overnight}</span>`
-   )
-   )
-  }
-  </div>
+ <div class="between" style="margin-bottom:6px;">
+ <div>
+ <div style="font-size:20px;font-weight:900;">${r.number}</div>
+ <span style="font-size:10px;background:#1e3a8a;color:#93c5fd;padding:2px 6px;border-radius:6px;font-weight:700;">${r.type}</span>
+ </div>
+ <button onclick="event.stopPropagation();toggleRoomLight(${idx})" style="width:36px;height:36px;border-radius:10px;font-size:10px;font-weight:900;${lightBg}">
+ 💡<br>${r.light ? 'ON' : 'OFF'}
+ </button>
+ </div>
+ 
+ <div class="between" style="border-top:1px solid var(--border);padding-top:6px;font-size:12px;">
+ ${isOcc
+ ? `<div style="display:flex;flex-direction:column;min-width:0;flex:1;">
+ <span style="color:#fda4af;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">👤 ${r.guestName || 'มีผู้เข้าพัก'}${depositBadge}</span>
+ <div style="font-size:10px;color:var(--muted);margin-top:1px;">${countdownText || (stayLabel + (r.checkInTime ? ' • ' + r.checkInTime : ''))}</div>
+ </div>
+ <b style="color:var(--amber);">฿${calcRoomTotal(r).grand}</b>`
+ : (isClean
+ ? `<div class="between" style="width:100%;">
+ <div>
+ <span style="color:#fcd34d;font-weight:800;">🧹 รอแม่บ้าน</span>
+ <div style="font-size:9.5px;color:var(--muted);">${r.dirtySince || ''}</div>
+ </div>
+ <button onclick="event.stopPropagation();markRoomCleaned(${idx})" class="btn btn-emerald" style="padding:2px 8px;font-size:11px;">เสร็จแล้ว</button>
+ </div>`
+ : (isRes
+ ? `<div class="between" style="width:100%;">
+ <div style="display:flex;flex-direction:column;min-width:0;">
+  <span style="color:#38bdf8;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 จอง: ${assignedB.guest}</span>
+  <span style="font-size:10px;color:var(--muted);">รอเช็คอิน (฿${assignedB.rate||650})</span>
+ </div>
+ <button onclick="event.stopPropagation();quickCheckInBooking(${idx}, '${assignedB.id}')" class="btn btn-sky" style="padding:3px 10px;font-size:11px;font-weight:800;">เช็คอิน</button>
+  </div>`
+ : `<span style="color:#34d399;font-weight:700;">✔ ห้องว่าง</span><span style="color:var(--muted);">฿${r.customRate || state.rates.overnight}</span>`
+ )
+ )
+ }
+ </div>
  </div>
  `;
  });
@@ -1394,12 +1396,12 @@ function switchRoomTab(n) {
  const depBox = document.getElementById('m-deposit-warn-box');
  const depAmt = document.getElementById('m-deposit-warn-amt');
  if (depBox && depAmt) {
-  if (Number(r.keyDeposit) > 0) {
-  depAmt.textContent = '฿' + Number(r.keyDeposit).toLocaleString();
-  depBox.classList.remove('hidden');
-  } else {
-  depBox.classList.add('hidden');
-  }
+ if (Number(r.keyDeposit) > 0) {
+ depAmt.textContent = '฿' + Number(r.keyDeposit).toLocaleString();
+ depBox.classList.remove('hidden');
+ } else {
+ depBox.classList.add('hidden');
+ }
  }
  }
  }
@@ -1590,13 +1592,13 @@ function searchCustomerQuickInline() {
  const stays = (c.stayHistory || []).length;
  return `
  <div onclick="selectQuickCustomer(${realIdx})" style="padding:8px 10px;border-bottom:1px solid #1e293b;cursor:pointer;font-size:12px;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='transparent'">
-  <div class="between">
-  <b style="color:#fff;">👤 ${c.name}</b>
-  ${stays > 0 ? `<span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">พัก ${stays} ครั้ง</span>` : ''}
-  </div>
-  <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">
-  📞 ${c.phone || '-'} ${c.addr ? '• 🏠 ' + c.addr : ''}
-  </div>
+ <div class="between">
+ <b style="color:#fff;">👤 ${c.name}</b>
+ ${stays > 0 ? `<span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">พัก ${stays} ครั้ง</span>` : ''}
+ </div>
+ <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">
+ 📞 ${c.phone || '-'} ${c.addr ? '• 🏠 ' + c.addr : ''}
+ </div>
  </div>
  `;
  }).join('');
@@ -1646,50 +1648,50 @@ function printRegCard() {
  <meta charset="utf-8">
  <title>บัตรทะเบียนผู้พัก - ห้อง ${r.number}</title>
  <style>
-  body { font-family: Sarabun, Tahoma, sans-serif; padding: 25px; color: #000; font-size: 13px; line-height: 1.6; }
-  .box { border: 1.5px solid #000; border-radius: 8px; padding: 16px; max-width: 650px; margin: 0 auto; }
-  .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
-  .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-  .line { border-bottom: 1px dotted #333; flex: 1; margin: 0 6px; }
-  .sign { margin-top: 40px; display: flex; justify-content: space-around; text-align: center; }
+ body { font-family: Sarabun, Tahoma, sans-serif; padding: 25px; color: #000; font-size: 13px; line-height: 1.6; }
+ .box { border: 1.5px solid #000; border-radius: 8px; padding: 16px; max-width: 650px; margin: 0 auto; }
+ .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+ .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+ .line { border-bottom: 1px dotted #333; flex: 1; margin: 0 6px; }
+ .sign { margin-top: 40px; display: flex; justify-content: space-around; text-align: center; }
  </style>
  </head>
  <body>
  <div class="box">
-  <div class="hdr">
-  <h2 style="margin:0;">ภูเบศร์อินเตอร์โฮเต็ล (PHUBESTH INTER HOTEL)</h2>
-  <div>108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 | โทร: 037231232</div>
-  <h3 style="margin:6px 0 0 0; text-decoration:underline;">บัตรทะเบียนผู้พัก (GUEST REGISTRATION CARD)</h3>
-  </div>
-  <div class="row">
-  <div><b>หมายเลขห้อง (Room No.):</b> <span style="font-size:16px;font-weight:bold;">${r.number}</span> (${r.type})</div>
-  <div><b>วันที่เข้าพัก (Date):</b> ${todayStr}</div>
-  </div>
-  <div class="row">
-  <div style="flex:1;display:flex;"><b>ชื่อ-สกุล (Name):</b> <span class="line">${r.guestName || ''}</span></div>
-  <div style="width:200px;display:flex;"><b>โทร (Phone):</b> <span class="line">${r.guestPhone || ''}</span></div>
-  </div>
-  <div class="row">
-  <div style="flex:1;display:flex;"><b>เลขบัตร ปชช./Passport:</b> <span class="line">${r.guestTax || ''}</span></div>
-  </div>
-  <div class="row">
-  <div><b>รูปแบบการพัก:</b> ${r.stayType === 'short' ? 'ชั่วคราว (3 ชม.)' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน')}</div>
-  <div><b>มัดจำกุญแจ:</b> ฿${r.keyDeposit || 0} บาท</div>
-  </div>
-  <div style="font-size:11px;color:#555;margin-top:14px;border:1px dashed #888;padding:8px;border-radius:6px;">
-  * โปรดเก็บรักษาทรัพย์สินมีค่าของท่าน ทางโรงแรมไม่รับผิดชอบกรณีสูญหายในห้องพัก<br>
-  * เวลาเช็คเอาท์ปกติไม่เกิน 12:00 น. หากเกินกำหนดคิดค่าบริการตามระเบียบโรงแรม
-  </div>
-  <div class="sign">
-  <div>
-  <div>ลงชื่อผู้เข้าพัก (Guest Signature)</div>
-  <div style="margin-top:40px;">(......................................................)</div>
-  </div>
-  <div>
-  <div>เจ้าหน้าที่ผู้รับลงทะเบียน (Front Desk)</div>
-  <div style="margin-top:40px;">(......................................................)</div>
-  </div>
-  </div>
+ <div class="hdr">
+ <h2 style="margin:0;">ภูเบศร์อินเตอร์โฮเต็ล (PHUBESTH INTER HOTEL)</h2>
+ <div>108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 | โทร: 037231232</div>
+ <h3 style="margin:6px 0 0 0; text-decoration:underline;">บัตรทะเบียนผู้พัก (GUEST REGISTRATION CARD)</h3>
+ </div>
+ <div class="row">
+ <div><b>หมายเลขห้อง (Room No.):</b> <span style="font-size:16px;font-weight:bold;">${r.number}</span> (${r.type})</div>
+ <div><b>วันที่เข้าพัก (Date):</b> ${todayStr}</div>
+ </div>
+ <div class="row">
+ <div style="flex:1;display:flex;"><b>ชื่อ-สกุล (Name):</b> <span class="line">${r.guestName || ''}</span></div>
+ <div style="width:200px;display:flex;"><b>โทร (Phone):</b> <span class="line">${r.guestPhone || ''}</span></div>
+ </div>
+ <div class="row">
+ <div style="flex:1;display:flex;"><b>เลขบัตร ปชช./Passport:</b> <span class="line">${r.guestTax || ''}</span></div>
+ </div>
+ <div class="row">
+ <div><b>รูปแบบการพัก:</b> ${r.stayType === 'short' ? 'ชั่วคราว (3 ชม.)' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน')}</div>
+ <div><b>มัดจำกุญแจ:</b> ฿${r.keyDeposit || 0} บาท</div>
+ </div>
+ <div style="font-size:11px;color:#555;margin-top:14px;border:1px dashed #888;padding:8px;border-radius:6px;">
+ * โปรดเก็บรักษาทรัพย์สินมีค่าของท่าน ทางโรงแรมไม่รับผิดชอบกรณีสูญหายในห้องพัก<br>
+ * เวลาเช็คเอาท์ปกติไม่เกิน 12:00 น. หากเกินกำหนดคิดค่าบริการตามระเบียบโรงแรม
+ </div>
+ <div class="sign">
+ <div>
+ <div>ลงชื่อผู้เข้าพัก (Guest Signature)</div>
+ <div style="margin-top:40px;">(......................................................)</div>
+ </div>
+ <div>
+ <div>เจ้าหน้าที่ผู้รับลงทะเบียน (Front Desk)</div>
+ <div style="margin-top:40px;">(......................................................)</div>
+ </div>
+ </div>
  </div>
  <script>window.onload = function() { window.print(); }</script>
  </body>
@@ -2194,18 +2196,18 @@ function renderReceiptsArchive() {
  box.innerHTML = filtered.map((r, idx) => `
  <div class="between" style="background:#030712;border:1px solid #1f2937;border-radius:12px;padding:12px 16px;">
  <div>
-  <div class="row">
-  <b style="font-size:14px;color:#c084fc;">📄 ${r.receiptId}</b>
-  <span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:2px 7px;border-radius:6px;font-weight:800;">ห้อง ${r.roomNumber} (${r.roomType})</span>
-  <span style="font-size:11px;color:#cbd5e1;">👤 ${r.guestName}</span>
-  </div>
-  <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">
-  📅 วันที่: <b>${r.date} ${r.time||''}</b> | ยอดสุทธิ: <b style="color:#34d399;font-size:13px;">฿${(r.calc?.grand || 0).toLocaleString()}</b> ${r.vatEnabled ? '<span style="color:#fde68a;">(มี VAT)</span>' : ''}
-  </div>
+ <div class="row">
+ <b style="font-size:14px;color:#c084fc;">📄 ${r.receiptId}</b>
+ <span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:2px 7px;border-radius:6px;font-weight:800;">ห้อง ${r.roomNumber} (${r.roomType})</span>
+ <span style="font-size:11px;color:#cbd5e1;">👤 ${r.guestName}</span>
+ </div>
+ <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">
+ 📅 วันที่: <b>${r.date} ${r.time||''}</b> | ยอดสุทธิ: <b style="color:#34d399;font-size:13px;">฿${(r.calc?.grand || 0).toLocaleString()}</b> ${r.vatEnabled ? '<span style="color:#fde68a;">(มี VAT)</span>' : ''}
+ </div>
  </div>
  <div class="row">
-  <button onclick="reprintArchivedReceipt(${idx})" class="btn btn-amber" style="padding:6px 12px;font-size:11px;">🖨️ พิมพ์ซ้ำ / ดูบิล</button>
-  <button onclick="if(confirm('ลบประวัติใบเสร็จนี้?')){state.receiptsArchive.splice(${idx},1);saveDatabase();renderReceiptsArchive();}" class="btn btn-dark" style="padding:6px 8px;font-size:11px;color:#fda4af;">🗑️</button>
+ <button onclick="reprintArchivedReceipt(${idx})" class="btn btn-amber" style="padding:6px 12px;font-size:11px;">🖨️ พิมพ์ซ้ำ / ดูบิล</button>
+ <button onclick="if(confirm('ลบประวัติใบเสร็จนี้?')){state.receiptsArchive.splice(${idx},1);saveDatabase();renderReceiptsArchive();}" class="btn btn-dark" style="padding:6px 8px;font-size:11px;color:#fda4af;">🗑️</button>
  </div>
  </div>
  `).join('');
@@ -2240,114 +2242,114 @@ function reprintArchivedReceipt(idx) {
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
  <title>ใบเสร็จรับเงิน ${r.receiptId} - ห้อง ${r.roomNumber}</title>
  <style>
-  * { box-sizing: border-box; }
-  body {
-  font-family: -apple-system, BlinkMacSystemFont, "Sarabun", Tahoma, sans-serif;
-  background: #0b0f19;
-  margin: 0;
-  padding: 24px 12px 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  }
-  .action-bar {
-  width: 100%;
-  max-width: 520px;
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-  }
-  .action-btn {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-weight: 800;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  }
-  .btn-print { background: #f59e0b; color: #000; }
-  .btn-close { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
-  
-  /* กล่องใบเสร็จขยายใหญ่ ชัดเจนเต็มตา */
-  .receipt-card {
-  width: 100%;
-  max-width: 520px;
-  background: #ffffff;
-  color: #000000;
-  border-radius: 18px;
-  padding: 28px 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-  font-size: 15px;
-  line-height: 1.6;
-  }
-  .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 12px; }
-  .row { display: flex; justify-content: space-between; align-items: center; }
-  
-  @media print {
-  body { background: #fff; padding: 0; }
-  .action-bar { display: none !important; }
-  .receipt-card {
-  border: none;
-  box-shadow: none;
-  max-width: 100%;
-  padding: 10px;
-  font-size: 13px;
-  }
-  }
+ * { box-sizing: border-box; }
+ body {
+ font-family: -apple-system, BlinkMacSystemFont, "Sarabun", Tahoma, sans-serif;
+ background: #0b0f19;
+ margin: 0;
+ padding: 24px 12px 60px;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: flex-start;
+ min-height: 100vh;
+ }
+ .action-bar {
+ width: 100%;
+ max-width: 520px;
+ display: flex;
+ gap: 10px;
+ margin-bottom: 16px;
+ }
+ .action-btn {
+ flex: 1;
+ padding: 12px 14px;
+ border-radius: 12px;
+ font-weight: 800;
+ border: none;
+ cursor: pointer;
+ font-size: 14px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 6px;
+ }
+ .btn-print { background: #f59e0b; color: #000; }
+ .btn-close { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+ 
+ /* กล่องใบเสร็จขยายใหญ่ ชัดเจนเต็มตา */
+ .receipt-card {
+ width: 100%;
+ max-width: 520px;
+ background: #ffffff;
+ color: #000000;
+ border-radius: 18px;
+ padding: 28px 24px;
+ box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+ font-size: 15px;
+ line-height: 1.6;
+ }
+ .hdr { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 12px; }
+ .row { display: flex; justify-content: space-between; align-items: center; }
+ 
+ @media print {
+ body { background: #fff; padding: 0; }
+ .action-bar { display: none !important; }
+ .receipt-card {
+ border: none;
+ box-shadow: none;
+ max-width: 100%;
+ padding: 10px;
+ font-size: 13px;
+ }
+ }
  </style>
  </head>
  <body>
  <div class="action-bar">
-  <button onclick="window.print()" class="action-btn btn-print">🖨️ สั่งพิมพ์ใบเสร็จ</button>
-  <button onclick="window.close()" class="action-btn btn-close">✕ ปิดหน้าต่าง</button>
+ <button onclick="window.print()" class="action-btn btn-print">🖨️ สั่งพิมพ์ใบเสร็จ</button>
+ <button onclick="window.close()" class="action-btn btn-close">✕ ปิดหน้าต่าง</button>
  </div>
 
  <div class="receipt-card" id="receipt-box">
-  <div class="hdr">
-  <div style="font-size:24px; font-weight:900; color:#000;">${hotelNameTh}</div>
-  <div style="font-size:13px; font-weight:800; letter-spacing:0.5px; color:#333;">${hotelNameEn}</div>
-  <div style="font-size:12px; color:#555; margin-top:3px;">${hotelAddress} | โทร: ${hotelPhone}</div>
-  <div style="margin-top:8px; display:inline-block; border:1.8px solid #000; border-radius:6px; padding:3px 14px; font-size:13.5px; font-weight:900;">
-  ${r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี (สำเนา) ]' : '[ ใบเสร็จรับเงิน (สำเนา) ]'}
-  </div>
-  <div style="font-size:12px; margin-top:4px; color:#666;">เลขที่บิล: <b>${r.receiptId}</b></div>
-  </div>
+ <div class="hdr">
+ <div style="font-size:24px; font-weight:900; color:#000;">${hotelNameTh}</div>
+ <div style="font-size:13px; font-weight:800; letter-spacing:0.5px; color:#333;">${hotelNameEn}</div>
+ <div style="font-size:12px; color:#555; margin-top:3px;">${hotelAddress} | โทร: ${hotelPhone}</div>
+ <div style="margin-top:8px; display:inline-block; border:1.8px solid #000; border-radius:6px; padding:3px 14px; font-size:13.5px; font-weight:900;">
+ ${r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี (สำเนา) ]' : '[ ใบเสร็จรับเงิน (สำเนา) ]'}
+ </div>
+ <div style="font-size:12px; margin-top:4px; color:#666;">เลขที่บิล: <b>${r.receiptId}</b></div>
+ </div>
 
-  <div style="border-bottom:1.5px dashed #444; padding-bottom:10px; margin-bottom:12px; font-size:14px;">
-  <div class="row">
-  <span><b>ห้องพัก:</b> <b style="font-size:17px;">${r.roomNumber}</b> (${r.roomType})</span>
-  <span><b>วันที่:</b> ${r.date} ${r.time ? '• ' + r.time : ''}</span>
-  </div>
-  <div style="margin-top:4px;"><b>ชื่อลูกค้า:</b> ${r.guestName}</div>
-  ${r.guestTax ? `<div style="font-size:12.5px; color:#444;"><b>เลขประจำตัวผู้เสียภาษี:</b> ${r.guestTax}</div>` : ''}
-  </div>
+ <div style="border-bottom:1.5px dashed #444; padding-bottom:10px; margin-bottom:12px; font-size:14px;">
+ <div class="row">
+ <span><b>ห้องพัก:</b> <b style="font-size:17px;">${r.roomNumber}</b> (${r.roomType})</span>
+ <span><b>วันที่:</b> ${r.date} ${r.time ? '• ' + r.time : ''}</span>
+ </div>
+ <div style="margin-top:4px;"><b>ชื่อลูกค้า:</b> ${r.guestName}</div>
+ ${r.guestTax ? `<div style="font-size:12.5px; color:#444;"><b>เลขประจำตัวผู้เสียภาษี:</b> ${r.guestTax}</div>` : ''}
+ </div>
 
-  <div style="min-height:70px; font-size:14.5px;">
-  ${itemsHtml}
-  </div>
+ <div style="min-height:70px; font-size:14.5px;">
+ ${itemsHtml}
+ </div>
 
-  <div style="border-top:2px solid #000; margin-top:12px; padding-top:8px; font-size:14.5px;">
-    <div class="row"><span>รวมเป็นเงิน:</span><span>฿${((r.vatEnabled && r.vatMode === 'include') ? (calc.grand - (calc.vat || 0)) : (calc.subtotal || 0)).toFixed(2)}</span></div>
+ <div style="border-top:2px solid #000; margin-top:12px; padding-top:8px; font-size:14.5px;">
+ <div class="row"><span>รวมเป็นเงิน:</span><span>฿${((r.vatEnabled && r.vatMode === 'include') ? (calc.grand - (calc.vat || 0)) : (calc.subtotal || 0)).toFixed(2)}</span></div>
  
-  ${r.discount > 0 ? `<div class="row" style="color:#059669;"><span>ส่วนลดพิเศษ:</span><span>-฿${Number(r.discount).toFixed(2)}</span></div>` : ''}
-  ${r.vatEnabled ? `<div class="row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span>฿${(calc.vat||0).toFixed(2)}</span></div>` : ''}
-  <div class="row" style="font-size:20px; font-weight:900; border-top:1.5px dashed #000; margin-top:6px; padding-top:8px; color:#000;">
-  <span>ยอดสุทธิ (TOTAL):</span>
-  <span>฿${(calc.grand||0).toFixed(2)}</span>
-  </div>
-  </div>
+ ${r.discount > 0 ? `<div class="row" style="color:#059669;"><span>ส่วนลดพิเศษ:</span><span>-฿${Number(r.discount).toFixed(2)}</span></div>` : ''}
+ ${r.vatEnabled ? `<div class="row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span>฿${(calc.vat||0).toFixed(2)}</span></div>` : ''}
+ <div class="row" style="font-size:20px; font-weight:900; border-top:1.5px dashed #000; margin-top:6px; padding-top:8px; color:#000;">
+ <span>ยอดสุทธิ (TOTAL):</span>
+ <span>฿${(calc.grand||0).toFixed(2)}</span>
+ </div>
+ </div>
 
-  <div style="text-align:center; margin-top:20px; padding-top:12px; border-top:1px dashed #777; font-size:12px; color:#555;">
-  🙏 ขอบคุณที่ไว้วางใจใช้บริการ ${hotelNameTh}<br>
-  <span style="font-size:11px; color:#888;">(เอกสารสำเนาประวัติย้อนหลัง • ระบบ Smart PMS)</span>
-  </div>
+ <div style="text-align:center; margin-top:20px; padding-top:12px; border-top:1px dashed #777; font-size:12px; color:#555;">
+ 🙏 ขอบคุณที่ไว้วางใจใช้บริการ ${hotelNameTh}<br>
+ <span style="font-size:11px; color:#888;">(เอกสารสำเนาประวัติย้อนหลัง • ระบบ Smart PMS)</span>
+ </div>
  </div>
  </body>
  </html>
@@ -2513,20 +2515,20 @@ function renderCustomers() {
  return `
  <div class="between" style="background:#030712;padding:8px 12px;border-radius:10px;margin-bottom:6px;border:1px solid ${isVip ? 'rgba(245,158,11,0.6)' : '#1f2937'};">
  <div style="min-width:0;flex:1;">
-  <div class="row" style="gap:6px;">
-  <b style="font-size:13.5px;color:#fff;">👤 ${c.name}</b>
-  ${isVip ? `<span style="font-size:9.5px;background:#78350f;color:#fde68a;padding:1px 5px;border-radius:4px;font-weight:900;">⭐ VIP</span>` : ''}
-  <span style="font-size:9.5px;background:#1e293b;color:#94a3b8;padding:1px 5px;border-radius:4px;">${totalStays} ครั้ง (${totalNights} คืน)</span>
-  <span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">สะสม ฿${totalSpend.toLocaleString()}</span>
-  </div>
-  <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-  📞 ${c.phone || '-'} ${c.tax ? '| 📝 ' + c.tax : ''} ${c.addr ? '| 🏠 ' + c.addr : ''}
-  </div>
+ <div class="row" style="gap:6px;">
+ <b style="font-size:13.5px;color:#fff;">👤 ${c.name}</b>
+ ${isVip ? `<span style="font-size:9.5px;background:#78350f;color:#fde68a;padding:1px 5px;border-radius:4px;font-weight:900;">⭐ VIP</span>` : ''}
+ <span style="font-size:9.5px;background:#1e293b;color:#94a3b8;padding:1px 5px;border-radius:4px;">${totalStays} ครั้ง (${totalNights} คืน)</span>
+ <span style="font-size:9.5px;background:#064e3b;color:#6ee7b7;padding:1px 5px;border-radius:4px;font-weight:700;">สะสม ฿${totalSpend.toLocaleString()}</span>
+ </div>
+ <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+ 📞 ${c.phone || '-'} ${c.tax ? '| 📝 ' + c.tax : ''} ${c.addr ? '| 🏠 ' + c.addr : ''}
+ </div>
  </div>
  <div class="row" style="gap:4px;margin-left:8px;">
-  <button onclick="viewCustomerHistory(${realIdx})" class="btn btn-amber" style="padding:4px 8px;font-size:10.5px;">📜 ประวัติ</button>
-  <button onclick="editCustomer(${realIdx})" class="btn btn-sky" style="padding:4px 8px;font-size:10.5px;">✏️</button>
-  <button onclick="deleteCustomerSecure(${realIdx})" class="btn btn-rose" style="padding:4px 7px;font-size:10.5px;">🗑️</button>
+ <button onclick="viewCustomerHistory(${realIdx})" class="btn btn-amber" style="padding:4px 8px;font-size:10.5px;">📜 ประวัติ</button>
+ <button onclick="editCustomer(${realIdx})" class="btn btn-sky" style="padding:4px 8px;font-size:10.5px;">✏️</button>
+ <button onclick="deleteCustomerSecure(${realIdx})" class="btn btn-rose" style="padding:4px 7px;font-size:10.5px;">🗑️</button>
  </div>
  </div>
  `;
@@ -2814,8 +2816,8 @@ async function processFastRealtimeEnv(env) {
  rawTxt = env.message;
  } else if (env.attachment && env.attachment.url) {
  const attUrl = env.attachment.url.startsWith('http')
-  ? env.attachment.url
-  : ('https://ntfy.sh' + (env.attachment.url.startsWith('/') ? '' : '/') + env.attachment.url);
+ ? env.attachment.url
+ : ('https://ntfy.sh' + (env.attachment.url.startsWith('/') ? '' : '/') + env.attachment.url);
  const r = await fetch(attUrl);
  if (r.ok) rawTxt = await r.text();
  }
@@ -2899,17 +2901,17 @@ async function pullFromCloud(manual = false) {
  let remoteData = null;
  for (let i = lines.length - 1; i >= 0; i--) {
  try {
-  const item = JSON.parse(lines[i]);
-  let raw = null;
-  if (item.message && item.message.includes('rooms')) raw = item.message;
-  else if (item.attachment && item.attachment.url) {
-  const ar = await fetch(item.attachment.url);
-  if (ar.ok) raw = await ar.text();
-  }
-  if (raw) {
-  const p = JSON.parse(raw);
-  if (p && Array.isArray(p.rooms)) { remoteData = p; break; }
-  }
+ const item = JSON.parse(lines[i]);
+ let raw = null;
+ if (item.message && item.message.includes('rooms')) raw = item.message;
+ else if (item.attachment && item.attachment.url) {
+ const ar = await fetch(item.attachment.url);
+ if (ar.ok) raw = await ar.text();
+ }
+ if (raw) {
+ const p = JSON.parse(raw);
+ if (p && Array.isArray(p.rooms)) { remoteData = p; break; }
+ }
  } catch (err) {}
  }
 
@@ -3098,11 +3100,11 @@ function checkAvailabilityPreview() {
  const isAvail = stat.available > 0;
  return `
  <div style="background:#090d16; border:1px solid ${isAvail ? '#10b981' : '#f43f5e'}; border-radius:12px; padding:10px;">
-  <div style="font-size:12px; font-weight:800; color:#fff;">${t}</div>
-  <div class="between" style="margin-top:4px;">
-  <span style="font-size:11px; color:var(--muted);">ทั้งหมด: ${stat.total}</span>
-  <b style="font-size:16px; color:${isAvail ? '#34d399' : '#f43f5e'};">ว่าง ${stat.available} ห้อง</b>
-  </div>
+ <div style="font-size:12px; font-weight:800; color:#fff;">${t}</div>
+ <div class="between" style="margin-top:4px;">
+ <span style="font-size:11px; color:var(--muted);">ทั้งหมด: ${stat.total}</span>
+ <b style="font-size:16px; color:${isAvail ? '#34d399' : '#f43f5e'};">ว่าง ${stat.available} ห้อง</b>
+ </div>
  </div>
  `;
  }).join('');
@@ -3169,23 +3171,23 @@ function renderBookingsList() {
  return `
  <div class="between" style="background:#030712; border:1px solid ${isCancelled ? '#334155' : 'var(--border)'}; border-radius:12px; padding:12px; opacity:${isCancelled ? '0.7' : '1'};">
  <div>
-  <div class="row">
-  <b style="font-size:14px; color:#fff;">👤 ${b.guest}</b>
-  <span style="font-size:10px; background:#1e3a8a; color:#93c5fd; padding:2px 6px; border-radius:6px; font-weight:700;">${b.roomType} x${b.qty} ห้อง</span>
-  ${b.deposit > 0 ? `<span style="font-size:10px; background:#064e3b; color:#6ee7b7; padding:2px 6px; border-radius:6px; font-weight:700;">มัดจำ ฿${b.deposit}</span>` : ''}
-  <span style="font-size:10px; color:${!isCancelled ? '#34d399' : '#fda4af'}; font-weight:800;">[${!isCancelled ? 'ยืนยัน' : 'ยกเลิก'}]</span>
-  </div>
-  <div style="font-size:11.5px; color:var(--muted); margin-top:4px;">
-  📅 เข้า: <b>${b.checkIn}</b> ➔ ออก: <b>${b.checkOut}</b> | 📞 โทร: <b>${b.phone || '-'}</b> | ราคา: ฿${b.rate || 650}
-  </div>
+ <div class="row">
+ <b style="font-size:14px; color:#fff;">👤 ${b.guest}</b>
+ <span style="font-size:10px; background:#1e3a8a; color:#93c5fd; padding:2px 6px; border-radius:6px; font-weight:700;">${b.roomType} x${b.qty} ห้อง</span>
+ ${b.deposit > 0 ? `<span style="font-size:10px; background:#064e3b; color:#6ee7b7; padding:2px 6px; border-radius:6px; font-weight:700;">มัดจำ ฿${b.deposit}</span>` : ''}
+ <span style="font-size:10px; color:${!isCancelled ? '#34d399' : '#fda4af'}; font-weight:800;">[${!isCancelled ? 'ยืนยัน' : 'ยกเลิก'}]</span>
+ </div>
+ <div style="font-size:11.5px; color:var(--muted); margin-top:4px;">
+ 📅 เข้า: <b>${b.checkIn}</b> ➔ ออก: <b>${b.checkOut}</b> | 📞 โทร: <b>${b.phone || '-'}</b> | ราคา: ฿${b.rate || 650}
+ </div>
  </div>
  <div class="row">
-  <button onclick="editReservation(${realIdx})" class="btn btn-sky" style="font-size:11px; padding:5px 9px;">✏️ แก้ไข</button>
-  ${!isCancelled 
-  ? `<button onclick="cancelReservation(${realIdx})" class="btn btn-rose" style="font-size:11px; padding:5px 9px;">ยกเลิก</button>` 
-  : `<button onclick="state.reservations[${realIdx}].status='confirmed'; saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms(); showToast('กู้คืนสถานะการจองสำเร็จ');" class="btn btn-emerald" style="font-size:11px; padding:5px 9px;">🔄 กู้คืน</button>`
-  }
-  <button onclick="if(confirm('ลบรายการจองนี้ถาวร?')){state.reservations.splice(${realIdx},1); saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms();}" class="btn btn-dark" style="font-size:11px; padding:5px 8px; color:#fda4af;">🗑️</button>
+ <button onclick="editReservation(${realIdx})" class="btn btn-sky" style="font-size:11px; padding:5px 9px;">✏️ แก้ไข</button>
+ ${!isCancelled 
+ ? `<button onclick="cancelReservation(${realIdx})" class="btn btn-rose" style="font-size:11px; padding:5px 9px;">ยกเลิก</button>` 
+ : `<button onclick="state.reservations[${realIdx}].status='confirmed'; saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms(); showToast('กู้คืนสถานะการจองสำเร็จ');" class="btn btn-emerald" style="font-size:11px; padding:5px 9px;">🔄 กู้คืน</button>`
+ }
+ <button onclick="if(confirm('ลบรายการจองนี้ถาวร?')){state.reservations.splice(${realIdx},1); saveDatabase(); renderBookingsList(); checkAvailabilityPreview(); renderRooms();}" class="btn btn-dark" style="font-size:11px; padding:5px 8px; color:#fda4af;">🗑️</button>
  </div>
  </div>
  `;
@@ -3280,7 +3282,7 @@ function forceInstallApp() {
  deferredPwaPrompt.prompt();
  deferredPwaPrompt.userChoice.then((choiceResult) => {
  if (choiceResult.outcome === 'accepted') {
-  showToast('ติดตั้งแอปสำเร็จ!');
+ showToast('ติดตั้งแอปสำเร็จ!');
  }
  deferredPwaPrompt = null;
  });
