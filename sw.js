@@ -1,11 +1,17 @@
-self.addEventListener('install', (e) => {
+const CACHE_NAME = 'phubesth-hotel-v1';
+
+self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (e) => {
-  // ปล่อยผ่านให้ Vercel โหลดข้อมูลปกติ เพื่อป้องกันระบบค้าง
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/index.html'))
+    );
+  }
 });
