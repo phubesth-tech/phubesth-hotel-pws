@@ -1,1 +1,23 @@
-self.addEventListener('fetch', (e) => {});
+const CACHE_NAME = 'phubesth-hotel-native-v2';
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  // ข้ามการแคชระบบซิงค์เรียลไทม์ ntfy เพื่อให้ซิงค์ข้ามเครื่องไว 100%
+  if (event.request.url.includes('ntfy.sh')) return;
+
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});
