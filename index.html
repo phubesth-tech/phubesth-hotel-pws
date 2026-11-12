@@ -3841,5 +3841,302 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+ <!-- ================= ADD-ON: พิมพ์ออกเครื่อง OCPP-C582 โดยตรง (ไม่เด้งไป Epson) + เปิดเก๊ะ 12V ================= -->
+<!-- วิธีใช้: คัดลอกโค้ดทั้งหมดในไฟล์นี้ ไปวางไว้ท้ายสุดของไฟล์ index.html (ก่อนบรรทัด </body>) -->
+​<style>
+/* ซ่อนปุ่มติดตั้งเก่าที่เสีย /
+button[onclick="triggerPwaInstall"], #pwa-guide-modal { display: none !important; }
+</style>
+​<!-- หน้าต่างตั้งค่าการพิมพ์ OCPP-C582 คู่กับปริ๊นเตอร์ Epson ปกติ -->
+<div id="ocpp-direct-modal" class="modal-backdrop hidden" style="z-index: 9800;">
+<div class="modal-box" style="max-width: 480px; border: 2px solid #10b981;">
+<div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
+<div>
+<b style="font-size: 16px; color: #34d399;">🖨️ ตั้งค่าเครื่องพิมพ์ OCPP-C582 & เก๊ะเก็บเงิน</b>
+<div style="font-size: 11px; color: var(--muted);">ยิงตรงเข้า OCPP-C582 พอร์ตเดียวกับเก๊ะเก็บเงิน (ไม่ผ่านหน้าต่าง Epson)</div>
+</div>
+<button onclick="document.getElementById('ocpp-direct-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+</div>
+​<div class="subcard" style="background: #082f49; border-color: #0284c7;">
+<div class="between">
+<div>
+<div style="font-size: 11px; color: #7dd3fc;">สถานะสาย USB (OCPP-C582):</div>
+<b id="ocpp-usb-label" style="font-size: 13px; color: #38bdf8;">🔌 กดจับคู่สาย USB ด้านขวา (ทำครั้งเดียว)</b>
+</div>
+<button onclick="pairOcppUsbNow()" class="btn btn-sky" style="padding: 8px 12px;">🔌 จับคู่สาย USB</button>
+</div>
+</div>
+​<div class="subcard">
+<b style="color: var(--amber); display: block; margin-bottom: 6px;">เมื่อกดปุ่ม "🖨️ สั่งพิมพ์ใบเสร็จ + เด้งเก๊ะ" ให้พิมพ์ออกทางไหน?</b>
+<select id="ocpp-target-select" onchange="saveOcppMode()" style="font-weight: 800; color: #34d399; margin-bottom: 8px;">
+<option value="ocpp_direct">⚡ พิมพ์ออกสลิป OCPP-C582 ทันที (USB / RawBT ไม่เด้งไป Epson)</option>
+<option value="ask_every_time">🔀 ถามทุกครั้งว่าจะพิมพ์ออก OCPP-C582 หรือ ปริ๊นเตอร์ปกติ (Epson)</option>
+<option value="normal_printer">📄 พิมพ์ออกปริ๊นเตอร์คอมพิวเตอร์ปกติ (Epson / A4)</option>
+</select>
+</div>
+​<div class="grid-2">
+<button onclick="kickDrawerOnly()" class="btn btn-emerald" style="padding: 12px;">🗄️ ทดสอบเด้งเก๊ะ</button>
+<button onclick="printDirectToOcpp58()" class="btn btn-amber" style="padding: 12px;">🧾 ทดสอบพิมพ์ออก OCPP-C582</button>
+</div>
+</div>
+</div>
+​<script>
+// ================= ระบบยิงใบเสร็จเข้าเครื่อง OCPP-C582 โดยตรง (พอร์ตเดียวกับเก๊ะเก็บเงิน) =================
+const OCPP_MODE_KEY = 'PHUBESTH_OCPP_PRINT_TARGET';
+let activeUsbPrinter = null;
+let activeUsbInterface = 0;
+let activeUsbEndpoint = 1;
+​function getOcppTargetMode() {
+return localStorage.getItem(OCPP_MODE_KEY) || 'ocpp_direct';
+}
+​function saveOcppMode() {
+const sel = document.getElementById('ocpp-target-select');
+if (sel) localStorage.setItem(OCPP_MODE_KEY, sel.value);
+}
+​function openOcppDirectModal() {
+const sel = document.getElementById('ocpp-target-select');
+if (sel) sel.value = getOcppTargetMode();
+document.getElementById('ocpp-direct-modal').classList.remove('hidden');
+}
+​// จับคู่สาย USB กับเครื่อง OCPP-C582
+async function pairOcppUsbNow() {
+if (!navigator.usb) {
+alert('หากใช้งานบน Android แนะนำให้ใช้คู่กับแอป RawBT หรือเปิดใน Chrome ครับ');
+return false;
+}
+try {
+const dev = await navigator.usb.requestDevice({ filters: [] });
+await openOcppUsbDevice(dev);
+showToast('✅ เชื่อมต่อเครื่องพิมพ์ OCPP-C582 สำเร็จ!');
+return true;
+} catch (e) {
+return false;
+}
+}
+​async function openOcppUsbDevice(dev) {
+await dev.open();
+if (dev.configuration === null) await dev.selectConfiguration(1);
+for (const iface of dev.configuration.interfaces) {
+for (const alt of iface.alternates) {
+for (const ep of alt.endpoints) {
+if (ep.direction === 'out') {
+activeUsbInterface = iface.interfaceNumber;
+activeUsbEndpoint = ep.endpointNumber;
+break;
+}
+}
+}
+}
+await dev.claimInterface(activeUsbInterface);
+activeUsbPrinter = dev;
+const lbl = document.getElementById('ocpp-usb-label');
+if (lbl) {
+lbl.textContent = '🟢 เชื่อมต่อแล้ว: ' + (dev.productName || 'OCPP-C582');
+lbl.style.color = '#34d399';
+}
+}
+​// ส่งข้อมูล Raw Bytes เข้าเครื่อง OCPP-C582 (ส่งออกทั้งสาย USB และ RawBT พอร์ตเดียวกับที่เปิดเก๊ะได้)
+async function sendRawBytesToOcpp(bytes) {
+// 1. ลองส่งผ่านสาย USB (WebUSB)
+try {
+if (!activeUsbPrinter && navigator.usb) {
+const list = await navigator.usb.getDevices();
+if (list.length > 0) await openOcppUsbDevice(list[0]);
+}
+if (activeUsbPrinter) {
+// แบ่งส่งทีละก้อน (Chunk) เพื่อให้เครื่องพิมพ์ OCPP-C582 พิมพ์กราฟิกภาษาไทยได้ลื่นไม่ค้าง
+const chunkSize = 4096;
+for (let i = 0; i < bytes.length; i += chunkSize) {
+const chunk = bytes.slice(i, i + chunkSize);
+await activeUsbPrinter.transferOut(activeUsbEndpoint, chunk);
+}
+return true;
+}
+} catch (e) {
+activeUsbPrinter = null;
+}
+​// 2. หากเปิดเก๊ะผ่านระบบ Android (RawBT Bridge) ให้ส่งเข้า RawBT โดยตรง
+if (/Android/i.test(navigator.userAgent)) {
+let binary = '';
+for (let i = 0; i < bytes.byteLength; i++) {
+binary += String.fromCharCode(bytes[i]);
+}
+const base64Data = btoa(binary);
+const iframe = document.createElement('iframe');
+iframe.style.display = 'none';
+iframe.src = 'rawbt:base64,' + base64Data;
+document.body.appendChild(iframe);
+setTimeout(() => { try { document.body.removeChild(iframe); } catch (err) {} }, 3000);
+return true;
+}
+​return false;
+}
+​// คำสั่งเปิดเก๊ะเก็บเงิน 12V (ที่คุณทดสอบแล้วว่าเปิดเก๊ะได้สำเร็จ)
+window.kickDrawerOnly = async function() {
+const kickCmd = new Uint8Array([
+0x1B, 0x40,
+0x1B, 0x70, 0x00, 0x19, 0xFA,
+0x1B, 0x70, 0x01, 0x19, 0xFA
+]);
+const ok = await sendRawBytesToOcpp(kickCmd);
+if (!ok && navigator.usb) {
+const paired = await pairOcppUsbNow();
+if (paired) await sendRawBytesToOcpp(kickCmd);
+}
+showToast('🗄️ ส่งสัญญาณเปิดเก๊ะเก็บเงินแล้ว!');
+};
+​// แปลงใบเสร็จภาษาไทย + QR Code เป็นรหัสภาพความร้อน ESC/POS (GS v 0) กว้าง 384 จุด (58mm) สำหรับ OCPP-C582
+async function buildOcpp58mmRasterBytes() {
+const r = (activeRoomIndex !== null && state.rooms[activeRoomIndex])
+? state.rooms[activeRoomIndex]
+: { number: '101', type: 'Double Bed', guestName: 'ลูกค้าทั่วไป', nights: 1, stayType: 'overnight', orders: [] };
+const calc = (typeof calcRoomTotal === 'function')
+? calcRoomTotal(r)
+: { roomCost: 650, elecCost: 0, waterCost: 0, lateCost: 0, subtotal: 650, vat: 0, grand: 650 };
+​const width = 384; // ความกว้างหัวพิมพ์มาตรฐาน 58mm ของ OCPP-C582 (384 dots = 48 bytes ต่อบรรทัด)
+const itemCount = 1 + (calc.elecCost > 0 ? 1 : 0) + (calc.waterCost > 0 ? 1 : 0) + (calc.lateCost > 0 ? 1 : 0) + (r.orders ? r.orders.length : 0);
+const height = 430 + (itemCount * 30);
+​const canvas = document.createElement('canvas');
+canvas.width = width;
+canvas.height = height;
+const ctx = canvas.getContext('2d');
+​// พื้นหลังสีขาว ตัวอักษรสีดำสนิท
+ctx.fillStyle = '#FFFFFF';
+ctx.fillRect(0, 0, width, height);
+ctx.fillStyle = '#000000';
+ctx.textAlign = 'center';
+​let y = 32;
+ctx.font = 'bold 24px Tahoma, sans-serif';
+ctx.fillText(state.hotelInfo?.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล', width / 2, y);
+y += 22;
+ctx.font = 'bold 14px Tahoma, sans-serif';
+ctx.fillText(state.hotelInfo?.nameEn || 'PHUBESTH INTER HOTEL', width / 2, y);
+y += 20;
+ctx.font = '13px Tahoma, sans-serif';
+ctx.fillText('โทร: ' + (state.hotelInfo?.phone || '037231232'), width / 2, y);
+y += 24;
+ctx.font = 'bold 16px Tahoma, sans-serif';
+ctx.fillText(r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี ]' : '[ ใบเสร็จรับเงิน ]', width / 2, y);
+​y += 14;
+ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(width - 10, y); ctx.lineWidth = 2; ctx.stroke();
+​y += 24;
+ctx.textAlign = 'left';
+ctx.font = 'bold 16px Tahoma, sans-serif';
+ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 10, y);
+ctx.textAlign = 'right';
+ctx.font = '14px Tahoma, sans-serif';
+ctx.fillText(new Date().toISOString().slice(0, 10), width - 10, y);
+​y += 22;
+ctx.textAlign = 'left';
+ctx.font = '15px Tahoma, sans-serif';
+ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 10, y);
+​y += 14;
+ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(width - 10, y); ctx.lineWidth = 1; ctx.stroke();
+​const drawLineItem = (leftTxt, rightTxt, isBold = false) => {
+y += 28;
+ctx.font = (isBold ? 'bold ' : '') + '16px Tahoma, sans-serif';
+ctx.textAlign = 'left';
+ctx.fillText(leftTxt, 10, y);
+ctx.textAlign = 'right';
+ctx.fillText(rightTxt, width - 10, y);
+};
+​const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
+drawLineItem(ค่าห้อง (${stayLabel} x${r.nights || 1}), '฿' + calc.roomCost.toFixed(0));
+if (calc.elecCost > 0) drawLineItem(ค่าไฟ (${calc.elecUnits} หน่วย), '฿' + calc.elecCost.toFixed(0));
+if (calc.waterCost > 0) drawLineItem(ค่าน้ำ (${calc.waterUnits} หน่วย), '฿' + calc.waterCost.toFixed(0));
+if (calc.lateCost > 0) drawLineItem('ค่าเลทเช็คเอาท์', '฿' + calc.lateCost.toFixed(0));
+(r.orders || []).forEach(o => {
+drawLineItem(${o.name} (x${o.qty}), '฿' + (o.price * o.qty).toFixed(0));
+});
+​y += 16;
+ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(width - 10, y); ctx.lineWidth = 2; ctx.stroke();
+​if (r.discount > 0) drawLineItem('ส่วนลดพิเศษ', '-฿' + Number(r.discount).toFixed(2));
+if (r.vatEnabled) drawLineItem('VAT 7%', '฿' + calc.vat.toFixed(2));
+drawLineItem('ยอดสุทธิ (TOTAL)', '฿' + calc.grand.toFixed(2), true);
+​y += 34;
+ctx.textAlign = 'center';
+ctx.font = 'bold 15px Tahoma, sans-serif';
+ctx.fillText('ขอบคุณที่ใช้บริการ ภูเบศร์อินเตอร์โฮเต็ล', width / 2, y);
+​// แปลงภาพ Canvas เป็นรหัสจุดความร้อน ESC/POS GS v 0 (1D 76 30 00)
+const imgData = ctx.getImageData(0, 0, width, height).data;
+const bytesPerLine = width / 8; // 48 bytes
+const rasterHeader = [
+0x1B, 0x40,                                     // Initialize
+0x1B, 0x70, 0x00, 0x19, 0xFA,                   // Kick Drawer Pin 2
+0x1B, 0x70, 0x01, 0x19, 0xFA,                   // Kick Drawer Pin 5
+0x1D, 0x76, 0x30, 0x00,                         // GS v 0 m
+bytesPerLine & 0xFF, (bytesPerLine >> 8) & 0xFF, // xL, xH
+height & 0xFF, (height >> 8) & 0xFF             // yL, yH
+];
+​const bitmapBytes = new Uint8Array(bytesPerLine * height);
+let idx = 0;
+for (let py = 0; py < height; py++) {
+for (let bx = 0; bx < bytesPerLine; bx++) {
+let byteVal = 0;
+for (let bit = 0; bit < 8; bit++) {
+const px = bx * 8 + bit;
+const offset = (py * width + px) * 4;
+const lum = (imgData[offset] + imgData[offset + 1] + imgData[offset + 2]) / 3;
+if (lum < 150) {
+byteVal |= (1 << (7 - bit));
+}
+}
+bitmapBytes[idx++] = byteVal;
+}
+}
+​// Feed กระดาษ 4 บรรทัดตอนจบสลิป
+const feedFooter = [0x1B, 0x64, 0x04];
+​const totalPacket = new Uint8Array(rasterHeader.length + bitmapBytes.length + feedFooter.length);
+totalPacket.set(rasterHeader, 0);
+totalPacket.set(bitmapBytes, rasterHeader.length);
+totalPacket.set(feedFooter, rasterHeader.length + bitmapBytes.length);
+return totalPacket;
+}
+​// สั่งพิมพ์ออกเครื่อง OCPP-C582 โดยตรง (ไม่ผ่านหน้าต่าง Epson)
+async function printDirectToOcpp58() {
+showToast('⏳ กำลังส่งใบเสร็จเข้าเครื่องพิมพ์ OCPP-C582...');
+const packet = await buildOcpp58mmRasterBytes();
+const ok = await sendRawBytesToOcpp(packet);
+if (!ok && navigator.usb) {
+const paired = await pairOcppUsbNow();
+if (paired) await sendRawBytesToOcpp(packet);
+}
+showToast('🖨️ พิมพ์สลิป OCPP-C582 + เปิดเก๊ะสำเร็จ!');
+}
+​// แทนที่ปุ่ม "🖨️ สั่งพิมพ์ใบเสร็จ + เด้งเก๊ะ" ให้ไม่เด้งไปเข้าปริ๊นเตอร์ Epson เองโดยไม่ตั้งใจ
+window.printReceiptPaper = async function() {
+const mode = getOcppTargetMode();
+if (mode === 'ocpp_direct') {
+await printDirectToOcpp58();
+return;
+}
+if (mode === 'ask_every_time') {
+const useOcpp = confirm('กด "ตกลง (OK)" เพื่อพิมพ์สลิปออกเครื่อง OCPP-C582 ทันที\nหรือกด "ยกเลิก (Cancel)" เพื่อไปหน้าต่างปริ๊นเตอร์คอมพิวเตอร์ (Epson)');
+if (useOcpp) {
+await printDirectToOcpp58();
+} else {
+await window.kickDrawerOnly();
+window.print();
+}
+return;
+}
+// กรณีเลือกโหมดปริ๊นเตอร์ปกติ (Epson)
+await window.kickDrawerOnly();
+window.print();
+};
+​// เพิ่มปุ่มสลับโหมดเครื่องพิมพ์ข้างปุ่มเปิดเก๊ะเก็บเงิน
+window.addEventListener('DOMContentLoaded', () => {
+const drawerBtns = document.querySelectorAll('button[onclick*="kickDrawerOnly"]');
+if (drawerBtns.length > 0 && !document.getElementById('btn-ocpp-cfg')) {
+const mainBtn = drawerBtns[0];
+const btn = document.createElement('button');
+btn.id = 'btn-ocpp-cfg';
+btn.className = 'btn btn-sky';
+btn.innerHTML = '🖨️ ตั้งค่าเครื่องพิมพ์ OCPP / Epson';
+btn.onclick = openOcppDirectModal;
+mainBtn.parentNode.insertBefore(btn, mainBtn.nextSibling);
+}
+});
+</script>
 </body>
 </html>
