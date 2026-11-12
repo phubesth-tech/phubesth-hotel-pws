@@ -3285,6 +3285,28 @@ initSseListener((state.syncRoom || 'phubesth-hotel').trim());
 </script>
     
 
-
+<!-- PWA Native Add-on (Phubesth Hotel) -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/jpeg" href="./icon.jpeg">
+<link rel="apple-touch-icon" href="./icon.jpeg">
+<style>
+  /* ซ่อนปุ่มติดตั้งเดิมที่ใช้ไม่ได้ออกทั้งหมด */
+  button[onclick*="triggerPwaInstall"], #pwa-guide-modal { display: none !important; }
+  /* ขยายปุ่มเต็มจอในหน้าล็อกอินให้เต็มกรอบสวยงาม */
+  #login-screen .grid-2 { grid-template-columns: 1fr !important; }
+</style>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('PHUBESTH_MASTER_DB')?.includes('hotelLogo')) {
+      ['login-logo', 'header-logo'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.src = './icon.jpeg';
+      });
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  });
+</script>
 </body>
 </html>
