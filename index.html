@@ -1027,31 +1027,6 @@ function renderAll() {
 }
 
 
- // ซ่อมข้อมูลอัตโนมัติ: ดึงห้องของคุณสมชายที่เผลอติดสีแดงกลับมาเป็นสถานะจอง (กรอบฟ้า) ทันที
-(function repairSomchaiRooms() {
- let countRepaired = 0;
- state.rooms.forEach(r => {
- if (r.guestName === 'สมชาย' && r.status === 'occupied') {
- r.status = 'vacant';
- r.light = false;
- r.guestName = '';
- r.checkInTime = '';
- r.checkInTimestamp = 0;
- countRepaired++;
- }
- });
- if (countRepaired > 0) {
- if (!Array.isArray(state.reservations)) state.reservations = [];
- let b = state.reservations.find(x => x.guest === 'สมชาย');
- if (b) {
- b.qty = 10;
- b.status = 'confirmed';
- }
- saveDatabase();
- }
-})();
-
-
  function renderRooms() {
  const q = (document.getElementById('room-search').value || '').trim().toLowerCase();
  const d = new Date();
@@ -1243,33 +1218,6 @@ function quickCheckInBooking(roomIdx, bookingId) {
  renderAll();
  showToast(`เช็คอินห้อง ${r.number} ให้คุณ ${r.guestName} สำเร็จ!`);
 }
-
- 
-
- 
- 
-
-// คำสั่งคืนค่าห้องที่เผลอกดเช็คอินไปแล้วให้กลับมาเป็นสถานะ "รอเข้าพัก" (กรอบฟ้า)
-function resetAccidentalCheckIn() {
- state.rooms.forEach(r => {
- if (r.guestName && r.guestName.includes('สมชาย')) {
- r.status = 'vacant';
- r.light = false;
- r.guestName = '';
- r.checkInTime = '';
- r.checkInTimestamp = 0;
- }
- });
- // คืนสต็อกการจองของสมชายให้กลับมาเป็น 10 ห้อง
- const b = (state.reservations || []).find(x => x.guest.includes('สมชาย'));
- if (b) {
- b.qty = 10;
- b.status = 'confirmed';
- }
- saveDatabase();
- renderAll();
-}
-
 
  function markRoomCleaned(idx) {
  const r = state.rooms[idx];
@@ -3234,48 +3182,6 @@ function cancelReservation(idx) {
 initSafePWA();
 loadDatabase();
 
-// ล้างห้องของคุณสมชายที่ค้างสีแดง คืนกลับมาเป็น "รอเช็คอิน (กรอบฟ้า)" 10 ห้องทันที
-(function fixSomchaiReservationNow() {
- let foundOccupied = false;
- state.rooms.forEach(r => {
- if (r.guestName && r.guestName.includes('สมชาย')) {
- r.status = 'vacant';
- r.light = false;
- r.guestName = '';
- r.checkInTime = '';
- r.checkInTimestamp = 0;
- foundOccupied = true;
- }
- });
-
- // สร้างหรือคืนค่าใบจอง 10 ห้องของคุณสมชาย
- if (!Array.isArray(state.reservations)) state.reservations = [];
- let b = state.reservations.find(x => x.guest && x.guest.includes('สมชาย'));
- const todayStr = new Date().toLocaleDateString('en-CA'); // ดึงวันที่ปัจจุบันแบบเวลาไทยเป๊ะๆ (YYYY-MM-DD)
- const tomorrowStr = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
-
- if (b) {
- b.qty = 10;
- b.status = 'confirmed';
- b.checkIn = todayStr;
- b.roomType = 'Twin Bed';
- } else {
- state.reservations.unshift({
- id: 'BK-' + Date.now().toString().slice(-6),
- guest: 'สมชาย',
- phone: '08x-xxx-xxxx',
- checkIn: todayStr,
- checkOut: tomorrowStr,
- roomType: 'Twin Bed',
- qty: 10,
- rate: 650,
- deposit: 6500,
- status: 'confirmed'
- });
- }
- saveDatabase();
-})();
-
 applyHotelLogo();
 applyHotelProfile();
 initSseListener((state.syncRoom || 'phubesth-hotel').trim());
@@ -3728,7 +3634,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 </style>
 
-<script>
+
 <!-- ================= FINAL PRO-POS 58MM RASTER PRINT (LARGE FONT, FULL HOTEL ADDRESS & AUTO-CUT) ================= -->
 <script>
 async function buildOcpp58mmRasterBytes() {
