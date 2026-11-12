@@ -3729,12 +3729,9 @@ window.addEventListener('DOMContentLoaded', () => {
 </style>
 
 <script>
-<!-- ================= FINAL FIX: DIRECT OCPP-C582 RASTER PRINT (BYPASS SYSTEM PRINT DIALOG) ================= -->
+<!-- ================= FINAL PRO-POS 58MM RASTER PRINT (LARGE FONT, FULL HOTEL ADDRESS & AUTO-CUT) ================= -->
 <script>
-// ฟังก์ชันแปลงใบเสร็จเป็นภาพกราฟิกความร้อน 58mm และส่งเข้าเครื่อง OCPP-C582 ทาง USB / RawBT โดยตรงทันที
-async function printDirectToOcpp58() {
-  showToast('⏳ กำลังพิมพ์สลิปและตัดกระดาษ...');
-  
+async function buildOcpp58mmRasterBytes() {
   const r = (activeRoomIndex !== null && state.rooms[activeRoomIndex])
     ? state.rooms[activeRoomIndex]
     : { number: '102', type: 'Twin Bed', guestName: 'สมชาย', nights: 1, stayType: 'overnight', customRate: 650, orders: [] };
@@ -3742,9 +3739,10 @@ async function printDirectToOcpp58() {
     ? calcRoomTotal(r)
     : { roomCost: 650, elecUnits: 0, elecCost: 0, waterUnits: 0, waterCost: 0, lateCost: 0, subtotal: 650, vat: 0, grand: 650 };
 
-  const width = 384; // 58mm มาตรฐาน (48 bytes ต่อบรรทัด)
+  // ขยายความกว้าง Canvas เป็น 576 จุด (มาตรฐานสลิป POS ขนาด 58mm ที่ฟอนต์ใหญ่เต็มหน้ากระดาษสวยงาม)
+  const width = 576; 
   const itemCount = 1 + (calc.elecCost > 0 ? 1 : 0) + (calc.waterCost > 0 ? 1 : 0) + (calc.lateCost > 0 ? 1 : 0) + (r.orders ? r.orders.length : 0);
-  const rawHeight = 440 + (itemCount * 32);
+  const rawHeight = 580 + (itemCount * 45);
   const height = Math.ceil(rawHeight / 24) * 24;
 
   const canvas = document.createElement('canvas');
@@ -3757,45 +3755,54 @@ async function printDirectToOcpp58() {
   ctx.fillStyle = '#000000';
   ctx.textAlign = 'center';
 
-  let y = 36;
-  ctx.font = '26px Tahoma, sans-serif';
+  let y = 42;
+  // ชื่อร้าน/โรงแรม ขนาดใหญ่เต็มตาแบบ POS
+  ctx.font = 'bold 36px Tahoma, sans-serif';
   ctx.fillText((state.hotelInfo && state.hotelInfo.nameTh) ? state.hotelInfo.nameTh : 'ภูเบศร์อินเตอร์โฮเต็ล', width / 2, y);
-  y += 24;
-  ctx.font = '15px Tahoma, sans-serif';
+  
+  y += 30;
+  ctx.font = 'bold 20px Tahoma, sans-serif';
   ctx.fillText((state.hotelInfo && state.hotelInfo.nameEn) ? state.hotelInfo.nameEn : 'PHUBESTH INTER HOTEL', width / 2, y);
-  y += 20;
-  ctx.font = '13px Tahoma, sans-serif';
-  ctx.fillText('โทร: ' + ((state.hotelInfo && state.hotelInfo.phone) ? state.hotelInfo.phone : '037231232'), width / 2, y);
+  
+  // ที่อยู่โรงแรม
   y += 26;
   ctx.font = '18px Tahoma, sans-serif';
+  ctx.fillText((state.hotelInfo && state.hotelInfo.address) ? state.hotelInfo.address : '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120', width / 2, y);
+  
+  y += 24;
+  ctx.font = '18px Tahoma, sans-serif';
+  ctx.fillText('โทร: ' + ((state.hotelInfo && state.hotelInfo.phone) ? state.hotelInfo.phone : '037231232'), width / 2, y);
+  
+  y += 32;
+  ctx.font = 'bold 22px Tahoma, sans-serif';
   ctx.fillText(r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี ]' : '[ ใบเสร็จรับเงิน ]', width / 2, y);
 
-  y += 16;
-  ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(width - 8, y); ctx.lineWidth = 2.5; ctx.stroke();
+  y += 18;
+  ctx.beginPath(); ctx.moveTo(12, y); ctx.lineTo(width - 12, y); ctx.lineWidth = 3; ctx.stroke();
 
-  y += 28;
+  y += 34;
   ctx.textAlign = 'left';
-  ctx.font = '18px Tahoma, sans-serif';
-  ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 8, y);
+  ctx.font = 'bold 22px Tahoma, sans-serif';
+  ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 12, y);
   ctx.textAlign = 'right';
-  ctx.font = '16px Tahoma, sans-serif';
-  ctx.fillText(new Date().toISOString().slice(0, 10), width - 8, y);
+  ctx.font = '20px Tahoma, sans-serif';
+  ctx.fillText(new Date().toISOString().slice(0, 10), width - 12, y);
 
-  y += 26;
+  y += 30;
   ctx.textAlign = 'left';
-  ctx.font = '17px Tahoma, sans-serif';
-  ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 8, y);
+  ctx.font = '22px Tahoma, sans-serif';
+  ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 12, y);
 
-  y += 16;
-  ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(width - 8, y); ctx.lineWidth = 1; ctx.stroke();
+  y += 18;
+  ctx.beginPath(); ctx.moveTo(12, y); ctx.lineTo(width - 12, y); ctx.lineWidth = 1.5; ctx.stroke();
 
-  const drawLineItem = (leftTxt, rightTxt) => {
-    y += 32;
-    ctx.font = '17px Tahoma, sans-serif';
+  const drawLineItem = (leftTxt, rightTxt, isBold = false) => {
+    y += 38;
+    ctx.font = (isBold ? 'bold ' : '') + '22px Tahoma, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(leftTxt, 8, y);
+    ctx.fillText(leftTxt, 12, y);
     ctx.textAlign = 'right';
-    ctx.fillText(rightTxt, width - 8, y);
+    ctx.fillText(rightTxt, width - 12, y);
   };
 
   const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
@@ -3807,27 +3814,28 @@ async function printDirectToOcpp58() {
     drawLineItem(o.name + ' (x' + o.qty + ')', '฿' + (o.price * o.qty).toFixed(0));
   });
 
-  y += 18;
-  ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(width - 8, y); ctx.lineWidth = 2; ctx.stroke();
+  y += 20;
+  ctx.beginPath(); ctx.moveTo(12, y); ctx.lineTo(width - 12, y); ctx.lineWidth = 2; ctx.stroke();
 
   if (r.discount > 0) drawLineItem('ส่วนลดพิเศษ', '-฿' + Number(r.discount).toFixed(2));
   if (r.vatEnabled) drawLineItem('VAT 7%', '฿' + calc.vat.toFixed(2));
   
-  y += 34;
-  ctx.font = '20px Tahoma, sans-serif';
-  ctx.textAlign = 'left'; ctx.fillText('ยอดสุทธิ (TOTAL)', 8, y);
-  ctx.textAlign = 'right'; ctx.fillText('฿' + calc.grand.toFixed(2), width - 8, y);
+  // ยอดสุทธิ ตัวใหญ่เด่นชัด
+  y += 42;
+  ctx.font = 'bold 26px Tahoma, sans-serif';
+  ctx.textAlign = 'left'; ctx.fillText('ยอดสุทธิ (TOTAL)', 12, y);
+  ctx.textAlign = 'right'; ctx.fillText('฿' + calc.grand.toFixed(2), width - 12, y);
 
-  y += 32;
+  y += 40;
   ctx.textAlign = 'center';
-  ctx.font = '15px Tahoma, sans-serif';
+  ctx.font = '20px Tahoma, sans-serif';
   ctx.fillText('ขอบคุณที่ใช้บริการ ภูเบศร์อินเตอร์โฮเต็ล', width / 2, y);
 
   const imgData = ctx.getImageData(0, 0, width, height).data;
-  const bytesPerLine = width / 8;
+  const bytesPerLine = width / 8; // 72 bytes สำหรับความกว้าง 576 จุด
   let chunks = [];
 
-  // เริ่มต้น + สั่งเปิดเก๊ะเก็บเงิน 12V ทันที
+  // เริ่มต้นเครื่องพิมพ์ + สั่งเปิดเก๊ะเก็บเงิน 12V
   chunks.push(0x1B, 0x40);
   chunks.push(0x1B, 0x70, 0x00, 0x19, 0xFA);
   chunks.push(0x1B, 0x70, 0x01, 0x19, 0xFA);
@@ -3856,14 +3864,18 @@ async function printDirectToOcpp58() {
     }
   }
 
-  // Feed + ตัดกระดาษอัตโนมัติ (Full Cut)
-  chunks.push(0x1B, 0x64, 0x03);
+  // เลื่อนกระดาษออก 4 บรรทัด + สั่งตัดกระดาษอัตโนมัติ (Full Cut: 0x1D 0x56 0x42 0x00)
+  chunks.push(0x1B, 0x64, 0x04);
   chunks.push(0x1D, 0x56, 0x42, 0x00);
 
-  const packet = new Uint8Array(chunks);
+  return new Uint8Array(chunks);
+}
 
-  // ส่งข้อมูลเข้าเครื่องพิมพ์ทาง WebUSB หรือ RawBT โดยไม่เรียกหน้าต่าง Windows Print
-  if (typeof activeUsbPrinter !== 'undefined' && activeUsbPrinter) {
+async function printDirectToOcpp58() {
+  showToast('⏳ กำลังพิมพ์สลิปและตัดกระดาษ...');
+  const packet = await buildOcpp58mmRasterBytes();
+  
+  if (activeUsbPrinter) {
     const chunkSize = 512;
     for (let i = 0; i < packet.length; i += chunkSize) {
       await activeUsbPrinter.transferOut(activeUsbEndpoint, packet.slice(i, i + chunkSize));
@@ -3879,18 +3891,13 @@ async function printDirectToOcpp58() {
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { try { document.body.removeChild(a); } catch (e) {} }, 2000);
-  } else {
-    // กรณีคอมพิวเตอร์เดสก์ท็อป หากยังไม่ได้จับคู่ USB ให้ลองใช้โหมดพิมพ์ปกติหรือเตือนจับคู่
-    alert('กรุณากดปุ่ม "จับคู่สาย USB" ในเมนูตั้งค่าเครื่องพิมพ์ก่อนสั่งพิมพ์ครับ');
   }
-
   showToast('🖨️ พิมพ์สลิป + ตัดกระดาษ + เปิดเก๊ะสำเร็จ!');
-};
+}
 
-// **ล็อกทับฟังก์ชันสั่งพิมพ์ของโปรแกรม ไม่ให้เด้งไปหน้าต่าง Windows Print (Brother/Epson) อีกต่อไป**
 window.printReceiptPaper = async function() {
   await printDirectToOcpp58();
 };
 </script>
- </body>
+</body>
 </html>
