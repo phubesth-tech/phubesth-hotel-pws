@@ -3308,5 +3308,63 @@ initSseListener((state.syncRoom || 'phubesth-hotel').trim());
     }
   });
 </script>
+<!-- ===== ADD-ON: ตัวติดตั้งแอปแท้ชิดแถบ URL (URL Bar PWA Installer) ===== -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/jpeg" href="./icon.jpeg">
+<link rel="apple-touch-icon" href="./icon.jpeg">
+<style>
+  button[onclick*="triggerPwaInstall"], #pwa-guide-modal { display: none !important; }
+  #login-screen .grid-2 { grid-template-columns: 1fr !important; }
+  #url-pwa-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    background: linear-gradient(90deg, #0f172a, #1e3a8a, #0f172a);
+    border-bottom: 2px solid #f59e0b; padding: 6px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.75);
+  }
+  @media (display-mode: standalone) { #url-pwa-bar { display: none !important; } }
+</style>
+<div id="url-pwa-bar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <img src="./icon.jpeg" style="width:28px;height:28px;border-radius:7px;border:1px solid #f59e0b;object-fit:cover;">
+    <div style="line-height:1.2;">
+      <b style="color:#fff;font-size:12px;">ภูเบศร์อินเตอร์โฮเต็ล (App)</b>
+      <div style="color:#93c5fd;font-size:10px;">ติดตั้งเป็นแอปแท้เต็มจอ ไม่มีแถบ URL</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <button id="url-pwa-btn" onclick="installFromUrlBar()" style="background:#10b981;color:#fff;border:none;padding:6px 12px;border-radius:99px;font-weight:900;font-size:11.5px;cursor:pointer;box-shadow:0 0 12px rgba(16,185,129,0.6);">
+      📲 ติดตั้งแอปตรงนี้
+    </button>
+    <button onclick="document.getElementById('url-pwa-bar').style.display='none'" style="background:transparent;color:#94a3b8;border:none;font-size:14px;cursor:pointer;padding:2px 6px;">✕</button>
+  </div>
+</div>
+<script>
+  window.__urlPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // ไม่เรียก e.preventDefault() เพื่อให้ Chrome โชว์ไอคอนติดตั้งบนแถบ URL ด้วย!
+    window.__urlPrompt = e;
+    const btn = document.getElementById('url-pwa-btn');
+    if (btn) btn.textContent = '📲 กดติดตั้งแอปแท้ทันที!';
+  });
+  window.addEventListener('appinstalled', () => {
+    const bar = document.getElementById('url-pwa-bar');
+    if (bar) bar.style.display = 'none';
+  });
+  async function installFromUrlBar() {
+    if (window.__urlPrompt) {
+      window.__urlPrompt.prompt();
+      await window.__urlPrompt.userChoice;
+      window.__urlPrompt = null;
+    } else {
+      alert('👉 วิธีติดตั้งเป็นแอปแท้:\n1. กดจุด 3 จุด (⋮) มุมขวาบนของ Chrome\n2. กดเมนู "Install and create shortcut" (รูปหน้าจอมีลูกศรลง)\n3. กด "Install" (ติดตั้ง) จะได้แอปแท้ทันทีครับ!');
+    }
+  }
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    const bar = document.getElementById('url-pwa-bar');
+    if (bar) bar.style.display = 'none';
+  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script> 
 </body>
 </html>
