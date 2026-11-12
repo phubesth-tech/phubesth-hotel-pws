@@ -1,15 +1,32 @@
 {
-  "name": "ภูเบศร์อินเตอร์โฮเต็ล",
+  "id": "/?app=phubesth-hotel-pms",
+  "name": "ภูเบศร์อินเตอร์โฮเต็ล - Smart PMS",
   "short_name": "ภูเบศร์โฮเต็ล",
-  "start_url": "/",
+  "description": "ระบบบริหารจัดการโรงแรม ภูเบศร์อินเตอร์โฮเต็ล",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0b0f19",
   "theme_color": "#0b0f19",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Emoji_u1f3e8.svg/192px-Emoji_u1f3e8.svg.png",
+      "src": "./icon.jpeg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ]
 }
