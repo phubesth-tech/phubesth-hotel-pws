@@ -3433,5 +3433,413 @@ initSseListener((state.syncRoom || 'phubesth-hotel').trim());
     navigator.serviceWorker.register('./sw.js').then((reg) => reg.update()).catch(() => {});
   }
 </script>
+ <!-- ===== ADD-ON: ระบบเชื่อมต่อเครื่องพิมพ์ OCPP-C582 (USB/WiFi/RawBT) & สั่งเด้งเก๊ะเก็บเงิน 12V ===== -->
+<link rel="manifest" href="./manifest.json">
+<style>
+  button[onclick*="triggerPwaInstall"], #pwa-guide-modal { display: none !important; }
+  #login-screen .grid-2 { grid-template-columns: 1fr !important; }
+
+  /* ปรับแต่งการพิมพ์ให้รองรับทั้งกระดาษความร้อน 58mm (OCPP-C582) และเครื่องปริ๊นธรรมดา */
+  body.thermal-58mm-mode #receipt-paper {
+    max-width: 58mm !important;
+    width: 58mm !important;
+    padding: 4px !important;
+    font-size: 11px !important;
+  }
+  @media print {
+    @page { margin: 0; }
+    body.thermal-58mm-mode #receipt-paper {
+      width: 54mm !important;
+      max-width: 54mm !important;
+      margin: 0 !important;
+      padding: 2mm !important;
+    }
+  }
+</style>
+
+<!-- หน้าต่างตั้งค่าและควบคุมเครื่องพิมพ์ OCPP-C582 & เก๊ะเก็บเงิน -->
+<div id="ocpp-printer-modal" class="modal-backdrop hidden" style="z-index: 9500;">
+  <div class="modal-box" style="max-width: 520px; border: 2px solid #10b981;">
+    <div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
+      <div>
+        <b style="font-size: 16px; color: #34d399;">🖨️🗄️ ตั้งค่าเครื่องพิมพ์ OCPP-C582 & เก๊ะเก็บเงิน</b>
+        <div style="font-size: 11px; color: var(--muted);">รองรับ OCPP-C582 (58mm USB+WiFi | Cash Drawer 12V) และปริ๊นเตอร์ทั่วไป</div>
+      </div>
+      <button onclick="document.getElementById('ocpp-printer-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+
+    <!-- สถานะการเชื่อมต่อปัจจุบัน -->
+    <div class="subcard" style="border-color: #0284c7; background: #082f49;">
+      <div class="between">
+        <div>
+          <div style="font-size: 11px; color: #7dd3fc;">สถานะพอร์ตเครื่องพิมพ์ / เก๊ะเก็บเงิน:</div>
+          <b id="ocpp-conn-status" style="font-size: 13.5px; color: #38bdf8;">⚡ พร้อมใช้งาน (โหมดอัตโนมัติ USB / RawBT / WiFi)</b>
+        </div>
+        <button onclick="connectUsbPrinterDevice()" class="btn btn-sky" style="padding: 8px 12px; font-size: 12px;">
+          🔌 จับคู่สาย USB (OCPP-C582)
+        </button>
+      </div>
+    </div>
+
+    <!-- เลือกโหมดการเชื่อมต่อหลัก -->
+    <div class="subcard">
+      <b style="color: var(--amber); display: block; margin-bottom: 6px;">1. เลือกวิธีส่งคำสั่งเปิดเก๊ะเก็บเงิน (RJ11 12V ด้านหลัง OCPP-C582)</b>
+      <select id="ocpp-drawer-mode" onchange="saveOcppPrinterConfig()" style="margin-bottom: 8px; font-weight: 800; color: #34d399;">
+        <option value="auto">⚡ อัตโนมัติ (สาย USB OTG ➔ แอป RawBT ➔ WiFi IP)</option>
+        <option value="usb">🔌 สาย USB โดยตรง (เสียบสาย USB เข้าแท็บเล็ต/คอมพิวเตอร์)</option>
+        <option value="rawbt">📱 แอป RawBT (สำหรับแท็บเล็ต Android ที่ลงแอป RawBT)</option>
+        <option value="wifi">🌐 WiFi / LAN IP (ยิงคำสั่งผ่านวงแลน/ไวไฟไปยัง OCPP-C582)</option>
+        <option value="print_pulse">🖨️ เด้งเก๊ะผ่านไดรเวอร์ตอนสั่งพิมพ์หน้าต่างปกติ</option>
+      </select>
+
+      <div id="ocpp-wifi-box" style="margin-top: 6px;">
+        <span style="font-size: 11px; color: var(--muted);">IP Address ของเครื่องพิมพ์ OCPP-C582 (กรณีใช้ WiFi เช่น 192.168.1.100):</span>
+        <div class="row" style="margin-top: 4px;">
+          <input type="text" id="ocpp-wifi-ip" placeholder="เช่น 192.168.1.100 หรือ 192.168.1.200" oninput="saveOcppPrinterConfig()" style="flex: 1;">
+          <input type="number" id="ocpp-wifi-port" value="9100" oninput="saveOcppPrinterConfig()" style="width: 85px;" title="พอร์ตมาตรฐาน 9100">
+        </div>
+      </div>
+    </div>
+
+    <!-- เลือกรูปแบบการพิมพ์ใบเสร็จ -->
+    <div class="subcard">
+      <b style="color: var(--amber); display: block; margin-bottom: 6px;">2. เลือกรูปแบบการพิมพ์ใบเสร็จ (ลิงก์ได้ทั้ง OCPP-C582 และปริ๊นเตอร์ธรรมดา)</b>
+      <select id="ocpp-print-mode" onchange="saveOcppPrinterConfig()" style="font-weight: 700;">
+        <option value="both_dialog_58">🖨️ พิมพ์ผ่านหน้าต่างระบบ (ปรับขนาดสลิป 58mm + เลือกปริ๊นเตอร์ธรรมดาได้)</option>
+        <option value="usb_direct_58">⚡ พิมพ์สลิปความร้อน 58mm ทันทีผ่านสาย USB (OCPP-C582 Direct)</option>
+        <option value="rawbt_58">📱 พิมพ์สลิปความร้อน 58mm ทันทีผ่านแอป RawBT + เด้งเก๊ะ</option>
+        <option value="normal_a4">📄 ปริ๊นเตอร์ธรรมดา (ขนาดมาตรฐาน ไม่ย่อ 58mm)</option>
+      </select>
+    </div>
+
+    <!-- ปุ่มทดสอบระบบทันที -->
+    <div class="grid-2" style="margin-bottom: 10px;">
+      <button onclick="kickDrawerOnly(true)" class="btn btn-emerald" style="padding: 12px; font-size: 13.5px;">
+        🗄️ ทดสอบเด้งเก๊ะเดี๋ยวนี้!
+      </button>
+      <button onclick="testPrintOcpp58()" class="btn btn-amber" style="padding: 12px; font-size: 13.5px;">
+        🧾 ทดสอบพิมพ์สลิป 58mm
+      </button>
+    </div>
+
+    <div style="font-size: 11px; color: var(--muted); background: #030712; padding: 8px 10px; border-radius: 8px; border: 1px solid #1f2937;">
+      💡 <b>เคล็ดลับสำหรับแท็บเล็ต Android ในรูปของคุณ:</b><br>
+      • หากต่อด้วย <b>สาย USB</b>: กดปุ่ม <b>"🔌 จับคู่สาย USB (OCPP-C582)"</b> ด้านบน แล้วกดเลือก USB Printer เพื่ออนุญาตสิทธิ์ 1 ครั้ง จากนั้นกดปุ่มเปิดเก๊ะได้เลย!<br>
+      • หากเชื่อมต่อผ่าน <b>WiFi หรือ USB บน Android แบบไร้รอยต่อ</b>: สามารถติดตั้งแอปฟรีชื่อ <b>"RawBT Print Service"</b> จาก Play Store ตั้งค่าเครื่องพิมพ์ใน RawBT แล้วเลือกโหมด <b>แอป RawBT</b> จะสั่งเด้งเก๊ะและพิมพ์ไทยคมชัด 100% ทันทีครับ
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= ระบบควบคุม OCPP-C582 & Cash Drawer 12V (ESC/POS) =================
+const OCPP_CFG_KEY = 'PHUBESTH_OCPP_PRINTER_CFG';
+let ocppUsbDevice = null;
+let ocppUsbInterface = 0;
+let ocppUsbEndpoint = 1;
+
+let ocppConfig = {
+  drawerMode: 'auto',
+  printMode: 'both_dialog_58',
+  wifiIp: '',
+  wifiPort: 9100
+};
+
+function loadOcppPrinterConfig() {
+  try {
+    const saved = localStorage.getItem(OCPP_CFG_KEY);
+    if (saved) ocppConfig = Object.assign({}, ocppConfig, JSON.parse(saved));
+  } catch (e) {}
+  applyPaperModeClass();
+}
+
+function saveOcppPrinterConfig() {
+  const dm = document.getElementById('ocpp-drawer-mode');
+  const pm = document.getElementById('ocpp-print-mode');
+  const ip = document.getElementById('ocpp-wifi-ip');
+  const pt = document.getElementById('ocpp-wifi-port');
+  if (dm) ocppConfig.drawerMode = dm.value;
+  if (pm) ocppConfig.printMode = pm.value;
+  if (ip) ocppConfig.wifiIp = ip.value.trim();
+  if (pt) ocppConfig.wifiPort = Number(pt.value) || 9100;
+  try { localStorage.setItem(OCPP_CFG_KEY, JSON.stringify(ocppConfig)); } catch (e) {}
+  applyPaperModeClass();
+}
+
+function applyPaperModeClass() {
+  if (ocppConfig.printMode === 'both_dialog_58') {
+    document.body.classList.add('thermal-58mm-mode');
+  } else {
+    document.body.classList.remove('thermal-58mm-mode');
+  }
+}
+
+function openOcppPrinterModal() {
+  loadOcppPrinterConfig();
+  const dm = document.getElementById('ocpp-drawer-mode');
+  const pm = document.getElementById('ocpp-print-mode');
+  const ip = document.getElementById('ocpp-wifi-ip');
+  const pt = document.getElementById('ocpp-wifi-port');
+  if (dm) dm.value = ocppConfig.drawerMode || 'auto';
+  if (pm) pm.value = ocppConfig.printMode || 'both_dialog_58';
+  if (ip) ip.value = ocppConfig.wifiIp || '';
+  if (pt) pt.value = ocppConfig.wifiPort || 9100;
+  document.getElementById('ocpp-printer-modal').classList.remove('hidden');
+}
+
+// รหัสคำสั่งมาตรฐาน ESC/POS สำหรับเด้งเก๊ะ 12V (ยิงทั้ง Pin 2 และ Pin 5 เพื่อความชัวร์ 100% กับเก๊ะทุกรุ่น)
+function getDrawerKickBytes() {
+  return new Uint8Array([
+    0x1B, 0x40,                         // ESC @ (Initialize printer)
+    0x1B, 0x70, 0x00, 0x19, 0xFA,       // ESC p 0 25 250 (Kick Drawer Pin 2 - 50ms pulse)
+    0x1B, 0x70, 0x01, 0x19, 0xFA        // ESC p 1 25 250 (Kick Drawer Pin 5 - 50ms pulse)
+  ]);
+}
+
+// 1. เชื่อมต่อผ่านสาย USB OTG โดยตรง (WebUSB API บน Chrome Android / Windows)
+async function connectUsbPrinterDevice() {
+  if (!navigator.usb) {
+    alert('เบราว์เซอร์นี้ไม่รองรับ WebUSB โดยตรง แนะนำให้เลือกโหมด "แอป RawBT" หรือเชื่อมต่อผ่าน WiFi แทนครับ');
+    return false;
+  }
+  try {
+    const device = await navigator.usb.requestDevice({ filters: [] });
+    await setupUsbPrinterDevice(device);
+    showToast('✅ เชื่อมต่อเครื่องพิมพ์ OCPP-C582 ผ่านสาย USB สำเร็จ!');
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function setupUsbPrinterDevice(device) {
+  await device.open();
+  if (device.configuration === null) {
+    await device.selectConfiguration(1);
+  }
+  // ค้นหา Interface และ Endpoint ขาออก (OUT) ของเครื่องพิมพ์
+  for (const iface of device.configuration.interfaces) {
+    for (const alt of iface.alternates) {
+      for (const ep of alt.endpoints) {
+        if (ep.direction === 'out') {
+          ocppUsbInterface = iface.interfaceNumber;
+          ocppUsbEndpoint = ep.endpointNumber;
+          break;
+        }
+      }
+    }
+  }
+  await device.claimInterface(ocppUsbInterface);
+  ocppUsbDevice = device;
+  const st = document.getElementById('ocpp-conn-status');
+  if (st) {
+    st.textContent = '🟢 เชื่อมต่อสาย USB แล้ว: ' + (device.productName || 'OCPP-C582 Thermal Printer');
+    st.style.color = '#34d399';
+  }
+}
+
+async function sendBytesViaWebUsb(bytes) {
+  try {
+    if (!ocppUsbDevice && navigator.usb) {
+      const devices = await navigator.usb.getDevices();
+      if (devices.length > 0) {
+        await setupUsbPrinterDevice(devices[0]);
+      }
+    }
+    if (ocppUsbDevice) {
+      await ocppUsbDevice.transferOut(ocppUsbEndpoint, bytes);
+      return true;
+    }
+  } catch (e) {
+    ocppUsbDevice = null;
+  }
+  return false;
+}
+
+// 2. ส่งคำสั่งผ่านแอป RawBT บน Android (รองรับทั้ง USB และ WiFi โดยไม่ต้องตั้งค่าซับซ้อน)
+function sendBytesViaRawBT(bytes) {
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64Data = btoa(binary);
+  const rawbtUrl = 'rawbt:base64,' + base64Data;
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = rawbtUrl;
+  document.body.appendChild(iframe);
+  setTimeout(() => { try { document.body.removeChild(iframe); } catch (e) {} }, 2500);
+}
+
+// 3. ส่งคำสั่งผ่าน WiFi / LAN IP ไปยังเครื่องพิมพ์ OCPP-C582
+async function sendBytesViaWifi(bytes) {
+  if (!ocppConfig.wifiIp) return false;
+  const targetUrl = 'http://' + ocppConfig.wifiIp + ':' + (ocppConfig.wifiPort || 9100);
+  try {
+    await fetch(targetUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: bytes
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ฟังก์ชันหลักเมื่อกดปุ่ม "🗄️ เปิดเก๊ะเก็บเงิน" หรือตอนรับเงินเช็คเอาท์
+window.kickDrawerOnly = async function(fromTestModal = false) {
+  loadOcppPrinterConfig();
+  const pulseBytes = getDrawerKickBytes();
+  const mode = ocppConfig.drawerMode || 'auto';
+
+  // โหมดสาย USB โดยตรง
+  if (mode === 'usb') {
+    const ok = await sendBytesViaWebUsb(pulseBytes);
+    if (!ok) {
+      const paired = await connectUsbPrinterDevice();
+      if (paired) await sendBytesViaWebUsb(pulseBytes);
+    }
+    showToast('🗄️ ส่งสัญญาณเปิดเก๊ะผ่านสาย USB แล้ว!');
+    return;
+  }
+
+  // โหมดแอป RawBT บน Android
+  if (mode === 'rawbt') {
+    sendBytesViaRawBT(pulseBytes);
+    showToast('🗄️ ส่งคำสั่งเด้งเก๊ะผ่าน RawBT แล้ว!');
+    return;
+  }
+
+  // โหมด WiFi IP
+  if (mode === 'wifi') {
+    if (!ocppConfig.wifiIp) {
+      openOcppPrinterModal();
+      alert('กรุณากรอกหมายเลข IP ของเครื่องพิมพ์ OCPP-C582 ก่อนครับ');
+      return;
+    }
+    await sendBytesViaWifi(pulseBytes);
+    showToast('🗄️ ส่งสัญญาณเปิดเก๊ะผ่าน WiFi (' + ocppConfig.wifiIp + ') แล้ว!');
+    return;
+  }
+
+  // โหมดอัตโนมัติ (Auto): ลองส่งทางสาย USB ที่จับคู่ไว้ก่อน ➔ ถ้ายังไม่ได้จับคู่และเป็น Android ให้ยิงผ่าน RawBT + WiFi พร้อมกัน
+  const usbSent = await sendBytesViaWebUsb(pulseBytes);
+  if (usbSent) {
+    showToast('🗄️ เปิดเก๊ะเก็บเงินสำเร็จ (USB Direct)!');
+    return;
+  }
+
+  if (ocppConfig.wifiIp) {
+    await sendBytesViaWifi(pulseBytes);
+  }
+
+  // หากอยู่บนแท็บเล็ต Android ให้ยิงสัญญาณ RawBT ควบคู่ไปด้วยทันที
+  if (/Android/i.test(navigator.userAgent)) {
+    sendBytesViaRawBT(pulseBytes);
+    showToast('🗄️ ส่งสัญญาณเปิดเก๊ะเก็บเงินแล้ว (12V Pulse)!');
+  } else if (navigator.usb && !fromTestModal) {
+    const wantPair = confirm('🔌 ต้องการจับคู่เครื่องพิมพ์ OCPP-C582 ผ่านสาย USB เพื่อเปิดเก๊ะเก็บเงินทันทีหรือไม่?\n(หรือกด ยกเลิก เพื่อตั้งค่าโหมด WiFi / RawBT)');
+    if (wantPair) {
+      const paired = await connectUsbPrinterDevice();
+      if (paired) {
+        await sendBytesViaWebUsb(pulseBytes);
+        showToast('🗄️ เปิดเก๊ะเก็บเงินสำเร็จ!');
+      }
+    } else {
+      openOcppPrinterModal();
+    }
+  } else {
+    showToast('🗄️ ส่งสัญญาณเปิดเก๊ะเก็บเงินแล้ว!');
+  }
+};
+
+// สร้างข้อมูลใบเสร็จสำหรับพิมพ์ออกเครื่องความร้อน OCPP-C582 (58mm) พร้อมตัดกระดาษและเด้งเก๊ะ
+function buildEscPosReceiptText() {
+  const r = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : { number: '101', type: 'Double Bed', guestName: 'ลูกค้าทั่วไป', nights: 1, stayType: 'overnight', orders: [] };
+  const calc = (typeof calcRoomTotal === 'function') ? calcRoomTotal(r) : { roomCost: 650, elecCost: 0, waterCost: 0, lateCost: 0, subtotal: 650, vat: 0, grand: 650 };
+  const hotelName = (state.hotelInfo && state.hotelInfo.nameTh) ? state.hotelInfo.nameTh : 'ภูเบศร์อินเตอร์โฮเต็ล';
+  const hotelPhone = (state.hotelInfo && state.hotelInfo.phone) ? state.hotelInfo.phone : '037231232';
+  const today = new Date().toISOString().slice(0, 10);
+
+  let lines = [];
+  lines.push('================================');
+  lines.push('   ' + hotelName);
+  lines.push('   PHUBESTH INTER HOTEL');
+  lines.push('   โทร: ' + hotelPhone);
+  lines.push('================================');
+  lines.push('ห้อง: ' + r.number + ' (' + r.type + ')');
+  lines.push('วันที่: ' + today);
+  lines.push('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'));
+  lines.push('--------------------------------');
+  lines.push('ค่าห้องพัก (x' + (r.nights || 1) + ')       ' + calc.roomCost.toFixed(0) + ' บ.');
+  if (calc.elecCost > 0) lines.push('ค่าไฟ (' + calc.elecUnits + ' หน่วย)      ' + calc.elecCost.toFixed(0) + ' บ.');
+  if (calc.waterCost > 0) lines.push('ค่าน้ำ (' + calc.waterUnits + ' หน่วย)      ' + calc.waterCost.toFixed(0) + ' บ.');
+  if (calc.lateCost > 0) lines.push('ค่าเลทเช็คเอาท์        ' + calc.lateCost.toFixed(0) + ' บ.');
+  (r.orders || []).forEach(o => {
+    lines.push(o.name + ' x' + o.qty + '        ' + (o.price * o.qty).toFixed(0) + ' บ.');
+  });
+  lines.push('--------------------------------');
+  if (r.discount > 0) lines.push('ส่วนลดพิเศษ:         -' + Number(r.discount).toFixed(2) + ' บ.');
+  if (r.vatEnabled) lines.push('VAT 7%:              ' + calc.vat.toFixed(2) + ' บ.');
+  lines.push('ยอดสุทธิ (TOTAL):   ' + calc.grand.toFixed(2) + ' บาท');
+  lines.push('================================');
+  lines.push('   ขอบคุณที่ใช้บริการครับ');
+  lines.push('\n\n\n');
+  return lines.join('\n');
+}
+
+// ฟังก์ชันเมื่อกดปุ่ม "🖨️ สั่งพิมพ์ใบเสร็จ + เด้งเก๊ะ" (รองรับทั้ง OCPP-C582 และปริ๊นเตอร์ธรรมดา)
+window.printReceiptPaper = async function() {
+  loadOcppPrinterConfig();
+  await window.kickDrawerOnly(true);
+
+  if (ocppConfig.printMode === 'rawbt_58') {
+    const text = buildEscPosReceiptText();
+    const encoded = encodeURIComponent(text);
+    window.location.href = 'intent:' + encoded + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+    return;
+  }
+
+  if (ocppConfig.printMode === 'usb_direct_58') {
+    const encoder = new TextEncoder();
+    const textBytes = encoder.encode(buildEscPosReceiptText());
+    const kickBytes = getDrawerKickBytes();
+    const combined = new Uint8Array(kickBytes.length + textBytes.length);
+    combined.set(kickBytes, 0);
+    combined.set(textBytes, kickBytes.length);
+    const ok = await sendBytesViaWebUsb(combined);
+    if (ok) {
+      showToast('🖨️ พิมพ์ใบเสร็จออก OCPP-C582 + เด้งเก๊ะเรียบร้อย!');
+      return;
+    }
+  }
+
+  // เปิดหน้าต่างพิมพ์ของระบบ (สามารถเลือกได้ทั้ง OCPP-C582 และปริ๊นเตอร์ธรรมดาทุกเครื่อง)
+  applyPaperModeClass();
+  window.print();
+};
+
+async function testPrintOcpp58() {
+  await window.printReceiptPaper();
+}
+
+// เพิ่มปุ่ม "🖨️ ตั้งค่าเครื่องพิมพ์/เก๊ะ" บนแถบเมนูด้านบนให้กดตั้งค่าได้สะดวกตลอดเวลา
+window.addEventListener('DOMContentLoaded', () => {
+  loadOcppPrinterConfig();
+  const drawerBtns = document.querySelectorAll('button[onclick*="kickDrawerOnly"]');
+  if (drawerBtns.length > 0) {
+    const mainDrawerBtn = drawerBtns[0];
+    const cfgBtn = document.createElement('button');
+    cfgBtn.className = 'btn btn-dark';
+    cfgBtn.style.cssText = 'color:#38bdf8;border-color:#0284c7;';
+    cfgBtn.innerHTML = '🖨️ ตั้งค่าปริ๊นเตอร์/เก๊ะ';
+    cfgBtn.onclick = openOcppPrinterModal;
+    mainDrawerBtn.parentNode.insertBefore(cfgBtn, mainDrawerBtn.nextSibling);
+  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+</script>
 </body>
 </html>
