@@ -3806,84 +3806,256 @@ window.printReceiptPaper = async function() {
 };
 </script>
 
- <!-- ================= ADD-ON: FIREBASE REALTIME DB & GOOGLE SHEETS SYNC (PRE-CONFIGURED) ================= -->
+<!-- ================= ADD-ON: FIREBASE + GOOGLE SHEETS + CUSTOMER FACING DISPLAY (2ND SCREEN) ================= -->
+<style>
+  #cfd-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: radial-gradient(circle at top, #111827 0%, #030712 100%);
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif;
+  }
+  .cfd-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+    background: rgba(11, 15, 25, 0.85);
+  }
+  .cfd-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+  }
+  .cfd-billing-grid {
+    width: 100%;
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+  @media (min-width: 720px) {
+    .cfd-billing-grid { grid-template-columns: 1.15fr 0.85fr; }
+  }
+  .cfd-card {
+    background: rgba(17, 24, 39, 0.92);
+    border: 1.5px solid #1f2937;
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+  }
+  .cfd-qr-card {
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 22px;
+    padding: 22px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+  }
+  .cfd-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #334155;
+    font-size: 16px;
+  }
+</style>
+
+<!-- Modal ตั้งค่า Cloud & จอลูกค้า -->
 <div id="cloud-db-modal" class="modal-backdrop hidden" style="z-index: 9900;">
-  <div class="modal-box" style="max-width: 520px; border: 2px solid #f59e0b;">
+  <div class="modal-box" style="max-width: 540px; border: 2px solid #f59e0b;">
     <div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
       <div>
-        <b style="font-size: 16px; color: var(--amber);">☁️ ตั้งค่าฐานข้อมูล Firebase & Google Sheets</b>
-        <div style="font-size: 11px; color: var(--muted);">ซิงค์สถานะห้องพักเรียลไทม์ & บันทึกบัญชีลง Google Sheets อัตโนมัติ</div>
+        <b style="font-size: 16px; color: var(--amber);">☁️ Firebase • Google Sheets • จอลูกค้า (จอที่ 2)</b>
+        <div style="font-size: 11px; color: var(--muted);">เชื่อมต่อเรียบร้อยพร้อมใช้งานทุกเครื่องอัตโนมัติ</div>
       </div>
       <button onclick="document.getElementById('cloud-db-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
     </div>
 
-    <div class="subcard">
+    <div class="subcard" style="border-color: #0284c7;">
       <b style="color: #38bdf8; display: block; margin-bottom: 6px;">🔥 1. Firebase Realtime Database URL</b>
-      <input type="text" id="cfg-firebase-url" placeholder="https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app" style="margin-bottom: 6px;">
-      <div style="font-size: 10.5px; color: var(--muted);">* ใช้ซิงค์สถานะห้องพัก 38 ห้อง, รายการจอง และไฟห้องพักข้ามอุปกรณ์แบบ Real-time</div>
+      <input type="text" id="cfg-firebase-url" style="margin-bottom: 4px; color: #7dd3fc;">
+      <div style="font-size: 10.5px; color: var(--muted);">* ใช้ซิงค์ห้องพัก 38 ห้อง และส่งข้อมูลขึ้นจอลูกค้าแบบเรียลไทม์</div>
     </div>
 
     <div class="subcard" style="border-color: #10b981;">
-      <b style="color: #34d399; display: block; margin-bottom: 6px;">📊 2. Google Sheets Web App URL (เชื่อมต่อแล้ว)</b>
-      <input type="text" id="cfg-gsheet-url" style="margin-bottom: 6px; color: #6ee7b7;">
-      <div style="font-size: 10.5px; color: var(--muted);">* บันทึกอัตโนมัติทุกครั้งที่เช็คเอาท์, บันทึกรายรับ-รายจ่าย และเพิ่มลูกค้าใหม่</div>
+      <b style="color: #34d399; display: block; margin-bottom: 6px;">📊 2. Google Sheets Web App URL</b>
+      <input type="text" id="cfg-gsheet-url" style="margin-bottom: 4px; color: #6ee7b7;">
+      <div style="font-size: 10.5px; color: var(--muted);">* ส่งใบเสร็จ, รายรับ-รายจ่าย และลูกค้าใหม่ลงชีตอัตโนมัติ</div>
     </div>
 
-    <div class="grid-2" style="margin-bottom: 8px;">
-      <button onclick="saveCloudDbConfig()" class="btn btn-amber" style="padding: 11px;">💾 บันทึกการตั้งค่า</button>
-      <button onclick="testGoogleSheetSync()" class="btn btn-emerald" style="padding: 11px;">🧪 ทดสอบส่งเข้า Sheets</button>
+    <div class="subcard" style="background: #0f172a; border-color: #f59e0b;">
+      <b style="color: var(--amber); display: block; margin-bottom: 8px;">🖥️ 3. หน้าจอลูกค้าที่เคาน์เตอร์ (Customer Facing Display)</b>
+      <div class="grid-2" style="margin-bottom: 6px;">
+        <button onclick="enterCustomerDisplayMode()" class="btn btn-amber" style="padding: 10px;">🖥️ เปิดเครื่องนี้เป็นจอลูกค้า</button>
+        <button onclick="copyCustomerDisplayLink()" class="btn btn-sky" style="padding: 10px;">🔗 คัดลอกลิงก์ไปเปิดจอที่ 2</button>
+      </div>
+      <button onclick="resetCustomerDisplayToIdle()" class="btn btn-dark" style="width: 100%; padding: 8px; font-size: 11.5px;">🔄 ล้างจอลูกค้ากลับหน้าต้อนรับ</button>
     </div>
-    <button onclick="pullFromFirebaseNow(true)" class="btn btn-sky" style="width: 100%; padding: 10px;">⬇️ ดึงข้อมูลล่าสุดจาก Firebase</button>
+
+    <div class="grid-3">
+      <button onclick="saveCloudDbConfig()" class="btn btn-amber" style="padding: 10px;">💾 บันทึก</button>
+      <button onclick="testGoogleSheetSync()" class="btn btn-emerald" style="padding: 10px;">🧪 เทสต์ Sheets</button>
+      <button onclick="pullFromFirebaseNow(true)" class="btn btn-sky" style="padding: 10px;">⬇️ ดึง Firebase</button>
+    </div>
+  </div>
+</div>
+
+<!-- หน้าจอแสดงผลฝั่งลูกค้า (Customer Facing Display Overlay) -->
+<div id="cfd-overlay" class="hidden">
+  <div class="cfd-topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img id="cfd-logo" src="./Icon.jpg" onerror="this.style.display='none'" style="width:42px;height:42px;border-radius:12px;border:1.5px solid #f59e0b;object-fit:cover;">
+      <div>
+        <div id="cfd-hotel-th" style="font-size:18px;font-weight:900;color:#fff;">ภูเบศร์อินเตอร์โฮเต็ล</div>
+        <div id="cfd-hotel-en" style="font-size:11px;color:#f59e0b;font-weight:800;letter-spacing:1px;">PHUBESTH INTER HOTEL</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="cfd-conn-badge" style="font-size:11px;background:#064e3b;color:#6ee7b7;padding:4px 10px;border-radius:99px;font-weight:700;">🟢 เชื่อมต่อเคาน์เตอร์แล้ว</span>
+      <button onclick="toggleFullScreenMode()" style="background:rgba(30,41,59,0.7);color:#cbd5e1;padding:6px 10px;border-radius:8px;font-size:12px;">⛶ เต็มจอ</button>
+      <button onclick="exitCustomerDisplayMode()" style="background:rgba(244,63,94,0.2);color:#fda4af;border:1px solid rgba(244,63,94,0.4);padding:6px 10px;border-radius:8px;font-size:12px;">✕ ออก</button>
+    </div>
+  </div>
+
+  <div class="cfd-body">
+    <!-- สถานะ 1: หน้าต้อนรับ (Idle) -->
+    <div id="cfd-view-idle" style="text-align:center;max-width:600px;">
+      <img id="cfd-idle-logo" src="./Icon.jpg" onerror="this.style.display='none'" style="width:110px;height:110px;border-radius:28px;border:3px solid #f59e0b;object-fit:cover;margin-bottom:18px;box-shadow:0 0 35px rgba(245,158,11,0.35);">
+      <div style="font-size:34px;font-weight:900;color:#ffffff;margin-bottom:6px;">ยินดีต้อนรับสู่ ภูเบศร์อินเตอร์โฮเต็ล</div>
+      <div style="font-size:16px;color:#f59e0b;font-weight:700;letter-spacing:1.5px;margin-bottom:24px;">WELCOME TO PHUBESTH INTER HOTEL</div>
+      <div id="cfd-clock" style="font-size:56px;font-weight:900;color:#38bdf8;letter-spacing:2px;line-height:1;">00:00</div>
+      <div id="cfd-date" style="font-size:16px;color:#94a3b8;margin-top:8px;"></div>
+      <div style="margin-top:28px;display:inline-block;background:rgba(15,23,42,0.8);border:1px solid #334155;border-radius:14px;padding:12px 24px;font-size:14px;color:#cbd5e1;">
+        📍 108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120 &nbsp;|&nbsp; 📞 โทร: 037231232
+      </div>
+    </div>
+
+    <!-- สถานะ 2: แสดงยอดเงิน & QR Code (Billing) -->
+    <div id="cfd-view-billing" class="cfd-billing-grid hidden">
+      <div class="cfd-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div class="between" style="border-bottom:2px solid #f59e0b;padding-bottom:12px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:12px;color:#94a3b8;">สรุปรายการชำระเงิน (BILL SUMMARY)</div>
+              <div style="font-size:28px;font-weight:900;color:#f59e0b;">ห้อง <span id="cfd-room-no">-</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div id="cfd-room-type" style="font-size:13px;background:#1e3a8a;color:#93c5fd;padding:4px 10px;border-radius:8px;font-weight:700;display:inline-block;">-</div>
+              <div id="cfd-guest-name" style="font-size:15px;color:#e2e8f0;margin-top:6px;font-weight:700;">ลูกค้าทั่วไป</div>
+            </div>
+          </div>
+
+          <div id="cfd-items-list" style="margin-bottom:16px;"></div>
+        </div>
+
+        <div style="background:#090d16;border:1px solid #334155;border-radius:16px;padding:14px 18px;">
+          <div class="between" style="font-size:15px;color:#cbd5e1;margin-bottom:4px;">
+            <span>รวมเป็นเงิน</span><b id="cfd-subtotal">฿0.00</b>
+          </div>
+          <div id="cfd-disc-row" class="between hidden" style="font-size:15px;color:#34d399;margin-bottom:4px;">
+            <span>หักส่วนลดพิเศษ</span><b id="cfd-disc">-฿0.00</b>
+          </div>
+          <div id="cfd-vat-row" class="between hidden" style="font-size:15px;color:#fde68a;margin-bottom:4px;">
+            <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span><b id="cfd-vat">฿0.00</b>
+          </div>
+          <div class="between" style="border-top:1.5px dashed #475569;margin-top:8px;padding-top:10px;">
+            <span style="font-size:20px;font-weight:900;color:#fff;">ยอดสุทธิ (TOTAL)</span>
+            <span id="cfd-grand" style="font-size:32px;font-weight:900;color:#34d399;">฿0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfd-qr-card">
+        <div style="background:#113566;color:#fff;font-size:13px;font-weight:800;padding:5px 16px;border-radius:99px;margin-bottom:10px;">THAI QR PAYMENT</div>
+        <div id="cfd-qr-title" style="font-size:15px;font-weight:800;color:#1e293b;margin-bottom:10px;">สแกนชำระเงินผ่านพร้อมเพย์</div>
+        <div id="cfd-qr-box" style="width:240px;height:240px;padding:10px;border:2px solid #e2e8f0;border-radius:18px;display:flex;align-items:center;justify-content:center;background:#fff;margin-bottom:12px;"></div>
+        <div id="cfd-qr-amount" style="font-size:28px;font-weight:900;color:#047857;">฿0.00</div>
+        <div id="cfd-qr-acc" style="font-size:13px;font-weight:700;color:#475569;margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- สถานะ 3: ขอบคุณหลังรับเงิน (Thank You) -->
+    <div id="cfd-view-thankyou" class="hidden" style="text-align:center;max-width:560px;">
+      <div style="width:110px;height:110px;border-radius:50%;background:rgba(16,185,129,0.2);border:4px solid #10b981;display:flex;align-items:center;justify-content:center;font-size:58px;margin:0 auto 20px;">✓</div>
+      <div style="font-size:34px;font-weight:900;color:#34d399;margin-bottom:8px;">ชำระเงินเรียบร้อยแล้ว</div>
+      <div id="cfd-ty-detail" style="font-size:20px;color:#ffffff;font-weight:700;margin-bottom:16px;"></div>
+      <div style="font-size:18px;color:#fde68a;">🙏 ขอบคุณที่ไว้วางใจใช้บริการ ภูเบศร์อินเตอร์โฮเต็ล</div>
+      <div style="font-size:13px;color:#94a3b8;margin-top:6px;">THANK YOU & HAVE A SAFE JOURNEY</div>
+    </div>
   </div>
 </div>
 
 <script>
-const DEFAULT_FIREBASE_URL = '';
+const DEFAULT_FIREBASE_URL = 'https://phubesthinter-pws-default-rtdb.asia-southeast1.firebasedatabase.app';
 const DEFAULT_GSHEET_URL = 'https://script.google.com/macros/s/AKfycbz3ja2d7Ok8QJrvhj7vWUXvtbDOjeOEZLtTocnF4TnE1oRNL-VULOhNWW4oSrrz5NmPQQ/exec';
-const CLOUD_CFG_KEY = 'PHUBESTH_CLOUD_DB_CFG_V2';
+const CLOUD_CFG_KEY = 'PHUBESTH_CLOUD_DB_CFG_V3';
 
 let cloudDbCfg = {
   firebaseUrl: DEFAULT_FIREBASE_URL,
   gsheetUrl: DEFAULT_GSHEET_URL
 };
-let fbEventSource = null;
+let fbStateSource = null;
+let fbDisplaySource = null;
+let cfdPollTimer = null;
+let cfdClockTimer = null;
+let cfdLastUpdatedAt = 0;
+let isCustomerDisplayActive = false;
+window._cfdCheckoutLock = false;
+
+function getCleanFirebaseUrl() {
+  return (cloudDbCfg.firebaseUrl || DEFAULT_FIREBASE_URL).trim().replace(/\/+$/, '');
+}
 
 function loadCloudDbConfig() {
   try {
     const raw = localStorage.getItem(CLOUD_CFG_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      cloudDbCfg.firebaseUrl = parsed.firebaseUrl || DEFAULT_FIREBASE_URL;
-      cloudDbCfg.gsheetUrl = parsed.gsheetUrl || DEFAULT_GSHEET_URL;
+      cloudDbCfg.firebaseUrl = (parsed.firebaseUrl || DEFAULT_FIREBASE_URL).trim().replace(/\/+$/, '');
+      cloudDbCfg.gsheetUrl = (parsed.gsheetUrl || DEFAULT_GSHEET_URL).trim();
     }
   } catch (e) {}
 }
 
 function openCloudDbModal() {
   loadCloudDbConfig();
-  document.getElementById('cfg-firebase-url').value = cloudDbCfg.firebaseUrl || '';
+  document.getElementById('cfg-firebase-url').value = getCleanFirebaseUrl();
   document.getElementById('cfg-gsheet-url').value = cloudDbCfg.gsheetUrl || DEFAULT_GSHEET_URL;
   document.getElementById('cloud-db-modal').classList.remove('hidden');
 }
 
 function saveCloudDbConfig() {
-  cloudDbCfg.firebaseUrl = document.getElementById('cfg-firebase-url').value.trim().replace(/\/$/, '');
+  cloudDbCfg.firebaseUrl = document.getElementById('cfg-firebase-url').value.trim().replace(/\/+$/, '') || DEFAULT_FIREBASE_URL;
   cloudDbCfg.gsheetUrl = document.getElementById('cfg-gsheet-url').value.trim() || DEFAULT_GSHEET_URL;
   localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudDbCfg));
   document.getElementById('cloud-db-modal').classList.add('hidden');
-  if (cloudDbCfg.firebaseUrl) {
-    pushToFirebaseNow();
-    startFirebaseRealtimeListener();
-  }
-  showToast('บันทึกการเชื่อมต่อ Cloud เรียบร้อย!');
+  pushToFirebaseNow();
+  startFirebaseRealtimeListener();
+  showToast('บันทึกการเชื่อมต่อ Firebase & Google Sheets สำเร็จ!');
 }
 
+/* ==================== 1. FIREBASE STATE SYNC ==================== */
 async function pushToFirebaseNow() {
-  if (!cloudDbCfg.firebaseUrl) return;
+  const baseUrl = getCleanFirebaseUrl();
+  if (!baseUrl) return;
   try {
     state.updatedAt = Date.now();
     state.lastDeviceId = DEVICE_ID;
-    await fetch(cloudDbCfg.firebaseUrl + '/pms_state.json', {
+    await fetch(baseUrl + '/pms_state.json', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state)
@@ -3892,32 +4064,35 @@ async function pushToFirebaseNow() {
 }
 
 async function pullFromFirebaseNow(showMsg = false) {
-  if (!cloudDbCfg.firebaseUrl) {
-    if (showMsg) alert('ยังไม่ได้ใส่ลิงก์ Firebase Realtime Database URL ครับ');
-    return;
-  }
+  const baseUrl = getCleanFirebaseUrl();
+  if (!baseUrl) return;
   try {
-    const res = await fetch(cloudDbCfg.firebaseUrl + '/pms_state.json');
+    const res = await fetch(baseUrl + '/pms_state.json');
     if (res.ok) {
       const remote = await res.json();
       if (remote && Array.isArray(remote.rooms)) {
         state = Object.assign({}, state, remote);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         renderAll();
-        if (showMsg) showToast('ดึงข้อมูลจาก Firebase สำเร็จ!');
+        applyHotelProfile();
+        if (showMsg) showToast('ดึงข้อมูลล่าสุดจาก Firebase สำเร็จ!');
+      } else if (showMsg) {
+        await pushToFirebaseNow();
+        showToast('สร้างฐานข้อมูลเริ่มต้นบน Firebase เรียบร้อยแล้ว!');
       }
     }
   } catch (e) {
-    if (showMsg) alert('ไม่สามารถเชื่อมต่อ Firebase ได้ กรุณาเช็กลิงก์หรืออินเทอร์เน็ตครับ');
+    if (showMsg) alert('เชื่อมต่อ Firebase ไม่สำเร็จ กรุณาเช็กอินเทอร์เน็ตหรือสิทธิ์ Rules ใน Firebase ครับ');
   }
 }
 
 function startFirebaseRealtimeListener() {
-  if (!cloudDbCfg.firebaseUrl || !('EventSource' in window)) return;
-  if (fbEventSource) { try { fbEventSource.close(); } catch (e) {} }
+  const baseUrl = getCleanFirebaseUrl();
+  if (!baseUrl || !('EventSource' in window)) return;
+  if (fbStateSource) { try { fbStateSource.close(); } catch (e) {} }
   try {
-    fbEventSource = new EventSource(cloudDbCfg.firebaseUrl + '/pms_state.json');
-    fbEventSource.addEventListener('put', (ev) => {
+    fbStateSource = new EventSource(baseUrl + '/pms_state.json');
+    fbStateSource.addEventListener('put', (ev) => {
       try {
         const packet = JSON.parse(ev.data);
         if (packet && packet.data && packet.data.lastDeviceId !== DEVICE_ID) {
@@ -3925,7 +4100,7 @@ function startFirebaseRealtimeListener() {
             state = Object.assign({}, state, packet.data);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             renderAll();
-            showToast('⚡ อัปเดตข้อมูลเรียลไทม์จาก Firebase');
+            showToast('⚡ ซิงค์สถานะห้องพักจาก Firebase');
           }
         }
       } catch (err) {}
@@ -3933,6 +4108,7 @@ function startFirebaseRealtimeListener() {
   } catch (e) {}
 }
 
+/* ==================== 2. GOOGLE SHEETS SYNC ==================== */
 async function sendToGoogleSheet(actionName, payloadData) {
   const url = cloudDbCfg.gsheetUrl || DEFAULT_GSHEET_URL;
   if (!url) return false;
@@ -3959,36 +4135,290 @@ async function testGoogleSheetSync() {
     title: 'ทดสอบเชื่อมต่อ Google Sheets สำเร็จ',
     amount: 0
   });
-  if (ok) {
-    showToast('✅ ส่งข้อมูลทดสอบแล้ว! เปิดดูในแท็บ Transactions ได้เลย');
+  if (ok) showToast('✅ ส่งแล้ว! ตรวจสอบในแท็บ Transactions ได้เลย');
+}
+
+/* ==================== 3. CUSTOMER FACING DISPLAY (2ND SCREEN) ==================== */
+async function pushCustomerDisplayPacket(packet) {
+  const baseUrl = getCleanFirebaseUrl();
+  if (!baseUrl) return;
+  try {
+    packet.updatedAt = Date.now();
+    await fetch(baseUrl + '/customer_display.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(packet)
+    });
+  } catch (e) {}
+}
+
+function pushCurrentRoomToCustomerDisplay(showNotice = false) {
+  if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+  const r = state.rooms[activeRoomIndex];
+  const calc = calcRoomTotal(r);
+  const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน'));
+
+  const items = [];
+  items.push({ label: `ค่าห้องพัก (${stayLabel} x${r.nights || 1})`, amount: '฿' + calc.roomCost.toFixed(0) });
+  if (calc.elecCost > 0) items.push({ label: `ค่าไฟฟ้า (${calc.elecUnits} หน่วย)`, amount: '฿' + calc.elecCost.toFixed(0) });
+  if (calc.waterCost > 0) items.push({ label: `ค่าน้ำประปา (${calc.waterUnits} หน่วย)`, amount: '฿' + calc.waterCost.toFixed(0) });
+  if (calc.lateCost > 0) items.push({ label: 'ค่าเลทเช็คเอาท์ (เกินเที่ยง)', amount: '฿' + calc.lateCost.toFixed(0) });
+  (r.orders || []).forEach(o => {
+    items.push({ label: `${o.name} (x${o.qty})`, amount: '฿' + (o.price * o.qty).toFixed(0) });
+  });
+
+  const preVat = (r.vatEnabled && r.vatMode === 'include') ? (calc.grand - calc.vat) : calc.subtotal;
+  const isBank = state.payment.mode === 'bank';
+  const qrPayload = isBank ? '' : buildPromptPayPayload(state.payment.promptPayId || '0847177566', calc.grand);
+
+  const packet = {
+    status: 'billing',
+    hotelNameTh: (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล',
+    hotelNameEn: (state.hotelInfo && state.hotelInfo.nameEn) || 'PHUBESTH INTER HOTEL',
+    roomNumber: r.number,
+    roomType: r.type,
+    guestName: r.guestName || 'ลูกค้าทั่วไป',
+    items: items,
+    subtotal: Number(preVat.toFixed(2)),
+    discount: Number(r.discount || 0),
+    vatEnabled: !!r.vatEnabled,
+    vat: Number(calc.vat.toFixed(2)),
+    grand: Number(calc.grand.toFixed(2)),
+    paymentMode: state.payment.mode || 'promptpay',
+    qrPayload: qrPayload,
+    bankQrImage: (isBank && state.payment.bankQrImage) ? state.payment.bankQrImage : '',
+    qrTitle: isBank ? 'สแกนโอนเข้าบัญชีธนาคาร' : 'สแกนชำระเงินผ่าน Thai QR พร้อมเพย์',
+    qrAcc: isBank
+      ? `${state.payment.bankName} ${state.payment.bankAcc || ''} (${state.payment.promptPayName || ''})`
+      : `${state.payment.promptPayName || ''} (${state.payment.promptPayId || ''})`
+  };
+
+  pushCustomerDisplayPacket(packet);
+  if (showNotice) showToast('📺 ส่งยอดห้อง ' + r.number + ' ขึ้นจอลูกค้าแล้ว!');
+}
+
+function resetCustomerDisplayToIdle() {
+  pushCustomerDisplayPacket({
+    status: 'idle',
+    hotelNameTh: (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล',
+    hotelNameEn: (state.hotelInfo && state.hotelInfo.nameEn) || 'PHUBESTH INTER HOTEL'
+  });
+  showToast('🔄 รีเซ็ตจอลูกค้ากลับหน้าต้อนรับแล้ว');
+}
+
+function copyCustomerDisplayLink() {
+  const url = window.location.origin + window.location.pathname + '?mode=display';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      alert('✅ คัดลอกลิงก์จอลูกค้าแล้ว!\n\n' + url + '\n\nนำลิงก์นี้ไปเปิดบนแท็บเล็ตหรือมือถือเครื่องที่ 2 ได้เลย (เปิดแล้วจะเข้าหน้าจอลูกค้าทันทีโดยไม่ต้องใส่ PIN)');
+    });
   } else {
-    alert('❌ ส่งข้อมูลไม่สำเร็จ กรุณาเช็กการเชื่อมต่ออินเทอร์เน็ตครับ');
+    prompt('คัดลอกลิงก์นี้ไปเปิดบนเครื่องที่ 2:', url);
   }
 }
 
+function renderCustomerDisplayData(data) {
+  if (!data || !isCustomerDisplayActive) return;
+  if (data.updatedAt && data.updatedAt === cfdLastUpdatedAt) return;
+  cfdLastUpdatedAt = data.updatedAt || Date.now();
+
+  if (data.hotelNameTh) document.getElementById('cfd-hotel-th').textContent = data.hotelNameTh;
+  if (data.hotelNameEn) document.getElementById('cfd-hotel-en').textContent = data.hotelNameEn;
+
+  const vIdle = document.getElementById('cfd-view-idle');
+  const vBill = document.getElementById('cfd-view-billing');
+  const vTy = document.getElementById('cfd-view-thankyou');
+
+  vIdle.classList.add('hidden');
+  vBill.classList.add('hidden');
+  vTy.classList.add('hidden');
+
+  if (data.status === 'billing') {
+    document.getElementById('cfd-room-no').textContent = data.roomNumber || '-';
+    document.getElementById('cfd-room-type').textContent = data.roomType || '';
+    document.getElementById('cfd-guest-name').textContent = 'คุณ ' + (data.guestName || 'ลูกค้าทั่วไป');
+
+    const listEl = document.getElementById('cfd-items-list');
+    listEl.innerHTML = (data.items || []).map(it =>
+      `<div class="cfd-item-row"><span>${it.label}</span><b style="color:#fff;">${it.amount}</b></div>`
+    ).join('');
+
+    document.getElementById('cfd-subtotal').textContent = '฿' + Number(data.subtotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    const discRow = document.getElementById('cfd-disc-row');
+    if (Number(data.discount) > 0) {
+      discRow.classList.remove('hidden');
+      document.getElementById('cfd-disc').textContent = '-฿' + Number(data.discount).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    } else {
+      discRow.classList.add('hidden');
+    }
+
+    const vatRow = document.getElementById('cfd-vat-row');
+    if (data.vatEnabled) {
+      vatRow.classList.remove('hidden');
+      document.getElementById('cfd-vat').textContent = '฿' + Number(data.vat || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    } else {
+      vatRow.classList.add('hidden');
+    }
+
+    const grandStr = '฿' + Number(data.grand || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    document.getElementById('cfd-grand').textContent = grandStr;
+    document.getElementById('cfd-qr-amount').textContent = 'ยอดโอน: ' + grandStr;
+    document.getElementById('cfd-qr-title').textContent = data.qrTitle || 'สแกนชำระเงินผ่าน Thai QR พร้อมเพย์';
+    document.getElementById('cfd-qr-acc').textContent = data.qrAcc || '';
+
+    const qrBox = document.getElementById('cfd-qr-box');
+    qrBox.innerHTML = '';
+    const img = document.createElement('img');
+    img.style.cssText = 'width:216px;height:216px;object-fit:contain;';
+    if (data.paymentMode === 'bank' && data.bankQrImage) {
+      img.src = data.bankQrImage;
+    } else if (data.qrPayload) {
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(data.qrPayload);
+    }
+    qrBox.appendChild(img);
+    vBill.classList.remove('hidden');
+  } else if (data.status === 'thankyou') {
+    document.getElementById('cfd-ty-detail').textContent =
+      `ห้อง ${data.roomNumber || ''} • ยอดชำระ ฿${Number(data.grand || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    vTy.classList.remove('hidden');
+  } else {
+    vIdle.classList.remove('hidden');
+  }
+}
+
+function updateCfdClock() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const clk = document.getElementById('cfd-clock');
+  const dt = document.getElementById('cfd-date');
+  if (clk) clk.textContent = `${hh}:${mm}`;
+  if (dt) dt.textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function enterCustomerDisplayMode() {
+  isCustomerDisplayActive = true;
+  cfdLastUpdatedAt = 0;
+  document.getElementById('cloud-db-modal').classList.add('hidden');
+  document.getElementById('cfd-overlay').classList.remove('hidden');
+  updateCfdClock();
+  clearInterval(cfdClockTimer);
+  cfdClockTimer = setInterval(updateCfdClock, 5000);
+
+  const baseUrl = getCleanFirebaseUrl();
+  const fetchDisplayState = async () => {
+    try {
+      const res = await fetch(baseUrl + '/customer_display.json');
+      if (res.ok) {
+        const d = await res.json();
+        renderCustomerDisplayData(d || { status: 'idle' });
+      }
+    } catch (e) {}
+  };
+
+  fetchDisplayState();
+
+  // ฟังแบบ Real-time SSE + สำรอง Polling ทุก 2.5 วิ กันจอมือถือพักสัญญาณหลุด
+  if (fbDisplaySource) { try { fbDisplaySource.close(); } catch (e) {} }
+  if ('EventSource' in window) {
+    try {
+      fbDisplaySource = new EventSource(baseUrl + '/customer_display.json');
+      fbDisplaySource.addEventListener('put', (ev) => {
+        try {
+          const p = JSON.parse(ev.data);
+          if (p && p.data) renderCustomerDisplayData(p.data);
+        } catch (err) {}
+      });
+    } catch (e) {}
+  }
+  clearInterval(cfdPollTimer);
+  cfdPollTimer = setInterval(fetchDisplayState, 2500);
+}
+
+function exitCustomerDisplayMode() {
+  isCustomerDisplayActive = false;
+  document.getElementById('cfd-overlay').classList.add('hidden');
+  if (fbDisplaySource) { try { fbDisplaySource.close(); } catch (e) {} fbDisplaySource = null; }
+  clearInterval(cfdPollTimer);
+  clearInterval(cfdClockTimer);
+}
+
+/* ==================== 4. HOOKS & INITIALIZATION ==================== */
 window.addEventListener('DOMContentLoaded', () => {
   loadCloudDbConfig();
 
+  // 1) เพิ่มปุ่ม "🔥 Firebase / จอลูกค้า" บนแถบเมนูหลัก
   const syncBtn = document.querySelector('button[onclick="openSyncModal()"]');
   if (syncBtn && !document.getElementById('btn-cloud-db-cfg')) {
     const fbBtn = document.createElement('button');
     fbBtn.id = 'btn-cloud-db-cfg';
     fbBtn.className = 'btn btn-amber';
     fbBtn.style.cssText = 'padding:3px 10px;border-radius:99px;font-size:11px;';
-    fbBtn.innerHTML = '🔥 Firebase / Sheets';
+    fbBtn.innerHTML = '🔥 Firebase / จอลูกค้า';
     fbBtn.onclick = openCloudDbModal;
     syncBtn.parentNode.insertBefore(fbBtn, syncBtn.nextSibling);
   }
 
-  // 1. พ่วงการเซฟฐานข้อมูลทุกจุดให้ส่งขึ้น Firebase
+  // 2) เพิ่มปุ่มเข้าโหมดจอลูกค้าไว้ที่หน้า Login ด้วย (เครื่องที่ 2 กดเข้าได้ทันทีไม่ต้องใส่ PIN)
+  const loginCard = document.querySelector('#login-screen .card');
+  if (loginCard && !document.getElementById('btn-login-cfd')) {
+    const cfdLoginBtn = document.createElement('button');
+    cfdLoginBtn.id = 'btn-login-cfd';
+    cfdLoginBtn.className = 'btn btn-dark';
+    cfdLoginBtn.style.cssText = 'width:100%;margin-top:8px;padding:9px;font-size:12px;color:#fbbf24;border-color:#f59e0b;';
+    cfdLoginBtn.innerHTML = '🖥️ เปิดเครื่องนี้เป็นหน้าจอลูกค้า (จอที่ 2)';
+    cfdLoginBtn.onclick = enterCustomerDisplayMode;
+    loginCard.appendChild(cfdLoginBtn);
+  }
+
+  // 3) เพิ่มปุ่มส่งขึ้นจอลูกค้าไว้ในหน้าคิดเงิน (Tab 3)
+  const bigQrBtn = document.querySelector('button[onclick="openBigQrModal()"]');
+  if (bigQrBtn && !document.getElementById('btn-push-cfd')) {
+    const pushCfdBtn = document.createElement('button');
+    pushCfdBtn.id = 'btn-push-cfd';
+    pushCfdBtn.className = 'btn btn-amber';
+    pushCfdBtn.style.cssText = 'width:100%;padding:10px;margin-bottom:8px;';
+    pushCfdBtn.innerHTML = '📺 ส่งรายการ & QR ขึ้นจอลูกค้า (จอที่ 2)';
+    pushCfdBtn.onclick = () => pushCurrentRoomToCustomerDisplay(true);
+    bigQrBtn.parentNode.insertBefore(pushCfdBtn, bigQrBtn);
+  }
+
+  // 4) พ่วงฟังก์ชันเดิมทั้งหมดให้เชื่อม Firebase + Google Sheets + จอลูกค้าอัตโนมัติ
   const origSave = window.saveDatabase;
   window.saveDatabase = function() {
     if (origSave) origSave();
-    clearTimeout(window._fbTimer);
-    window._fbTimer = setTimeout(pushToFirebaseNow, 400);
+    clearTimeout(window._fbStatePushTimer);
+    window._fbStatePushTimer = setTimeout(pushToFirebaseNow, 400);
   };
 
-  // 2. พ่วงการบันทึกรายรับ-รายจ่าย -> ส่งเข้าแท็บ Transactions
+  const origSwitchTab = window.switchRoomTab;
+  window.switchRoomTab = function(n) {
+    if (origSwitchTab) origSwitchTab(n);
+    if (n === 3) {
+      pushCurrentRoomToCustomerDisplay(false);
+    }
+  };
+
+  const origUpdateReceipt = window.updateReceiptPreview;
+  window.updateReceiptPreview = function() {
+    if (origUpdateReceipt) origUpdateReceipt();
+    const tab3 = document.getElementById('rcontent-3');
+    if (tab3 && !tab3.classList.contains('hidden')) {
+      clearTimeout(window._cfdUpdateTimer);
+      window._cfdUpdateTimer = setTimeout(() => pushCurrentRoomToCustomerDisplay(false), 300);
+    }
+  };
+
+  const origCloseRoom = window.closeRoomModal;
+  window.closeRoomModal = function() {
+    if (origCloseRoom) origCloseRoom();
+    if (window._cfdCheckoutLock) {
+      window._cfdCheckoutLock = false;
+    } else {
+      pushCustomerDisplayPacket({ status: 'idle' });
+    }
+  };
+
   const origSaveTx = window.saveTransaction;
   window.saveTransaction = function() {
     const prevLen = (state.transactions || []).length;
@@ -3998,7 +4428,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // 3. พ่วงการเพิ่มลูกค้าใหม่ -> ส่งเข้าแท็บ Customers
   const origAddCust = window.addCustomerManual;
   window.addCustomerManual = function() {
     const prevLen = (state.customers || []).length;
@@ -4008,13 +4437,19 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // 4. พ่วงการเช็คเอาท์รับเงิน -> ส่งเข้าแท็บ Receipts, Transactions และ Customers (ถ้าเป็นลูกค้าใหม่)
   const origCheckout = window.completeCheckOutAndPay;
   window.completeCheckOutAndPay = function() {
     const prevRcpLen = (state.receiptsArchive || []).length;
     const prevTxLen = (state.transactions || []).length;
     const prevCustLen = (state.customers || []).length;
+    const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+    const snapGrand = snapRoom ? calcRoomTotal(snapRoom).grand : 0;
+    const snapRoomNo = snapRoom ? snapRoom.number : '';
+
+    window._cfdCheckoutLock = true;
     if (origCheckout) origCheckout();
+
+    // ส่งเข้า Google Sheets
     if ((state.receiptsArchive || []).length > prevRcpLen) {
       sendToGoogleSheet('SAVE_RECEIPT', state.receiptsArchive[0]);
     }
@@ -4024,9 +4459,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if ((state.customers || []).length > prevCustLen) {
       sendToGoogleSheet('SAVE_CUSTOMER', state.customers[0]);
     }
+
+    // แสดงหน้าขอบคุณบนจอลูกค้า 8 วินาที แล้วกลับหน้าต้อนรับอัตโนมัติ
+    pushCustomerDisplayPacket({ status: 'thankyou', roomNumber: snapRoomNo, grand: snapGrand });
+    setTimeout(() => {
+      pushCustomerDisplayPacket({ status: 'idle' });
+    }, 8000);
   };
 
-  if (cloudDbCfg.firebaseUrl) {
+  // ตรวจสอบว่าเปิดมาด้วยลิงก์จอลูกค้า (?mode=display) หรือไม่
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'display') {
+    enterCustomerDisplayMode();
+  } else {
     pullFromFirebaseNow(false);
     startFirebaseRealtimeListener();
   }
