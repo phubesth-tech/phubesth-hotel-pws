@@ -3805,7 +3805,8 @@ window.printReceiptPaper = async function() {
   await printDirectToOcpp58();
 };
 </script>
- <!-- ================= ADD-ON: FIREBASE REALTIME DB & GOOGLE SHEETS SYNC ================= -->
+
+ <!-- ================= ADD-ON: FIREBASE REALTIME DB & GOOGLE SHEETS SYNC (PRE-CONFIGURED) ================= -->
 <div id="cloud-db-modal" class="modal-backdrop hidden" style="z-index: 9900;">
   <div class="modal-box" style="max-width: 520px; border: 2px solid #f59e0b;">
     <div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
@@ -3822,49 +3823,61 @@ window.printReceiptPaper = async function() {
       <div style="font-size: 10.5px; color: var(--muted);">* ใช้ซิงค์สถานะห้องพัก 38 ห้อง, รายการจอง และไฟห้องพักข้ามอุปกรณ์แบบ Real-time</div>
     </div>
 
-    <div class="subcard">
-      <b style="color: #34d399; display: block; margin-bottom: 6px;">📊 2. Google Sheets Web App URL (Apps Script)</b>
-      <input type="text" id="cfg-gsheet-url" placeholder="https://script.google.com/macros/s/xxxxxx/exec" style="margin-bottom: 6px;">
-      <div style="font-size: 10.5px; color: var(--muted);">* เมื่อกดเช็คเอาท์หรือบันทึกรายรับ-รายจ่าย ข้อมูลจะถูกส่งไปเพิ่มแถวใน Google Sheets ทันที</div>
+    <div class="subcard" style="border-color: #10b981;">
+      <b style="color: #34d399; display: block; margin-bottom: 6px;">📊 2. Google Sheets Web App URL (เชื่อมต่อแล้ว)</b>
+      <input type="text" id="cfg-gsheet-url" style="margin-bottom: 6px; color: #6ee7b7;">
+      <div style="font-size: 10.5px; color: var(--muted);">* บันทึกอัตโนมัติทุกครั้งที่เช็คเอาท์, บันทึกรายรับ-รายจ่าย และเพิ่มลูกค้าใหม่</div>
     </div>
 
     <div class="grid-2" style="margin-bottom: 8px;">
-      <button onclick="saveCloudDbConfig()" class="btn btn-amber" style="padding: 12px;">💾 บันทึกการเชื่อมต่อ</button>
-      <button onclick="pullFromFirebaseNow(true)" class="btn btn-sky" style="padding: 12px;">⬇️ ดึงข้อมูลล่าสุดจาก Firebase</button>
+      <button onclick="saveCloudDbConfig()" class="btn btn-amber" style="padding: 11px;">💾 บันทึกการตั้งค่า</button>
+      <button onclick="testGoogleSheetSync()" class="btn btn-emerald" style="padding: 11px;">🧪 ทดสอบส่งเข้า Sheets</button>
     </div>
+    <button onclick="pullFromFirebaseNow(true)" class="btn btn-sky" style="width: 100%; padding: 10px;">⬇️ ดึงข้อมูลล่าสุดจาก Firebase</button>
   </div>
 </div>
 
 <script>
-const CLOUD_CFG_KEY = 'PHUBESTH_CLOUD_DB_CFG';
-let cloudDbCfg = { firebaseUrl: '', gsheetUrl: '' };
+const DEFAULT_FIREBASE_URL = '';
+const DEFAULT_GSHEET_URL = 'https://script.google.com/macros/s/AKfycbz3ja2d7Ok8QJrvhj7vWUXvtbDOjeOEZLtTocnF4TnE1oRNL-VULOhNWW4oSrrz5NmPQQ/exec';
+const CLOUD_CFG_KEY = 'PHUBESTH_CLOUD_DB_CFG_V2';
+
+let cloudDbCfg = {
+  firebaseUrl: DEFAULT_FIREBASE_URL,
+  gsheetUrl: DEFAULT_GSHEET_URL
+};
 let fbEventSource = null;
 
 function loadCloudDbConfig() {
   try {
     const raw = localStorage.getItem(CLOUD_CFG_KEY);
-    if (raw) cloudDbCfg = Object.assign({}, cloudDbCfg, JSON.parse(raw));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      cloudDbCfg.firebaseUrl = parsed.firebaseUrl || DEFAULT_FIREBASE_URL;
+      cloudDbCfg.gsheetUrl = parsed.gsheetUrl || DEFAULT_GSHEET_URL;
+    }
   } catch (e) {}
 }
 
 function openCloudDbModal() {
   loadCloudDbConfig();
   document.getElementById('cfg-firebase-url').value = cloudDbCfg.firebaseUrl || '';
-  document.getElementById('cfg-gsheet-url').value = cloudDbCfg.gsheetUrl || '';
+  document.getElementById('cfg-gsheet-url').value = cloudDbCfg.gsheetUrl || DEFAULT_GSHEET_URL;
   document.getElementById('cloud-db-modal').classList.remove('hidden');
 }
 
 function saveCloudDbConfig() {
   cloudDbCfg.firebaseUrl = document.getElementById('cfg-firebase-url').value.trim().replace(/\/$/, '');
-  cloudDbCfg.gsheetUrl = document.getElementById('cfg-gsheet-url').value.trim();
+  cloudDbCfg.gsheetUrl = document.getElementById('cfg-gsheet-url').value.trim() || DEFAULT_GSHEET_URL;
   localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudDbCfg));
   document.getElementById('cloud-db-modal').classList.add('hidden');
-  pushToFirebaseNow();
-  startFirebaseRealtimeListener();
-  showToast('บันทึกการเชื่อมต่อ Firebase & Google Sheets แล้ว!');
+  if (cloudDbCfg.firebaseUrl) {
+    pushToFirebaseNow();
+    startFirebaseRealtimeListener();
+  }
+  showToast('บันทึกการเชื่อมต่อ Cloud เรียบร้อย!');
 }
 
-// 1. ฟังก์ชันดันข้อมูล State ทั้งหมดขึ้น Firebase Realtime Database
 async function pushToFirebaseNow() {
   if (!cloudDbCfg.firebaseUrl) return;
   try {
@@ -3878,9 +3891,11 @@ async function pushToFirebaseNow() {
   } catch (e) {}
 }
 
-// 2. ฟังก์ชันดึงข้อมูลจาก Firebase
 async function pullFromFirebaseNow(showMsg = false) {
-  if (!cloudDbCfg.firebaseUrl) return;
+  if (!cloudDbCfg.firebaseUrl) {
+    if (showMsg) alert('ยังไม่ได้ใส่ลิงก์ Firebase Realtime Database URL ครับ');
+    return;
+  }
   try {
     const res = await fetch(cloudDbCfg.firebaseUrl + '/pms_state.json');
     if (res.ok) {
@@ -3892,10 +3907,11 @@ async function pullFromFirebaseNow(showMsg = false) {
         if (showMsg) showToast('ดึงข้อมูลจาก Firebase สำเร็จ!');
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    if (showMsg) alert('ไม่สามารถเชื่อมต่อ Firebase ได้ กรุณาเช็กลิงก์หรืออินเทอร์เน็ตครับ');
+  }
 }
 
-// 3. ฟังการเปลี่ยนแปลงแบบ Real-time จาก Firebase (ผ่าน Server-Sent Events ของ Firebase REST API)
 function startFirebaseRealtimeListener() {
   if (!cloudDbCfg.firebaseUrl || !('EventSource' in window)) return;
   if (fbEventSource) { try { fbEventSource.close(); } catch (e) {} }
@@ -3917,27 +3933,46 @@ function startFirebaseRealtimeListener() {
   } catch (e) {}
 }
 
-// 4. ฟังก์ชันยิงข้อมูลเข้า Google Sheets
 async function sendToGoogleSheet(actionName, payloadData) {
-  if (!cloudDbCfg.gsheetUrl) return;
+  const url = cloudDbCfg.gsheetUrl || DEFAULT_GSHEET_URL;
+  if (!url) return false;
   try {
-    await fetch(cloudDbCfg.gsheetUrl, {
+    await fetch(url, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: actionName, data: payloadData })
     });
-  } catch (e) {}
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
-// พ่วงระบบเข้ากับฟังก์ชันเดิมของโปรแกรมโรงแรมโดยอัตโนมัติ
+async function testGoogleSheetSync() {
+  showToast('⏳ กำลังส่งข้อมูลทดสอบเข้า Google Sheets...');
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const ok = await sendToGoogleSheet('SAVE_TX', {
+    date: todayStr,
+    type: 'test',
+    category: 'ทดสอบระบบ',
+    title: 'ทดสอบเชื่อมต่อ Google Sheets สำเร็จ',
+    amount: 0
+  });
+  if (ok) {
+    showToast('✅ ส่งข้อมูลทดสอบแล้ว! เปิดดูในแท็บ Transactions ได้เลย');
+  } else {
+    alert('❌ ส่งข้อมูลไม่สำเร็จ กรุณาเช็กการเชื่อมต่ออินเทอร์เน็ตครับ');
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   loadCloudDbConfig();
 
-  // เพิ่มปุ่มตั้งค่า Cloud บนหัวโปรแกรม
   const syncBtn = document.querySelector('button[onclick="openSyncModal()"]');
-  if (syncBtn) {
+  if (syncBtn && !document.getElementById('btn-cloud-db-cfg')) {
     const fbBtn = document.createElement('button');
+    fbBtn.id = 'btn-cloud-db-cfg';
     fbBtn.className = 'btn btn-amber';
     fbBtn.style.cssText = 'padding:3px 10px;border-radius:99px;font-size:11px;';
     fbBtn.innerHTML = '🔥 Firebase / Sheets';
@@ -3945,7 +3980,7 @@ window.addEventListener('DOMContentLoaded', () => {
     syncBtn.parentNode.insertBefore(fbBtn, syncBtn.nextSibling);
   }
 
-  // พ่วงการเซฟทุกครั้งให้ดันขึ้น Firebase
+  // 1. พ่วงการเซฟฐานข้อมูลทุกจุดให้ส่งขึ้น Firebase
   const origSave = window.saveDatabase;
   window.saveDatabase = function() {
     if (origSave) origSave();
@@ -3953,7 +3988,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window._fbTimer = setTimeout(pushToFirebaseNow, 400);
   };
 
-  // พ่วงการบันทึกรายรับ-รายจ่าย ให้ส่งเข้า Google Sheets
+  // 2. พ่วงการบันทึกรายรับ-รายจ่าย -> ส่งเข้าแท็บ Transactions
   const origSaveTx = window.saveTransaction;
   window.saveTransaction = function() {
     const prevLen = (state.transactions || []).length;
@@ -3963,17 +3998,31 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // พ่วงการเช็คเอาท์รับเงิน ให้ส่งทั้งใบเสร็จและรายรับเข้า Google Sheets
+  // 3. พ่วงการเพิ่มลูกค้าใหม่ -> ส่งเข้าแท็บ Customers
+  const origAddCust = window.addCustomerManual;
+  window.addCustomerManual = function() {
+    const prevLen = (state.customers || []).length;
+    if (origAddCust) origAddCust();
+    if ((state.customers || []).length > prevLen) {
+      sendToGoogleSheet('SAVE_CUSTOMER', state.customers[0]);
+    }
+  };
+
+  // 4. พ่วงการเช็คเอาท์รับเงิน -> ส่งเข้าแท็บ Receipts, Transactions และ Customers (ถ้าเป็นลูกค้าใหม่)
   const origCheckout = window.completeCheckOutAndPay;
   window.completeCheckOutAndPay = function() {
     const prevRcpLen = (state.receiptsArchive || []).length;
     const prevTxLen = (state.transactions || []).length;
+    const prevCustLen = (state.customers || []).length;
     if (origCheckout) origCheckout();
     if ((state.receiptsArchive || []).length > prevRcpLen) {
       sendToGoogleSheet('SAVE_RECEIPT', state.receiptsArchive[0]);
     }
     if ((state.transactions || []).length > prevTxLen) {
       sendToGoogleSheet('SAVE_TX', state.transactions[0]);
+    }
+    if ((state.customers || []).length > prevCustLen) {
+      sendToGoogleSheet('SAVE_CUSTOMER', state.customers[0]);
     }
   };
 
