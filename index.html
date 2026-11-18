@@ -3805,5 +3805,183 @@ window.printReceiptPaper = async function() {
   await printDirectToOcpp58();
 };
 </script>
+ <!-- ================= ADD-ON: FIREBASE REALTIME DB & GOOGLE SHEETS SYNC ================= -->
+<div id="cloud-db-modal" class="modal-backdrop hidden" style="z-index: 9900;">
+  <div class="modal-box" style="max-width: 520px; border: 2px solid #f59e0b;">
+    <div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
+      <div>
+        <b style="font-size: 16px; color: var(--amber);">☁️ ตั้งค่าฐานข้อมูล Firebase & Google Sheets</b>
+        <div style="font-size: 11px; color: var(--muted);">ซิงค์สถานะห้องพักเรียลไทม์ & บันทึกบัญชีลง Google Sheets อัตโนมัติ</div>
+      </div>
+      <button onclick="document.getElementById('cloud-db-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+
+    <div class="subcard">
+      <b style="color: #38bdf8; display: block; margin-bottom: 6px;">🔥 1. Firebase Realtime Database URL</b>
+      <input type="text" id="cfg-firebase-url" placeholder="https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app" style="margin-bottom: 6px;">
+      <div style="font-size: 10.5px; color: var(--muted);">* ใช้ซิงค์สถานะห้องพัก 38 ห้อง, รายการจอง และไฟห้องพักข้ามอุปกรณ์แบบ Real-time</div>
+    </div>
+
+    <div class="subcard">
+      <b style="color: #34d399; display: block; margin-bottom: 6px;">📊 2. Google Sheets Web App URL (Apps Script)</b>
+      <input type="text" id="cfg-gsheet-url" placeholder="https://script.google.com/macros/s/xxxxxx/exec" style="margin-bottom: 6px;">
+      <div style="font-size: 10.5px; color: var(--muted);">* เมื่อกดเช็คเอาท์หรือบันทึกรายรับ-รายจ่าย ข้อมูลจะถูกส่งไปเพิ่มแถวใน Google Sheets ทันที</div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 8px;">
+      <button onclick="saveCloudDbConfig()" class="btn btn-amber" style="padding: 12px;">💾 บันทึกการเชื่อมต่อ</button>
+      <button onclick="pullFromFirebaseNow(true)" class="btn btn-sky" style="padding: 12px;">⬇️ ดึงข้อมูลล่าสุดจาก Firebase</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLOUD_CFG_KEY = 'PHUBESTH_CLOUD_DB_CFG';
+let cloudDbCfg = { firebaseUrl: '', gsheetUrl: '' };
+let fbEventSource = null;
+
+function loadCloudDbConfig() {
+  try {
+    const raw = localStorage.getItem(CLOUD_CFG_KEY);
+    if (raw) cloudDbCfg = Object.assign({}, cloudDbCfg, JSON.parse(raw));
+  } catch (e) {}
+}
+
+function openCloudDbModal() {
+  loadCloudDbConfig();
+  document.getElementById('cfg-firebase-url').value = cloudDbCfg.firebaseUrl || '';
+  document.getElementById('cfg-gsheet-url').value = cloudDbCfg.gsheetUrl || '';
+  document.getElementById('cloud-db-modal').classList.remove('hidden');
+}
+
+function saveCloudDbConfig() {
+  cloudDbCfg.firebaseUrl = document.getElementById('cfg-firebase-url').value.trim().replace(/\/$/, '');
+  cloudDbCfg.gsheetUrl = document.getElementById('cfg-gsheet-url').value.trim();
+  localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudDbCfg));
+  document.getElementById('cloud-db-modal').classList.add('hidden');
+  pushToFirebaseNow();
+  startFirebaseRealtimeListener();
+  showToast('บันทึกการเชื่อมต่อ Firebase & Google Sheets แล้ว!');
+}
+
+// 1. ฟังก์ชันดันข้อมูล State ทั้งหมดขึ้น Firebase Realtime Database
+async function pushToFirebaseNow() {
+  if (!cloudDbCfg.firebaseUrl) return;
+  try {
+    state.updatedAt = Date.now();
+    state.lastDeviceId = DEVICE_ID;
+    await fetch(cloudDbCfg.firebaseUrl + '/pms_state.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+  } catch (e) {}
+}
+
+// 2. ฟังก์ชันดึงข้อมูลจาก Firebase
+async function pullFromFirebaseNow(showMsg = false) {
+  if (!cloudDbCfg.firebaseUrl) return;
+  try {
+    const res = await fetch(cloudDbCfg.firebaseUrl + '/pms_state.json');
+    if (res.ok) {
+      const remote = await res.json();
+      if (remote && Array.isArray(remote.rooms)) {
+        state = Object.assign({}, state, remote);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        renderAll();
+        if (showMsg) showToast('ดึงข้อมูลจาก Firebase สำเร็จ!');
+      }
+    }
+  } catch (e) {}
+}
+
+// 3. ฟังการเปลี่ยนแปลงแบบ Real-time จาก Firebase (ผ่าน Server-Sent Events ของ Firebase REST API)
+function startFirebaseRealtimeListener() {
+  if (!cloudDbCfg.firebaseUrl || !('EventSource' in window)) return;
+  if (fbEventSource) { try { fbEventSource.close(); } catch (e) {} }
+  try {
+    fbEventSource = new EventSource(cloudDbCfg.firebaseUrl + '/pms_state.json');
+    fbEventSource.addEventListener('put', (ev) => {
+      try {
+        const packet = JSON.parse(ev.data);
+        if (packet && packet.data && packet.data.lastDeviceId !== DEVICE_ID) {
+          if (Number(packet.data.updatedAt || 0) > Number(state.updatedAt || 0)) {
+            state = Object.assign({}, state, packet.data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            renderAll();
+            showToast('⚡ อัปเดตข้อมูลเรียลไทม์จาก Firebase');
+          }
+        }
+      } catch (err) {}
+    });
+  } catch (e) {}
+}
+
+// 4. ฟังก์ชันยิงข้อมูลเข้า Google Sheets
+async function sendToGoogleSheet(actionName, payloadData) {
+  if (!cloudDbCfg.gsheetUrl) return;
+  try {
+    await fetch(cloudDbCfg.gsheetUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: actionName, data: payloadData })
+    });
+  } catch (e) {}
+}
+
+// พ่วงระบบเข้ากับฟังก์ชันเดิมของโปรแกรมโรงแรมโดยอัตโนมัติ
+window.addEventListener('DOMContentLoaded', () => {
+  loadCloudDbConfig();
+
+  // เพิ่มปุ่มตั้งค่า Cloud บนหัวโปรแกรม
+  const syncBtn = document.querySelector('button[onclick="openSyncModal()"]');
+  if (syncBtn) {
+    const fbBtn = document.createElement('button');
+    fbBtn.className = 'btn btn-amber';
+    fbBtn.style.cssText = 'padding:3px 10px;border-radius:99px;font-size:11px;';
+    fbBtn.innerHTML = '🔥 Firebase / Sheets';
+    fbBtn.onclick = openCloudDbModal;
+    syncBtn.parentNode.insertBefore(fbBtn, syncBtn.nextSibling);
+  }
+
+  // พ่วงการเซฟทุกครั้งให้ดันขึ้น Firebase
+  const origSave = window.saveDatabase;
+  window.saveDatabase = function() {
+    if (origSave) origSave();
+    clearTimeout(window._fbTimer);
+    window._fbTimer = setTimeout(pushToFirebaseNow, 400);
+  };
+
+  // พ่วงการบันทึกรายรับ-รายจ่าย ให้ส่งเข้า Google Sheets
+  const origSaveTx = window.saveTransaction;
+  window.saveTransaction = function() {
+    const prevLen = (state.transactions || []).length;
+    if (origSaveTx) origSaveTx();
+    if ((state.transactions || []).length > prevLen) {
+      sendToGoogleSheet('SAVE_TX', state.transactions[0]);
+    }
+  };
+
+  // พ่วงการเช็คเอาท์รับเงิน ให้ส่งทั้งใบเสร็จและรายรับเข้า Google Sheets
+  const origCheckout = window.completeCheckOutAndPay;
+  window.completeCheckOutAndPay = function() {
+    const prevRcpLen = (state.receiptsArchive || []).length;
+    const prevTxLen = (state.transactions || []).length;
+    if (origCheckout) origCheckout();
+    if ((state.receiptsArchive || []).length > prevRcpLen) {
+      sendToGoogleSheet('SAVE_RECEIPT', state.receiptsArchive[0]);
+    }
+    if ((state.transactions || []).length > prevTxLen) {
+      sendToGoogleSheet('SAVE_TX', state.transactions[0]);
+    }
+  };
+
+  if (cloudDbCfg.firebaseUrl) {
+    pullFromFirebaseNow(false);
+    startFirebaseRealtimeListener();
+  }
+});
+</script>
 </body>
 </html>
