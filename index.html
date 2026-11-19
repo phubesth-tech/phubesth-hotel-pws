@@ -4491,5 +4491,1316 @@ window.kickDrawerOnly = async function() {
   }
 };
 </script>
+ <!-- ================= ADD-ON: PHUBESTH LUXURY 5-STAR PMS (DRAWER + FLOOR GROUPING + 3D ISOMETRIC + FLOOR PLAN + TAPE CHART + SMART WATCH + AI VOICE) ================= -->
+<style>
+  /* 1. คุมโทนหรูระดับ 5 ดาว & จัดระเบียบ Header ใหม่ */
+  #app-screen > .card:first-child {
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(9, 13, 22, 0.98)) !important;
+    border: 1px solid rgba(245, 158, 11, 0.28) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    padding: 10px 12px !important;
+  }
+  .pro-hdr-menu-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: rgba(245, 158, 11, 0.14);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    color: #fbbf24;
+    font-size: 18px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pro-hdr-menu-btn:active { transform: scale(0.92); }
+
+  .pro-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pro-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #0b1120;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    white-space: nowrap;
+  }
+  .pro-pill-btn.active-emerald {
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.55);
+    color: #34d399;
+  }
+  .pro-pill-btn.active-amber {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: rgba(245, 158, 11, 0.55);
+    color: #fbbf24;
+  }
+
+  /* แถบแท็บเมนูหลัก 5 แท็บ ให้เรียงสวยเป็นแถวเดียวเลื่อนซ้ายขวาได้ */
+  .hotel-main-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    gap: 6px !important;
+    margin-top: 10px !important;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    scrollbar-width: none;
+  }
+  .hotel-main-tabs::-webkit-scrollbar { display: none; }
+  .hotel-main-tabs .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+    border-radius: 11px !important;
+  }
+  .hotel-main-tabs .btn-amber {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  }
+  .hotel-main-tabs .btn-dark {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid #1f2937 !important;
+    color: #cbd5e1 !important;
+  }
+
+  /* 2. Slide-Out Drawer เมนูระบบด้านข้าง */
+  #hotel-pro-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(4px);
+    z-index: 4400;
+    display: none;
+  }
+  #hotel-pro-backdrop.open { display: block; }
+  #hotel-pro-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 295px;
+    max-width: 86vw;
+    background: linear-gradient(180deg, #0f172a 0%, #070b14 100%);
+    border-right: 1px solid rgba(245, 158, 11, 0.35);
+    z-index: 4500;
+    transform: translateX(-105%);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 14px;
+    overflow-y: auto;
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.85);
+  }
+  #hotel-pro-drawer.open { transform: translateX(0); }
+  .pro-drawer-sec-title {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 12px 0 6px;
+  }
+  .pro-drawer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .pro-drawer-stack .btn {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+    border-radius: 11px !important;
+    font-size: 12.5px !important;
+  }
+
+  /* 3. ปรับกล่อง KPI 4 ช่องให้เรียบหรู ไม่แย่งซีนสีสถานะห้อง */
+  #view-rooms > .grid-4 .card {
+    background: linear-gradient(145deg, #111827, #0b1120) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-left-width: 4px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  }
+  #view-rooms > .grid-4 .card:nth-child(1) { border-left-color: #38bdf8 !important; }
+  #view-rooms > .grid-4 .card:nth-child(2) { border-left-color: #60a5fa !important; }
+  #view-rooms > .grid-4 .card:nth-child(3) { border-left-color: #10b981 !important; }
+  #view-rooms > .grid-4 .card:nth-child(4) { border-left-color: #f59e0b !important; }
+
+  /* 4. แถบสลับโหมด 2D / 3D / ผังทางเดิน + ปุ่มกรองชั้น 1-4 */
+  #pro-view-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+  }
+  .pro-seg-group {
+    display: inline-flex;
+    background: #030712;
+    border: 1px solid #1f2937;
+    border-radius: 11px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .pro-seg-btn {
+    padding: 6px 11px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #94a3b8;
+    background: transparent;
+  }
+  .pro-seg-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+  }
+  .pro-floor-chips {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pro-floor-chips::-webkit-scrollbar { display: none; }
+  .pro-floor-chip {
+    padding: 5px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #090d16;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+  .pro-floor-chip.active {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: #38bdf8;
+    color: #7dd3fc;
+  }
+
+  /* แถบเตือนไฟเปิดค้างในห้องว่าง (Anti-Fraud Watch) */
+  #pro-power-alert-banner {
+    display: none;
+    background: linear-gradient(90deg, rgba(159, 18, 57, 0.92), rgba(127, 29, 29, 0.92));
+    border: 1.5px solid #fb7185;
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.35);
+    animation: proPulseBorder 1.6s infinite;
+  }
+  @keyframes proPulseBorder {
+    0%, 100% { box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
+    50% { box-shadow: 0 0 22px rgba(244, 63, 94, 0.75); }
+  }
+
+  /* 5. โหมด 2D แยกชั้น 1-4 (Luxury Cards) */
+  #rooms-grid.pro-custom-container {
+    display: block !important;
+  }
+  .pro-floor-section {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+  .pro-floor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 9px;
+    padding-bottom: 7px;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+  }
+  .pro-floor-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #f8fafc;
+  }
+  .pro-floor-num-tag {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .pro-floor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  @media(min-width: 640px) {
+    .pro-floor-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media(min-width: 960px) {
+    .pro-floor-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  .pro-room-card {
+    position: relative;
+    background: linear-gradient(160deg, #131c2e 0%, #0b1120 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid #10b981;
+    border-radius: 14px;
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.32);
+    overflow: hidden;
+  }
+  .pro-room-card:active { transform: scale(0.96); }
+  .pro-room-card.st-vacant { border-left-color: #10b981; }
+  .pro-room-card.st-occupied {
+    border-left-color: #f43f5e;
+    background: linear-gradient(160deg, #27121d 0%, #110c14 100%);
+    box-shadow: 0 6px 18px rgba(244, 63, 94, 0.18);
+  }
+  .pro-room-card.st-cleaning {
+    border-left-color: #f59e0b;
+    background: linear-gradient(160deg, #261c0b 0%, #120f0a 100%);
+  }
+  .pro-room-card.st-reserved {
+    border-left-color: #38bdf8;
+    background: linear-gradient(160deg, #0d2137 0%, #0a1220 100%);
+  }
+  .pro-room-card.st-overdue {
+    border: 1.5px solid #f43f5e !important;
+    border-left-width: 5px !important;
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.6) !important;
+  }
+  .pro-bed-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .bed-double { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
+  .bed-twin { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(192, 132, 252, 0.35); }
+  .bed-vip { background: rgba(245, 158, 11, 0.22); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .bed-single { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+  .pro-lamp-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 9.5px;
+    font-weight: 900;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pro-lamp-btn.on {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.65);
+  }
+  .pro-lamp-btn.off {
+    background: #1e293b;
+    color: #64748b;
+    border: 1px solid #334155;
+  }
+
+  /* 6. โหมดตึก 3D (Interactive Isometric 4-Story Building) */
+  .pro-3d-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #0b1120;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .pro-3d-stage {
+    perspective: 1200px;
+    overflow: hidden;
+    padding: 26px 8px 36px;
+    background: radial-gradient(circle at 50% 35%, rgba(30, 58, 138, 0.24) 0%, rgba(3, 7, 18, 0.92) 72%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .pro-3d-stage.exploded {
+    gap: 34px;
+  }
+  .pro-3d-floor-plate {
+    width: 100%;
+    max-width: 680px;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
+    border: 1.5px solid rgba(148, 163, 184, 0.28);
+    border-radius: 18px;
+    padding: 14px 12px 16px;
+    transform-style: preserve-3d;
+    transition: transform 0.32s ease, margin 0.32s ease;
+    box-shadow:
+      0 10px 0 #090d16,
+      0 18px 35px rgba(0, 0, 0, 0.78);
+    position: relative;
+  }
+  .pro-3d-floor-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .pro-3d-room-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+  }
+  @media(max-width: 480px) {
+    .pro-3d-room-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  }
+  .pro-3d-cube {
+    position: relative;
+    border-radius: 10px;
+    padding: 7px 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    user-select: none;
+  }
+  .pro-3d-cube:active { transform: translateY(2px) scale(0.96) !important; }
+  .pro-3d-cube.c-vacant {
+    background: linear-gradient(180deg, #065f46 0%, #064e3b 100%);
+    border: 1px solid #34d399;
+    box-shadow: 0 5px 0 #022c22, 0 8px 14px rgba(0, 0, 0, 0.55);
+  }
+  .pro-3d-cube.c-occupied {
+    background: linear-gradient(180deg, #be123c 0%, #881337 100%);
+    border: 1px solid #fda4af;
+    transform: translateY(-5px);
+    box-shadow: 0 9px 0 #4c0519, 0 0 18px rgba(244, 63, 94, 0.55);
+  }
+  .pro-3d-cube.c-cleaning {
+    background: linear-gradient(180deg, #b45309 0%, #78350f 100%);
+    border: 1px solid #fcd34d;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 #451a03, 0 0 14px rgba(245, 158, 11, 0.45);
+  }
+  .pro-3d-cube.c-reserved {
+    background: linear-gradient(180deg, #0369a1 0%, #0c4a6e 100%);
+    border: 1px solid #7dd3fc;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 #082f49, 0 0 14px rgba(56, 189, 248, 0.45);
+  }
+  .pro-3d-cube.lit-room::after {
+    content: '💡';
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    font-size: 11px;
+    background: #fbbf24;
+    color: #000;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px #fbbf24;
+  }
+
+  /* 7. โหมดผังทางเดิน (Interactive Floor Plan Corridor) */
+  .pro-corridor-wrap {
+    background: #070b14;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .pro-corridor-wing {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+  @media(max-width: 520px) {
+    .pro-corridor-wing { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .pro-hallway-bar {
+    margin: 10px 0;
+    padding: 7px 14px;
+    border-radius: 10px;
+    background: repeating-linear-gradient(90deg, #0f172a, #0f172a 18px, #1e293b 18px, #1e293b 36px);
+    border: 1px dashed rgba(148, 163, 184, 0.35);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+  }
+
+  /* 8. ปฏิทินจอง 14 วัน (Visual Tape Chart) */
+  #pro-tape-chart-card {
+    background: linear-gradient(160deg, #0f172a, #090d16);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .tape-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .tape-table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .tape-table th, .tape-table td {
+    border: 1px solid #1e293b;
+    padding: 5px 4px;
+    text-align: center;
+  }
+  .tape-table th {
+    background: #030712;
+    color: #94a3b8;
+    font-weight: 800;
+  }
+  .tape-table th.is-today {
+    background: rgba(245, 158, 11, 0.22);
+    color: #fbbf24;
+    border-color: #f59e0b;
+  }
+  .tape-cell-ok { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; font-weight: 800; }
+  .tape-cell-low { background: rgba(245, 158, 11, 0.22); color: #fde68a; font-weight: 900; }
+  .tape-cell-full { background: rgba(244, 63, 94, 0.28); color: #fda4af; font-weight: 900; }
+  .tape-bar-pill {
+    background: linear-gradient(90deg, #0284c7, #2563eb);
+    color: #fff;
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 10.5px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+  }
+</style>
+
+<!-- Slide-Out Navigation Drawer -->
+<div id="hotel-pro-backdrop" onclick="window.__hotelPro.closeDrawer()"></div>
+<aside id="hotel-pro-drawer">
+  <div class="between" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:4px;">
+    <div>
+      <div style="font-size:15px;font-weight:900;color:#fbbf24;">🏨 ศูนย์ควบคุมโรงแรม</div>
+      <div style="font-size:10.5px;color:#94a3b8;">PHUBESTH SMART PMS PRO</div>
+    </div>
+    <button onclick="window.__hotelPro.closeDrawer()" class="btn btn-dark" style="padding:5px 10px;">✕</button>
+  </div>
+  <div id="hotel-pro-drawer-body"></div>
+</aside>
+
+<script>
+(function initHotelLuxuryProAddon() {
+  const UI_MODE_KEY = 'PHUBESTH_PRO_VIEW_MODE_V1';
+  const FLOOR_FLT_KEY = 'PHUBESTH_PRO_FLOOR_FLT_V1';
+  const VOICE_KEY = 'PHUBESTH_PRO_AI_VOICE_V1';
+  const LIGHT_WATCH_KEY = 'PHUBESTH_LIGHT_WATCH_V1';
+
+  let currentViewMode = localStorage.getItem(UI_MODE_KEY) || '2d'; // '2d' | '3d' | 'plan'
+  let currentFloorFilter = localStorage.getItem(FLOOR_FLT_KEY) || 'all';
+  let aiVoiceOn = localStorage.getItem(VOICE_KEY) !== 'false';
+  let iso3dTilt = 36;
+  let iso3dRotate = -10;
+  let iso3dExploded = false;
+  let lastSpokenAlertKey = '';
+
+  function escHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+
+  function speakHotelAI(text) {
+    if (!aiVoiceOn || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'th-TH';
+      u.rate = 1.05;
+      u.pitch = 1.04;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function getLightWatchMap() {
+    try { return JSON.parse(localStorage.getItem(LIGHT_WATCH_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function saveLightWatchMap(m) {
+    try { localStorage.setItem(LIGHT_WATCH_KEY, JSON.stringify(m)); } catch (e) {}
+  }
+
+  // อัปเดตตัวจับเวลาห้องว่างที่เปิดไฟค้างไว้ (Anti-Fraud / ประหยัดไฟ)
+  function syncVacantLightWatch() {
+    if (!state || !Array.isArray(state.rooms)) return [];
+    const map = getLightWatchMap();
+    const now = Date.now();
+    const alerts = [];
+    let changed = false;
+
+    state.rooms.forEach((r, idx) => {
+      const key = String(r.number);
+      if (r.status === 'vacant' && r.light) {
+        if (!map[key]) { map[key] = now; changed = true; }
+        const mins = Math.floor((now - Number(map[key])) / 60000);
+        alerts.push({ idx, number: r.number, mins });
+      } else {
+        if (map[key]) { delete map[key]; changed = true; }
+      }
+    });
+    if (changed) saveLightWatchMap(map);
+    return alerts;
+  }
+
+  // คำนวณนาทีที่รอแม่บ้านทำความสะอาดจาก r.dirtySince
+  function calcDirtyElapsedMins(dirtyStr) {
+    if (!dirtyStr) return null;
+    const m = String(dirtyStr).match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    const now = new Date();
+    const h = parseInt(m[1], 10);
+    const min = parseInt(m[2], 10);
+    let diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + min);
+    if (diff < -720) diff += 1440;
+    return diff >= 0 ? diff : 0;
+  }
+
+  // คำนวณคิวห้องจองวันนี้แบบเดียวกับ renderRooms() เดิม (Read-Only ไม่แก้ state)
+  function computeTodayBookingAssignments() {
+    const d = new Date();
+    const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const todayBookings = (state.reservations || []).filter(b => b.status === 'confirmed' && b.checkIn === todayStr);
+    const queues = {};
+    todayBookings.forEach(b => {
+      if (!queues[b.roomType]) queues[b.roomType] = [];
+      for (let i = 0; i < (Number(b.qty) || 1); i++) queues[b.roomType].push(b);
+    });
+    const assigned = {};
+    (state.rooms || []).forEach((r, idx) => {
+      if (r.status === 'vacant' && queues[r.type] && queues[r.type].length > 0) {
+        assigned[idx] = queues[r.type].shift();
+      }
+    });
+    return assigned;
+  }
+
+  function getRoomFloorKey(roomNum) {
+    const s = String(roomNum || '').trim();
+    const ch = s.charAt(0);
+    return /^[1-9]$/.test(ch) ? ch : '0';
+  }
+
+  function getBedBadgeHtml(type) {
+    const t = String(type || '');
+    if (t.includes('Twin')) return `<span class="pro-bed-pill bed-twin">🛏️🛏️ Twin</span>`;
+    if (t.includes('VIP')) return `<span class="pro-bed-pill bed-vip">👑 VIP</span>`;
+    if (t.includes('Single')) return `<span class="pro-bed-pill bed-single">🛏️ Single</span>`;
+    return `<span class="pro-bed-pill bed-double">🛏️ Double</span>`;
+  }
+
+  // =========================================================================
+  // 1. จัดระเบียบ Header & ย้ายปุ่มระบบเข้า Slide-Out Drawer (ไม่ลบปุ่มเดิม)
+  // =========================================================================
+  function reorganizeHeaderToExecutiveLayout() {
+    const appCard = document.querySelector('#app-screen > .card:first-child');
+    if (!appCard || document.getElementById('pro-drawer-trigger-btn')) return;
+
+    const topBetween = appCard.querySelector(':scope > .between');
+    const secondRow = appCard.querySelector(':scope > .row');
+    if (!topBetween || !secondRow) return;
+
+    // 1.1 แทรกปุ่มแฮมเบอร์เกอร์ (☰) ซ้ายสุดของหัวจอ
+    const leftRow = topBetween.querySelector(':scope > .row');
+    if (leftRow) {
+      const menuBtn = document.createElement('button');
+      menuBtn.id = 'pro-drawer-trigger-btn';
+      menuBtn.className = 'pro-hdr-menu-btn';
+      menuBtn.innerHTML = '☰';
+      menuBtn.title = 'เมนูระบบและตั้งค่า';
+      menuBtn.onclick = () => window.__hotelPro.openDrawer();
+      leftRow.insertBefore(menuBtn, leftRow.firstChild);
+    }
+
+    // 1.2 สร้างกลุ่มปุ่มลัดขวาบน (เปิดเก๊ะ + จอลูกค้า + เสียง AI)
+    const quickBar = document.createElement('div');
+    quickBar.className = 'pro-quick-actions';
+    quickBar.innerHTML = `
+      <button type="button" onclick="kickDrawerOnly()" class="pro-pill-btn active-emerald">🗄️ เก๊ะ</button>
+      <button type="button" id="pro-voice-pill" onclick="window.__hotelPro.toggleVoice()" class="pro-pill-btn ${aiVoiceOn ? 'active-amber' : ''}">${aiVoiceOn ? '🔊 AI' : '🔇 AI'}</button>
+      <button type="button" onclick="openCloudDbModal()" class="pro-pill-btn active-amber" title="Firebase / จอลูกค้า">🔥 จอลูกค้า</button>
+    `;
+    topBetween.appendChild(quickBar);
+
+    // 1.3 ย้ายปุ่มรองทั้งหมดเข้า Drawer (รักษา onclick และ id เดิมไว้ 100%)
+    const drawerBody = document.getElementById('hotel-pro-drawer-body');
+    const secCloud = document.createElement('div');
+    secCloud.innerHTML = `<div class="pro-drawer-sec-title">☁️ ระบบออนไลน์ & จอลูกค้า</div><div class="pro-drawer-stack" id="drw-sec-cloud"></div>`;
+    const secHw = document.createElement('div');
+    secHw.innerHTML = `<div class="pro-drawer-sec-title">🖨️ ฮาร์ดแวร์ & หน้าเคาน์เตอร์</div><div class="pro-drawer-stack" id="drw-sec-hw"></div>`;
+    const secAdmin = document.createElement('div');
+    secAdmin.innerHTML = `<div class="pro-drawer-sec-title">⚙️ จัดการโรงแรม & บัญชีผู้ใช้</div><div class="pro-drawer-stack" id="drw-sec-admin"></div>`;
+    drawerBody.appendChild(secCloud);
+    drawerBody.appendChild(secHw);
+    drawerBody.appendChild(secAdmin);
+
+    const cloudBox = document.getElementById('drw-sec-cloud');
+    const hwBox = document.getElementById('drw-sec-hw');
+    const adminBox = document.getElementById('drw-sec-admin');
+
+    const moveToBox = (selector, targetBox) => {
+      const el = appCard.querySelector(selector);
+      if (el && targetBox) targetBox.appendChild(el);
+    };
+
+    moveToBox('button[onclick="openSyncModal()"]', cloudBox);
+    moveToBox('#btn-cloud-db-cfg', cloudBox);
+    moveToBox('button[onclick="triggerPwaInstall()"]', cloudBox);
+    moveToBox('button[onclick="toggleFullScreenMode()"]', cloudBox);
+
+    moveToBox('button[onclick*="kickDrawerOnly"]', hwBox);
+    moveToBox('#btn-ocpp-cfg', hwBox);
+    moveToBox('button[onclick="openHousekeepingModal()"]', hwBox);
+
+    moveToBox('button[onclick="openSettingsModal()"]', adminBox);
+    moveToBox('button[onclick="logout()"]', adminBox);
+
+    // กดปุ่มใน Drawer แล้วพับ Drawer เก็บอัตโนมัติ
+    drawerBody.addEventListener('click', (e) => {
+      if (e.target && e.target.closest('button')) {
+        window.__hotelPro.closeDrawer();
+      }
+    });
+
+    // 1.4 จัดแถบแท็บหลัก 5 แท็บให้สวยเป็นแถวเดียว
+    secondRow.classList.add('hotel-main-tabs');
+  }
+
+  // =========================================================================
+  // 2. แทรกแถบสลับโหมด 2D / 3D / ผังทางเดิน + ปุ่มกรองชั้น + แถบเตือนไฟค้าง
+  // =========================================================================
+  function injectRoomsToolbar() {
+    const gridEl = document.getElementById('rooms-grid');
+    if (!gridEl || document.getElementById('pro-view-toolbar')) return;
+
+    const alertHtml = `<div id="pro-power-alert-banner"></div>`;
+    const toolbarHtml = `
+      <div id="pro-view-toolbar">
+        <div class="pro-seg-group">
+          <button type="button" id="pro-mode-2d" class="pro-seg-btn" onclick="window.__hotelPro.setMode('2d')">🏨 2D แยกชั้น</button>
+          <button type="button" id="pro-mode-3d" class="pro-seg-btn" onclick="window.__hotelPro.setMode('3d')">🧊 ตึก 3D</button>
+          <button type="button" id="pro-mode-plan" class="pro-seg-btn" onclick="window.__hotelPro.setMode('plan')">🗺️ ผังทางเดิน</button>
+        </div>
+        <div id="pro-floor-chips-wrap" class="pro-floor-chips"></div>
+      </div>
+    `;
+    gridEl.insertAdjacentHTML('beforebegin', alertHtml + toolbarHtml);
+  }
+
+  function updateToolbarActiveState(floorsList) {
+    ['2d', '3d', 'plan'].forEach(m => {
+      const b = document.getElementById('pro-mode-' + m);
+      if (b) b.classList.toggle('active', currentViewMode === m);
+    });
+    const wrap = document.getElementById('pro-floor-chips-wrap');
+    if (!wrap) return;
+    let html = `<button type="button" class="pro-floor-chip ${currentFloorFilter === 'all' ? 'active' : ''}" onclick="window.__hotelPro.setFloor('all')">ทุกชั้น (${(state.rooms || []).length})</button>`;
+    floorsList.forEach(fk => {
+      const lbl = fk === '0' ? 'อื่นๆ' : `ชั้น ${fk}`;
+      html += `<button type="button" class="pro-floor-chip ${currentFloorFilter === fk ? 'active' : ''}" onclick="window.__hotelPro.setFloor('${fk}')">${lbl}</button>`;
+    });
+    wrap.innerHTML = html;
+  }
+
+  function renderPowerAlertBanner(alerts) {
+    const banner = document.getElementById('pro-power-alert-banner');
+    if (!banner) return;
+    const serious = alerts.filter(a => a.mins >= 10);
+    if (serious.length === 0) {
+      banner.style.display = 'none';
+      return;
+    }
+    banner.style.display = 'block';
+    const alertKey = serious.map(s => s.number).join(',');
+    if (alertKey !== lastSpokenAlertKey) {
+      lastSpokenAlertKey = alertKey;
+      speakHotelAI(`แจ้งเตือน พบห้องว่างเปิดไฟทิ้งไว้ ห้อง ${serious.map(s => s.number).join(' และ ')} ค่ะ`);
+    }
+    banner.innerHTML = `
+      <div class="between" style="gap:8px;">
+        <div>
+          <div style="font-weight:900;color:#fff;font-size:12.5px;">🚨 ตรวจพบไฟเปิดค้างในห้องว่างเกิน 10 นาที (Anti-Fraud / ประหยัดไฟ)</div>
+          <div style="font-size:11px;color:#fecdd3;margin-top:2px;">
+            ${serious.map(s => `ห้อง <b>${escHtml(s.number)}</b> (${s.mins} นาที)`).join(' • ')}
+          </div>
+        </div>
+        <div class="row" style="gap:5px;">
+          ${serious.map(s => `<button type="button" onclick="toggleRoomLight(${s.idx})" class="btn btn-amber" style="padding:5px 10px;font-size:11px;">💡 ปิดไฟ ${escHtml(s.number)}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // 3. ตัวเรนเดอร์ห้องพัก 3 โหมด (2D แยกชั้น / 3D Isometric / ผังทางเดิน)
+  // =========================================================================
+  function buildRoomMeta(r, idx, assignedMap, lightAlerts) {
+    const now = Date.now();
+    const isOcc = r.status === 'occupied';
+    const isClean = r.status === 'cleaning';
+    const assignedB = assignedMap[idx];
+    const isRes = !isOcc && !isClean && !!assignedB;
+    const lightWarn = lightAlerts.find(a => a.idx === idx);
+
+    let isOverdue = false;
+    let subInfo = '';
+    if (isOcc) {
+      if (r.stayType === 'short' && r.checkInTimestamp) {
+        const passed = Math.floor((now - r.checkInTimestamp) / 60000);
+        const rem = 180 - passed;
+        if (rem <= 0) {
+          isOverdue = true;
+          subInfo = `<span style="color:#fda4af;font-weight:900;">🚨 เกินชั่วคราว ${Math.abs(rem)} น.</span>`;
+        } else {
+          subInfo = `<span style="color:#38bdf8;font-weight:800;">⏱️ เหลือ ${Math.floor(rem/60)}:${String(rem%60).padStart(2,'0')} ชม.</span>`;
+        }
+      } else if (r.stayType === 'overnight') {
+        const curDate = new Date();
+        const curH = curDate.getHours();
+        const curM = curDate.getMinutes();
+        if (curH === 11) {
+          subInfo = `<span style="color:#fbbf24;font-weight:800;">⚠️ เตือนเที่ยง (${60 - curM} น.)</span>`;
+        } else if (curH >= 12 && curH < 18) {
+          isOverdue = true;
+          subInfo = `<span style="color:#fda4af;font-weight:900;">🚨 เลทเช็คเอาท์ +฿299</span>`;
+        }
+      }
+      if (!subInfo) {
+        const stayLbl = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'complimentary' ? 'ห้องฟรี' : 'ค้างคืน');
+        subInfo = `${stayLbl}${r.checkInTime ? ' • ' + escHtml(r.checkInTime) : ''}`;
+      }
+    }
+
+    const dirtyMins = isClean ? calcDirtyElapsedMins(r.dirtySince) : null;
+    return { isOcc, isClean, isRes, assignedB, isOverdue, subInfo, dirtyMins, lightWarn };
+  }
+
+  function renderSingleLuxuryCard(r, idx, meta) {
+    const stClass = meta.isOcc ? 'st-occupied' : (meta.isClean ? 'st-cleaning' : (meta.isRes ? 'st-reserved' : 'st-vacant'));
+    const depBadge = (Number(r.keyDeposit) > 0) ? `<span style="font-size:9px;background:#312e81;color:#c7d2fe;padding:1px 5px;border-radius:4px;margin-left:3px;">🔑฿${r.keyDeposit}</span>` : '';
+    const lightWarnBadge = (!meta.isOcc && meta.lightWarn)
+      ? `<div style="font-size:9.5px;color:#fbbf24;font-weight:800;margin-top:2px;">⚠️ ไฟเปิดค้าง ${meta.lightWarn.mins} น.</div>`
+      : '';
+
+    let footerHtml = '';
+    if (meta.isOcc) {
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#fda4af;font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">👤 ${escHtml(r.guestName || 'มีผู้เข้าพัก')}${depBadge}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:1px;">${meta.subInfo}</div>
+        </div>
+        <b style="color:#fbbf24;font-size:13px;flex-shrink:0;">฿${calcRoomTotal(r).grand}</b>
+      `;
+    } else if (meta.isClean) {
+      const elapsedTxt = meta.dirtyMins !== null ? `⏱️ ${meta.dirtyMins} น.` : escHtml(r.dirtySince || '');
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#fcd34d;font-weight:800;font-size:11.5px;">🧹 รอแม่บ้าน</div>
+          <div style="font-size:9.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${elapsedTxt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();markRoomCleaned(${idx})" class="btn btn-emerald" style="padding:3px 8px;font-size:10.5px;flex-shrink:0;">✓ เสร็จ</button>
+      `;
+    } else if (meta.isRes) {
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#38bdf8;font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 ${escHtml(meta.assignedB.guest)}</div>
+          <div style="font-size:9.5px;color:#94a3b8;">จองวันนี้ • ฿${meta.assignedB.rate || 650}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();quickCheckInBooking(${idx}, '${escHtml(meta.assignedB.id)}')" class="btn btn-sky" style="padding:3px 8px;font-size:10.5px;flex-shrink:0;">เช็คอิน</button>
+      `;
+    } else {
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <span style="color:#34d399;font-weight:800;font-size:11.5px;">● พร้อมขาย</span>
+          ${lightWarnBadge}
+        </div>
+        <span style="color:#94a3b8;font-weight:800;font-size:12px;">฿${r.rateOver || r.customRate || state.rates.overnight}</span>
+      `;
+    }
+
+    return `
+      <div onclick="openRoomModal(${idx})" class="pro-room-card ${stClass} ${meta.isOverdue ? 'st-overdue' : ''}">
+        <div class="between" style="margin-bottom:7px;align-items:flex-start;">
+          <div>
+            <div style="font-size:19px;font-weight:900;line-height:1.1;color:#fff;margin-bottom:4px;">${escHtml(r.number)}</div>
+            ${getBedBadgeHtml(r.type)}
+          </div>
+          <button type="button" onclick="event.stopPropagation();toggleRoomLight(${idx})" class="pro-lamp-btn ${r.light ? 'on' : 'off'}" title="เปิด/ปิดไฟห้อง ${escHtml(r.number)}">
+            <span>💡</span><span>${r.light ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
+        <div class="between" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:6px;gap:6px;">
+          ${footerHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProRoomsUI() {
+    injectRoomsToolbar();
+    const gridEl = document.getElementById('rooms-grid');
+    if (!gridEl || !state || !Array.isArray(state.rooms)) return;
+
+    const q = (document.getElementById('room-search')?.value || '').trim().toLowerCase();
+    const assignedMap = computeTodayBookingAssignments();
+    const lightAlerts = syncVacantLightWatch();
+    renderPowerAlertBanner(lightAlerts);
+
+    // รวบรวมชั้นทั้งหมดที่มีในระบบแบบไดนามิก
+    const floorSet = new Set();
+    state.rooms.forEach(r => floorSet.add(getRoomFloorKey(r.number)));
+    const floorsSorted = Array.from(floorSet).sort((a, b) => Number(a) - Number(b));
+    updateToolbarActiveState(floorsSorted);
+
+    // กรองห้องตาม filter + search + floor
+    const entries = [];
+    state.rooms.forEach((r, idx) => {
+      const meta = buildRoomMeta(r, idx, assignedMap, lightAlerts);
+      if (roomFilter === 'vacant' && (meta.isOcc || meta.isClean || meta.isRes)) return;
+      if (roomFilter === 'reserved' && !meta.isRes) return;
+      if (roomFilter === 'occupied' && !meta.isOcc) return;
+      if (roomFilter === 'cleaning' && !meta.isClean) return;
+
+      const fk = getRoomFloorKey(r.number);
+      if (currentFloorFilter !== 'all' && fk !== currentFloorFilter) return;
+
+      if (q) {
+        const mNum = String(r.number || '').toLowerCase().includes(q);
+        const mGuest = String(r.guestName || '').toLowerCase().includes(q);
+        const mBook = meta.isRes && String(meta.assignedB.guest || '').toLowerCase().includes(q);
+        if (!mNum && !mGuest && !mBook) return;
+      }
+      entries.push({ r, idx, meta, fk });
+    });
+
+    gridEl.classList.add('pro-custom-container');
+
+    if (entries.length === 0) {
+      gridEl.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;padding:28px;">ไม่พบห้องพักตามเงื่อนไขที่เลือก</div>`;
+      return;
+    }
+
+    // จัดกลุ่มตามชั้น
+    const byFloor = {};
+    entries.forEach(item => {
+      if (!byFloor[item.fk]) byFloor[item.fk] = [];
+      byFloor[item.fk].push(item);
+    });
+    const activeFloors = Object.keys(byFloor).sort((a, b) => Number(a) - Number(b));
+
+    // ---------- โหมด 1: 2D แยกชั้น 1-4 ----------
+    if (currentViewMode === '2d') {
+      gridEl.innerHTML = activeFloors.map(fk => {
+        const list = byFloor[fk];
+        const vacCnt = list.filter(x => !x.meta.isOcc && !x.meta.isClean && !x.meta.isRes).length;
+        const occCnt = list.filter(x => x.meta.isOcc).length;
+        const clnCnt = list.filter(x => x.meta.isClean).length;
+        const resCnt = list.filter(x => x.meta.isRes).length;
+
+        return `
+          <div class="pro-floor-section">
+            <div class="pro-floor-header">
+              <div class="pro-floor-badge">
+                <span class="pro-floor-num-tag">${fk === '0' ? 'โซนพิเศษ' : 'ชั้น ' + fk}</span>
+                <span>(${list.length} ห้อง)</span>
+              </div>
+              <div style="display:flex;gap:8px;font-size:11px;font-weight:800;flex-wrap:wrap;">
+                <span style="color:#34d399;">ว่าง ${vacCnt}</span>
+                <span style="color:#fda4af;">พัก ${occCnt}</span>
+                ${resCnt > 0 ? `<span style="color:#38bdf8;">จอง ${resCnt}</span>` : ''}
+                ${clnCnt > 0 ? `<span style="color:#fbbf24;">เคลียร์ ${clnCnt}</span>` : ''}
+              </div>
+            </div>
+            <div class="pro-floor-grid">
+              ${list.map(x => renderSingleLuxuryCard(x.r, x.idx, x.meta)).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+      return;
+    }
+
+    // ---------- โหมด 2: ตึก 3D Isometric (4 ชั้นเรียงจากบนลงล่าง) ----------
+    if (currentViewMode === '3d') {
+      const topDownFloors = [...activeFloors].sort((a, b) => Number(b) - Number(a));
+      const plateTransform = `rotateX(${iso3dTilt}deg) rotateZ(${iso3dRotate}deg)`;
+
+      gridEl.innerHTML = `
+        <div class="pro-3d-controls">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <b style="color:#38bdf8;font-size:12.5px;">🧊 มุมมองตึก 3D (แตะห้องเพื่อเช็คอิน/คิดเงิน)</b>
+            <button type="button" onclick="window.__hotelPro.toggle3dExplode()" class="pro-pill-btn ${iso3dExploded ? 'active-amber' : ''}">
+              ${iso3dExploded ? '🔽 ยุบชั้นตึก' : '🔼 กางชั้นตึก 3D'}
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:#94a3b8;">
+            <label style="display:flex;align-items:center;gap:5px;">เอียง
+              <input type="range" min="0" max="55" value="${iso3dTilt}" oninput="window.__hotelPro.set3dAngle(this.value, null)" style="width:72px;accent-color:#f59e0b;">
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;">หมุน
+              <input type="range" min="-28" max="28" value="${iso3dRotate}" oninput="window.__hotelPro.set3dAngle(null, this.value)" style="width:72px;accent-color:#38bdf8;">
+            </label>
+          </div>
+        </div>
+        <div class="pro-3d-stage ${iso3dExploded ? 'exploded' : ''}" id="pro-3d-stage-box">
+          ${topDownFloors.map(fk => {
+            const list = byFloor[fk];
+            const litCnt = list.filter(x => x.r.light).length;
+            const occCnt = list.filter(x => x.meta.isOcc).length;
+            return `
+              <div class="pro-3d-floor-plate" style="transform:${plateTransform};">
+                <div class="pro-3d-floor-label">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="pro-floor-num-tag">${fk === '0' ? 'F0' : 'ชั้น ' + fk}</span>
+                    <span style="font-size:11.5px;font-weight:800;color:#e2e8f0;">พัก ${occCnt}/${list.length} ห้อง</span>
+                  </div>
+                  <span style="font-size:11px;color:#fbbf24;font-weight:800;">💡 เปิดไฟ ${litCnt} ห้อง</span>
+                </div>
+                <div class="pro-3d-room-grid">
+                  ${list.map(x => {
+                    const cls = x.meta.isOcc ? 'c-occupied' : (x.meta.isClean ? 'c-cleaning' : (x.meta.isRes ? 'c-reserved' : 'c-vacant'));
+                    const bedIcon = String(x.r.type || '').includes('Twin') ? '🛏️🛏️' : (String(x.r.type || '').includes('VIP') ? '👑' : '🛏️');
+                    const shortTag = x.meta.isOcc
+                      ? escHtml((x.r.guestName || 'พักอยู่').slice(0, 7))
+                      : (x.meta.isClean ? 'เคลียร์' : (x.meta.isRes ? 'จอง' : '฿' + (x.r.rateOver || x.r.customRate || 650)));
+                    return `
+                      <div onclick="openRoomModal(${x.idx})" class="pro-3d-cube ${cls} ${x.r.light ? 'lit-room' : ''}">
+                        <div style="font-size:14px;font-weight:900;color:#fff;">${escHtml(x.r.number)}</div>
+                        <div style="font-size:9px;opacity:0.9;">${bedIcon}</div>
+                        <div style="font-size:9.5px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${shortTag}</div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+      return;
+    }
+
+    // ---------- โหมด 3: ผังทางเดิน (Floor Plan ซ้าย-ขวา) ----------
+    if (currentViewMode === 'plan') {
+      gridEl.innerHTML = activeFloors.map(fk => {
+        const list = byFloor[fk];
+        const leftWing = [];
+        const rightWing = [];
+        list.forEach((x, i) => {
+          const numVal = parseInt(String(x.r.number).replace(/\D/g, ''), 10);
+          if (!isNaN(numVal)) {
+            if (numVal % 2 === 1) leftWing.push(x);
+            else rightWing.push(x);
+          } else {
+            if (i % 2 === 0) leftWing.push(x);
+            else rightWing.push(x);
+          }
+        });
+
+        return `
+          <div class="pro-corridor-wrap">
+            <div class="pro-floor-header">
+              <div class="pro-floor-badge">
+                <span class="pro-floor-num-tag">${fk === '0' ? 'โซนพิเศษ' : 'ผังชั้น ' + fk}</span>
+                <span style="font-size:11.5px;color:#94a3b8;">ฝั่งซ้าย (เลขคี่) ↔ ฝั่งขวา (เลขคู่)</span>
+              </div>
+            </div>
+            <div class="pro-corridor-wing">
+              ${leftWing.map(x => renderSingleLuxuryCard(x.r, x.idx, x.meta)).join('')}
+            </div>
+            <div class="pro-hallway-bar">
+              <span>🚪 บันไดหนีไฟ</span>
+              <span>━━ โถงทางเดิน ชั้น ${fk} ━━</span>
+              <span>🛗 ลิฟต์ / โถงกลาง</span>
+            </div>
+            <div class="pro-corridor-wing">
+              ${rightWing.map(x => renderSingleLuxuryCard(x.r, x.idx, x.meta)).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // =========================================================================
+  // 4. ปฏิทินจอง 14 วันแบบ Tape Chart ในหน้า จองล่วงหน้า (#view-booking)
+  // =========================================================================
+  function renderProTapeChart() {
+    const viewBooking = document.getElementById('view-booking');
+    if (!viewBooking) return;
+
+    let card = document.getElementById('pro-tape-chart-card');
+    if (!card) {
+      card = document.createElement('div');
+      card.id = 'pro-tape-chart-card';
+      viewBooking.insertBefore(card, viewBooking.firstChild);
+    }
+
+    const days = [];
+    const baseD = new Date();
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(baseD);
+      d.setDate(baseD.getDate() + i);
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const wd = d.toLocaleDateString('th-TH', { weekday: 'short' });
+      const dd = `${d.getDate()}/${d.getMonth() + 1}`;
+      days.push({ iso, wd, dd, isToday: i === 0 });
+    }
+
+    const roomTypes = ['Double Bed', 'Twin Bed', 'Single Bed', 'VIP Suite'].filter(t =>
+      (state.rooms || []).some(r => r.type === t)
+    );
+    const activeTypes = roomTypes.length ? roomTypes : ['Double Bed', 'Twin Bed'];
+
+    const stockRowsHtml = activeTypes.map(t => {
+      const cells = days.map(day => {
+        const stat = typeof getAvailableRoomsOnDate === 'function'
+          ? getAvailableRoomsOnDate(day.iso, t)
+          : { total: 0, available: 0 };
+        const cls = stat.available <= 0 ? 'tape-cell-full' : (stat.available <= 3 ? 'tape-cell-low' : 'tape-cell-ok');
+        return `<td class="${cls}">${stat.available}/${stat.total}</td>`;
+      }).join('');
+      return `<tr><td style="text-align:left;font-weight:800;color:#e2e8f0;background:#0b1120;white-space:nowrap;">${escHtml(t)}</td>${cells}</tr>`;
+    }).join('');
+
+    const confirmed = (state.reservations || []).filter(b => b.status === 'confirmed');
+    const firstIso = days[0].iso;
+    const lastIso = days[days.length - 1].iso;
+
+    const bookingRowsHtml = confirmed.filter(b => b.checkOut > firstIso && b.checkIn <= lastIso).map(b => {
+      const realIdx = state.reservations.indexOf(b);
+      let startCol = days.findIndex(d => d.iso >= b.checkIn);
+      if (startCol === -1) startCol = 0;
+      let endCol = days.findIndex(d => d.iso >= b.checkOut);
+      if (endCol === -1) endCol = days.length;
+      const span = Math.max(1, endCol - startCol);
+
+      let tds = '';
+      for (let i = 0; i < startCol; i++) tds += `<td></td>`;
+      tds += `<td colspan="${span}" style="padding:3px;">
+        <div onclick="editReservation(${realIdx})" class="tape-bar-pill" title="คลิกเพื่อแก้ไขการจองนี้">
+          👤 ${escHtml(b.guest)} (${escHtml(b.roomType)} ×${b.qty})
+        </div>
+      </td>`;
+      for (let i = startCol + span; i < days.length; i++) tds += `<td></td>`;
+
+      return `<tr><td style="text-align:left;font-size:10.5px;color:#7dd3fc;background:#090d16;white-space:nowrap;">📌 ${escHtml(b.guest.slice(0, 14))}</td>${tds}</tr>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="between" style="margin-bottom:8px;">
+        <div>
+          <b style="font-size:14px;color:#38bdf8;">🗓️ ตารางปฏิทินห้องว่าง & แถบการจองล่วงหน้า 14 วัน (Tape Chart)</b>
+          <div style="font-size:10.5px;color:#94a3b8;">ตัวเลข = ห้องว่าง / ทั้งหมด • แตะแถบสีฟ้าเพื่อแก้ไขรายการจอง</div>
+        </div>
+      </div>
+      <div class="tape-scroll">
+        <table class="tape-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;min-width:110px;">ประเภทห้อง / แขกจอง</th>
+              ${days.map(d => `<th class="${d.isToday ? 'is-today' : ''}">${d.wd}<br>${d.dd}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${stockRowsHtml}
+            ${bookingRowsHtml || `<tr><td colspan="15" style="color:#64748b;padding:8px;">ยังไม่มีรายการจองล่วงหน้าในช่วง 14 วันนี้</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // 5. Public Controller & Safe Function Hooks (รันหลัง DOMContentLoaded ครบ)
+  // =========================================================================
+  window.__hotelPro = {
+    openDrawer() {
+      document.getElementById('hotel-pro-backdrop')?.classList.add('open');
+      document.getElementById('hotel-pro-drawer')?.classList.add('open');
+    },
+    closeDrawer() {
+      document.getElementById('hotel-pro-backdrop')?.classList.remove('open');
+      document.getElementById('hotel-pro-drawer')?.classList.remove('open');
+    },
+    setMode(mode) {
+      currentViewMode = mode;
+      try { localStorage.setItem(UI_MODE_KEY, mode); } catch (e) {}
+      renderProRoomsUI();
+    },
+    setFloor(fk) {
+      currentFloorFilter = fk;
+      try { localStorage.setItem(FLOOR_FLT_KEY, fk); } catch (e) {}
+      renderProRoomsUI();
+    },
+    toggle3dExplode() {
+      iso3dExploded = !iso3dExploded;
+      renderProRoomsUI();
+    },
+    set3dAngle(tilt, rot) {
+      if (tilt !== null) iso3dTilt = Number(tilt);
+      if (rot !== null) iso3dRotate = Number(rot);
+      document.querySelectorAll('.pro-3d-floor-plate').forEach(el => {
+        el.style.transform = `rotateX(${iso3dTilt}deg) rotateZ(${iso3dRotate}deg)`;
+      });
+    },
+    toggleVoice() {
+      aiVoiceOn = !aiVoiceOn;
+      try { localStorage.setItem(VOICE_KEY, String(aiVoiceOn)); } catch (e) {}
+      const btn = document.getElementById('pro-voice-pill');
+      if (btn) {
+        btn.className = 'pro-pill-btn ' + (aiVoiceOn ? 'active-amber' : '');
+        btn.textContent = aiVoiceOn ? '🔊 AI' : '🔇 AI';
+      }
+      if (aiVoiceOn) speakHotelAI('เปิดเสียงผู้ช่วยเอไอฟร้อนท์แล้วค่ะ');
+      else { try { window.speechSynthesis?.cancel(); } catch (e) {} }
+    }
+  };
+
+  function bootHotelProAddon() {
+    reorganizeHeaderToExecutiveLayout();
+
+    // Hook renderRooms แบบคงลอจิกเดิม 100%
+    if (typeof window.renderRooms === 'function' && !window.renderRooms._proWrapped) {
+      const _origRenderRooms = window.renderRooms;
+      const wrapped = function() {
+        const res = _origRenderRooms.apply(this, arguments);
+        renderProRoomsUI();
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.renderRooms = wrapped;
+    }
+
+    // Hook renderBookingsList เพื่ออัปเดต Tape Chart
+    if (typeof window.renderBookingsList === 'function' && !window.renderBookingsList._proWrapped) {
+      const _origRenderBook = window.renderBookingsList;
+      const wrapped = function() {
+        const res = _origRenderBook.apply(this, arguments);
+        renderProTapeChart();
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.renderBookingsList = wrapped;
+    }
+
+    // Hook switchMainView
+    if (typeof window.switchMainView === 'function' && !window.switchMainView._proWrapped) {
+      const _origSwitch = window.switchMainView;
+      const wrapped = function(v) {
+        const res = _origSwitch.apply(this, arguments);
+        if (v === 'booking') renderProTapeChart();
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.switchMainView = wrapped;
+    }
+
+    // Hook เสียง AI สำหรับ Check-In, Check-Out และแม่บ้านเคลียร์ห้องเสร็จ
+    if (typeof window.checkInRoom === 'function' && !window.checkInRoom._proWrapped) {
+      const _origCI = window.checkInRoom;
+      const wrapped = function() {
+        const snapNum = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex].number : '';
+        const res = _origCI.apply(this, arguments);
+        if (snapNum) speakHotelAI(`เช็คอินห้อง ${snapNum} เรียบร้อยค่ะ`);
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.checkInRoom = wrapped;
+    }
+
+    if (typeof window.completeCheckOutAndPay === 'function' && !window.completeCheckOutAndPay._proWrapped) {
+      const _origCO = window.completeCheckOutAndPay;
+      const wrapped = function() {
+        const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+        const snapNum = snapRoom ? snapRoom.number : '';
+        const snapAmt = snapRoom ? Math.round(calcRoomTotal(snapRoom).grand) : 0;
+        const res = _origCO.apply(this, arguments);
+        if (snapNum) speakHotelAI(`เช็คเอาท์ห้อง ${snapNum} ยอดชำระ ${snapAmt} บาท เรียบร้อยค่ะ`);
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.completeCheckOutAndPay = wrapped;
+    }
+
+    if (typeof window.markRoomCleaned === 'function' && !window.markRoomCleaned._proWrapped) {
+      const _origCln = window.markRoomCleaned;
+      const wrapped = function(idx) {
+        const rNum = state.rooms[idx] ? state.rooms[idx].number : '';
+        const res = _origCln.apply(this, arguments);
+        if (rNum) speakHotelAI(`ห้อง ${rNum} ทำความสะอาดเสร็จพร้อมขายแล้วค่ะ`);
+        return res;
+      };
+      wrapped._proWrapped = true;
+      window.markRoomCleaned = wrapped;
+    }
+
+    // รันเรนเดอร์ครั้งแรกทันที + ตั้งเวลารีเฟรชนาทีที่รอเคลียร์ห้อง/ไฟเปิดค้างทุก 30 วินาที
+    if (typeof window.renderRooms === 'function') window.renderRooms();
+    renderProTapeChart();
+
+    setInterval(() => {
+      const viewRooms = document.getElementById('view-rooms');
+      const roomModal = document.getElementById('room-modal');
+      if (viewRooms && !viewRooms.classList.contains('hidden') && roomModal && roomModal.classList.contains('hidden')) {
+        renderProRoomsUI();
+      }
+    }, 30000);
+  }
+
+  // รอให้ Add-on เดิมในไฟล์ (OCPP-C582 และ Firebase) สร้างปุ่มให้ครบก่อน แล้วจึงจัดระเบียบ
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(bootHotelProAddon, 180);
+  });
+})();
+</script>
 </body>
 </html>
