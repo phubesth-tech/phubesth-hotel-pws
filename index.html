@@ -5802,5 +5802,703 @@ window.kickDrawerOnly = async function() {
   });
 })();
 </script>
+ <!-- ================= HOTFIX V3: FULL AUDIT FIX (UI + FIREBASE REALTIME + 58MM PRINT + ARCHIVE MODAL + TOAST Z-INDEX) ================= -->
+<style>
+  /* 1. ดัน Toast แจ้งเตือนให้อยู่บนสุดเหนือทุกหน้าต่าง Modal */
+  #toast {
+    z-index: 100000 !important;
+  }
+
+  /* 2. ปรับแถบเมนูหลักเป็น Underline Tabs แยกหน้าตาขาดจากปุ่มห้องพัก */
+  .hotel-main-tabs {
+    background: transparent !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 4px 0 0 0 !important;
+    gap: 2px !important;
+  }
+  .hotel-main-tabs .btn {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 8px 8px 0 0 !important;
+    box-shadow: none !important;
+    color: #94a3b8 !important;
+    padding: 8px 13px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+  }
+  .hotel-main-tabs .btn.btn-amber {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #fbbf24 !important;
+    border-bottom: 3px solid #f59e0b !important;
+    font-weight: 900 !important;
+  }
+
+  /* 3. ยุบแถบ KPI 4 ช่องให้บางกะทัดรัด ไม่เป็นกล่องใหญ่คล้ายการ์ดห้องพัก */
+  #view-rooms > .grid-4 .card {
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    background: rgba(15, 23, 42, 0.55) !important;
+  }
+  #view-rooms > .grid-4 .card > div:last-child {
+    font-size: 15px !important;
+  }
+
+  /* 4. ปรับโทนแถบตัวกรองและแถบสลับโหมด 2D/3D ให้เรียบ ไม่แย่งซีนการ์ดห้องพัก */
+  #view-rooms > .card .between .row .btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+  }
+  #pro-view-toolbar {
+    background: rgba(11, 15, 25, 0.65) !important;
+    padding: 6px 10px !important;
+    border-radius: 12px !important;
+  }
+  .pro-seg-btn.active {
+    background: #1e293b !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.5) !important;
+    box-shadow: none !important;
+  }
+</style>
+
+<!-- Modal แสดงบิลย้อนหลังภายในแอป (แทน window.open ที่โดน PWA บล็อก) -->
+<div id="archived-receipt-modal" class="modal-backdrop hidden" style="z-index: 9950;">
+  <div class="modal-box" style="max-width: 440px; border: 2px solid #c084fc;">
+    <div class="between" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px;">
+      <b style="font-size: 15px; color: #c084fc;">🧾 ดูใบเสร็จย้อนหลัง / พิมพ์ซ้ำ</b>
+      <button onclick="document.getElementById('archived-receipt-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+    <div id="arc-rcp-preview-body" style="background:#ffffff;color:#000000;border-radius:12px;padding:16px;font-family:Tahoma,sans-serif;line-height:1.45;margin-bottom:12px;"></div>
+    <div class="grid-2">
+      <button onclick="printArchivedToOcpp58()" class="btn btn-amber" style="padding:11px;font-size:13px;">🖨️ พิมพ์ซ้ำ OCPP-C582</button>
+      <button onclick="document.getElementById('archived-receipt-modal').classList.add('hidden')" class="btn btn-dark" style="padding:11px;font-size:13px;">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function initPhubesthHotfixV3() {
+  /* =========================================================
+     1. ปิดระบบ ntfy.sh เก่า 100% ไม่ให้ตีกับ Firebase
+     ========================================================= */
+  try {
+    if (typeof rtSource !== 'undefined' && rtSource) {
+      rtSource.close();
+      rtSource = null;
+    }
+  } catch (e) {}
+  window.pushFastRealtimeNow = async function() {};
+  window.initSseListener = function() {};
+  window.processFastRealtimeEnv = async function() {};
+
+  /* =========================================================
+     2. ซิงค์ Firebase แบบ 2 ชั้น (SSE + เช็ค syncRev ทุก 3 วิ)
+        แก้ปัญหานาฬิกาเครื่องไม่ตรงกัน & เน็ตมือถือตัดสัญญาณ
+     ========================================================= */
+  let lastSyncedRev = '';
+  let isPullingFb = false;
+  let fbMetaPollTimer = null;
+
+  function getFbBase() {
+    return (typeof getCleanFirebaseUrl === 'function')
+      ? getCleanFirebaseUrl()
+      : 'https://phubesthinter-pws-default-rtdb.asia-southeast1.firebasedatabase.app';
+  }
+
+  function setSyncBadge(ok, detail) {
+    const b = document.getElementById('pro-fb-live-badge');
+    if (!b) return;
+    if (ok) {
+      b.style.borderColor = 'rgba(16,185,129,0.55)';
+      b.style.color = '#34d399';
+      b.textContent = '🟢 ' + detail;
+    } else {
+      b.style.borderColor = 'rgba(244,63,94,0.65)';
+      b.style.color = '#fda4af';
+      b.textContent = '🔴 ' + detail;
+    }
+  }
+
+  function nowHHMMSS() {
+    const d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' +
+           String(d.getMinutes()).padStart(2, '0') + ':' +
+           String(d.getSeconds()).padStart(2, '0');
+  }
+
+  function makeRevToken() {
+    return Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  }
+
+  function refreshEveryViewAfterSync() {
+    if (typeof applyHotelProfile === 'function') applyHotelProfile();
+    if (typeof applyHotelLogo === 'function') applyHotelLogo();
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof renderBookingsList === 'function') renderBookingsList();
+    if (typeof renderReceiptsArchive === 'function') renderReceiptsArchive();
+    const setModal = document.getElementById('settings-modal');
+    if (setModal && !setModal.classList.contains('hidden') && typeof renderSettingsMenuAndRooms === 'function') {
+      renderSettingsMenuAndRooms();
+    }
+  }
+
+  function applyRemoteStateSafely(remote) {
+    if (!remote || !Array.isArray(remote.rooms)) return false;
+    const keepLogo = state.hotelLogo || '';
+    state = Object.assign({}, state, remote);
+    if (!state.hotelLogo && keepLogo) state.hotelLogo = keepLogo;
+    if (remote.syncRev) lastSyncedRev = remote.syncRev;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    refreshEveryViewAfterSync();
+    return true;
+  }
+
+  window.pushToFirebaseNow = async function() {
+    const baseUrl = getFbBase();
+    if (!baseUrl) return;
+
+    const rev = makeRevToken();
+    lastSyncedRev = rev;
+    state.updatedAt = Date.now();
+    state.lastDeviceId = DEVICE_ID;
+    state.syncRev = rev;
+
+    try {
+      const res = await fetch(baseUrl + '/pms_state.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      });
+      if (res.ok) {
+        setSyncBadge(true, 'ซิงค์ ' + nowHHMMSS());
+      } else {
+        setSyncBadge(false, 'Error ' + res.status);
+        showToast('⚠️ Firebase บันทึกไม่ได้ (HTTP ' + res.status + ') เช็ค Rules');
+      }
+    } catch (e) {
+      setSyncBadge(false, 'ออฟไลน์');
+    }
+  };
+
+  window.pullFromFirebaseNow = async function(showMsg = false) {
+    const baseUrl = getFbBase();
+    if (!baseUrl || isPullingFb) return;
+    isPullingFb = true;
+    try {
+      const res = await fetch(baseUrl + '/pms_state.json?t=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        const remote = await res.json();
+        if (remote && Array.isArray(remote.rooms)) {
+          const remoteRev = remote.syncRev || String(remote.updatedAt || '');
+          if (showMsg || !lastSyncedRev || (remoteRev && remoteRev !== lastSyncedRev)) {
+            applyRemoteStateSafely(remote);
+            lastSyncedRev = remoteRev;
+            setSyncBadge(true, 'ซิงค์ ' + nowHHMMSS());
+            if (showMsg) showToast('✅ ดึงข้อมูลล่าสุดจาก Firebase แล้ว (' + state.rooms.length + ' ห้อง)');
+          }
+        } else if (showMsg) {
+          await window.pushToFirebaseNow();
+          showToast('สร้างฐานข้อมูลเริ่มต้นบน Firebase แล้ว');
+        }
+      } else {
+        setSyncBadge(false, 'Error ' + res.status);
+        if (showMsg) alert('❌ ดึง Firebase ไม่ได้ (HTTP ' + res.status + ') กรุณาเช็คว่ากด Publish Rules แล้ว');
+      }
+    } catch (e) {
+      setSyncBadge(false, 'ออฟไลน์');
+      if (showMsg) alert('❌ เชื่อมต่อ Firebase ไม่ได้ กรุณาเช็กอินเทอร์เน็ต');
+    }
+    isPullingFb = false;
+  };
+
+  async function checkFirebaseUpdateLightweight() {
+    if (document.visibilityState !== 'visible') return;
+    const baseUrl = getFbBase();
+    if (!baseUrl || isPullingFb) return;
+    try {
+      const [revRes, devRes] = await Promise.all([
+        fetch(baseUrl + '/pms_state/syncRev.json?t=' + Date.now(), { cache: 'no-store' }),
+        fetch(baseUrl + '/pms_state/lastDeviceId.json?t=' + Date.now(), { cache: 'no-store' })
+      ]);
+      if (!revRes.ok) {
+        setSyncBadge(false, 'Error ' + revRes.status);
+        return;
+      }
+      const remoteRev = await revRes.json();
+      const remoteDev = devRes.ok ? await devRes.json() : '';
+      setSyncBadge(true, 'ออนไลน์');
+      if (remoteRev && remoteRev !== lastSyncedRev && remoteDev !== DEVICE_ID) {
+        await window.pullFromFirebaseNow(false);
+        showToast('⚡ ซิงค์ข้อมูลล่าสุดจากอีกเครื่องแล้ว');
+      }
+    } catch (e) {
+      setSyncBadge(false, 'ออฟไลน์');
+    }
+  }
+
+  window.startFirebaseRealtimeListener = function() {
+    const baseUrl = getFbBase();
+    if (!baseUrl) return;
+
+    if (typeof fbStateSource !== 'undefined' && fbStateSource) {
+      try { fbStateSource.close(); } catch (e) {}
+    }
+    if ('EventSource' in window) {
+      try {
+        fbStateSource = new EventSource(baseUrl + '/pms_state.json');
+        fbStateSource.addEventListener('put', (ev) => {
+          try {
+            const packet = JSON.parse(ev.data);
+            const d = packet && packet.data;
+            if (d && Array.isArray(d.rooms) && d.lastDeviceId !== DEVICE_ID) {
+              const rRev = d.syncRev || String(d.updatedAt || '');
+              if (rRev && rRev !== lastSyncedRev) {
+                applyRemoteStateSafely(d);
+                lastSyncedRev = rRev;
+                setSyncBadge(true, 'ซิงค์ ' + nowHHMMSS());
+                showToast('⚡ อัปเดตข้อมูลเรียลไทม์จากอีกเครื่อง');
+              }
+            }
+          } catch (err) {}
+        });
+      } catch (e) {}
+    }
+
+    clearInterval(fbMetaPollTimer);
+    fbMetaPollTimer = setInterval(checkFirebaseUpdateLightweight, 3000);
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkFirebaseUpdateLightweight();
+      window.startFirebaseRealtimeListener();
+    }
+  });
+  window.addEventListener('focus', checkFirebaseUpdateLightweight);
+
+  /* =========================================================
+     3. แก้ส่งข้อมูลเครื่องพิมพ์ OCPP-C582 (58mm = 384 dots)
+        + หน่วงเวลาส่ง USB กันบัฟเฟอร์ล้น
+     ========================================================= */
+  window.sendRawBytesToOcpp = async function(bytes) {
+    let sent = false;
+    try {
+      if (!activeUsbPrinter && navigator.usb) {
+        const list = await navigator.usb.getDevices();
+        if (list.length > 0) await openOcppUsbDevice(list[0]);
+      }
+      if (activeUsbPrinter) {
+        const chunkSize = 512;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          const chunk = bytes.slice(i, i + chunkSize);
+          await activeUsbPrinter.transferOut(activeUsbEndpoint, chunk);
+          if (i % 1024 === 0) await new Promise(r => setTimeout(r, 15));
+        }
+        sent = true;
+      }
+    } catch (e) {
+      activeUsbPrinter = null;
+    }
+
+    const cfg = (typeof getOcppSettings === 'function') ? getOcppSettings() : { wifiIp: '', wifiPort: 9100 };
+    if (!sent && cfg.wifiIp) {
+      try {
+        await fetch('http://' + cfg.wifiIp + ':' + (cfg.wifiPort || 9100), {
+          method: 'POST',
+          mode: 'no-cors',
+          body: bytes
+        });
+        sent = true;
+      } catch (e) {}
+    }
+
+    if (!sent && /Android/i.test(navigator.userAgent)) {
+      let binary = '';
+      const step = 8192;
+      for (let i = 0; i < bytes.length; i += step) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+      }
+      const a = document.createElement('a');
+      a.href = 'rawbt:base64,' + btoa(binary);
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { try { document.body.removeChild(a); } catch (err) {} }, 2000);
+      return true;
+    }
+    return sent;
+  };
+
+  function wrapLines(ctx, text, maxW) {
+    const words = String(text || '').split(' ');
+    const lines = [];
+    let cur = '';
+    for (const w of words) {
+      const test = cur ? (cur + ' ' + w) : w;
+      if (ctx.measureText(test).width > maxW && cur) {
+        lines.push(cur);
+        cur = w;
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  window.buildOcpp58mmRasterBytes = async function(customReceipt = null) {
+    let r, calc, dateStr, titleSuffix = '';
+    if (customReceipt) {
+      r = {
+        number: customReceipt.roomNumber,
+        type: customReceipt.roomType,
+        guestName: customReceipt.guestName,
+        guestTax: customReceipt.guestTax,
+        stayType: customReceipt.stayType,
+        nights: customReceipt.nights || 1,
+        orders: customReceipt.orders || [],
+        discount: customReceipt.discount || 0,
+        vatEnabled: !!customReceipt.vatEnabled
+      };
+      calc = customReceipt.calc || { roomCost: 0, elecUnits: 0, elecCost: 0, waterUnits: 0, waterCost: 0, lateCost: 0, subtotal: 0, vat: 0, grand: 0 };
+      dateStr = customReceipt.date || new Date().toISOString().slice(0, 10);
+      titleSuffix = ' (สำเนา)';
+    } else {
+      r = (activeRoomIndex !== null && state.rooms[activeRoomIndex])
+        ? state.rooms[activeRoomIndex]
+        : { number: '101', type: 'Double Bed', guestName: 'ลูกค้าทั่วไป', nights: 1, stayType: 'overnight', customRate: 650, orders: [] };
+      calc = (typeof calcRoomTotal === 'function')
+        ? calcRoomTotal(r)
+        : { roomCost: 650, elecUnits: 0, elecCost: 0, waterUnits: 0, waterCost: 0, lateCost: 0, subtotal: 650, vat: 0, grand: 650 };
+      dateStr = new Date().toISOString().slice(0, 10);
+    }
+
+    const width = 384; // สเปก 58mm แท้ (48 bytes/line) ห้ามใช้ 576
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = 1400;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, width, canvas.height);
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+
+    const hotelTh = (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล';
+    const hotelEn = (state.hotelInfo && state.hotelInfo.nameEn) || 'PHUBESTH INTER HOTEL';
+    const hotelAddr = (state.hotelInfo && state.hotelInfo.address) || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120';
+    const hotelPhone = (state.hotelInfo && state.hotelInfo.phone) || '037231232';
+
+    let y = 34;
+    ctx.font = '30px Tahoma, sans-serif';
+    ctx.fillText(hotelTh, width / 2, y);
+
+    y += 24;
+    ctx.font = '16px Tahoma, sans-serif';
+    ctx.fillText(hotelEn, width / 2, y);
+
+    ctx.font = '16px Tahoma, sans-serif';
+    wrapLines(ctx, hotelAddr, width - 16).forEach(line => {
+      y += 21;
+      ctx.fillText(line, width / 2, y);
+    });
+
+    y += 22;
+    ctx.font = '17px Tahoma, sans-serif';
+    ctx.fillText('โทร: ' + hotelPhone, width / 2, y);
+
+    y += 28;
+    ctx.font = '19px Tahoma, sans-serif';
+    ctx.fillText((r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี' : '[ ใบเสร็จรับเงิน') + titleSuffix + ' ]', width / 2, y);
+
+    y += 14;
+    ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 2; ctx.stroke();
+
+    y += 28;
+    ctx.textAlign = 'left';
+    ctx.font = '20px Tahoma, sans-serif';
+    ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 6, y);
+    ctx.textAlign = 'right';
+    ctx.font = '17px Tahoma, sans-serif';
+    ctx.fillText(dateStr, width - 6, y);
+
+    y += 26;
+    ctx.textAlign = 'left';
+    ctx.font = '20px Tahoma, sans-serif';
+    ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 6, y);
+
+    if (r.guestTax) {
+      y += 23;
+      ctx.font = '16px Tahoma, sans-serif';
+      ctx.fillText('เลขผู้เสียภาษี: ' + r.guestTax, 6, y);
+    }
+
+    y += 14;
+    ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 1; ctx.stroke();
+
+    const drawRow = (leftTxt, rightTxt, fontSpec = '21px Tahoma, sans-serif') => {
+      y += 30;
+      ctx.font = fontSpec;
+      ctx.textAlign = 'left';
+      ctx.fillText(leftTxt, 6, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(rightTxt, width - 6, y);
+    };
+
+    const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
+    drawRow('ค่าห้อง (' + stayLabel + ' x' + (r.nights || 1) + ')', '฿' + Number(calc.roomCost || 0).toFixed(0));
+    if (calc.elecCost > 0) drawRow('ค่าไฟ (' + calc.elecUnits + ' หน่วย)', '฿' + Number(calc.elecCost).toFixed(0));
+    if (calc.waterCost > 0) drawRow('ค่าน้ำ (' + calc.waterUnits + ' หน่วย)', '฿' + Number(calc.waterCost).toFixed(0));
+    if (calc.lateCost > 0) drawRow('ค่าเลทเช็คเอาท์', '฿' + Number(calc.lateCost).toFixed(0));
+    (r.orders || []).forEach(o => {
+      drawRow(o.name + ' (x' + o.qty + ')', '฿' + (o.price * o.qty).toFixed(0));
+    });
+
+    y += 14;
+    ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 2; ctx.stroke();
+
+    if (r.discount > 0) drawRow('ส่วนลดพิเศษ', '-฿' + Number(r.discount).toFixed(2));
+    if (r.vatEnabled) drawRow('VAT 7%', '฿' + Number(calc.vat || 0).toFixed(2));
+    drawRow('ยอดสุทธิ', '฿' + Number(calc.grand || 0).toFixed(2), 'bold 25px Tahoma, sans-serif');
+
+    y += 28;
+    ctx.textAlign = 'center';
+    ctx.font = '18px Tahoma, sans-serif';
+    ctx.fillText('ขอบคุณที่ใช้บริการ ' + hotelTh, width / 2, y);
+
+    const finalHeight = Math.ceil((y + 18) / 24) * 24;
+    const imgData = ctx.getImageData(0, 0, width, finalHeight).data;
+    const bytesPerLine = width / 8; // 48 bytes
+    const chunks = [];
+
+    chunks.push(0x1B, 0x40);
+    if (!customReceipt) {
+      chunks.push(0x1B, 0x70, 0x00, 0x19, 0xFA);
+      chunks.push(0x1B, 0x70, 0x01, 0x19, 0xFA);
+    }
+
+    const bandHeight = 24;
+    for (let by = 0; by < finalHeight; by += bandHeight) {
+      const curBandH = Math.min(bandHeight, finalHeight - by);
+      chunks.push(
+        0x1D, 0x76, 0x30, 0x00,
+        bytesPerLine & 0xFF, (bytesPerLine >> 8) & 0xFF,
+        curBandH & 0xFF, (curBandH >> 8) & 0xFF
+      );
+      for (let py = by; py < by + curBandH; py++) {
+        for (let bx = 0; bx < bytesPerLine; bx++) {
+          let byteVal = 0;
+          for (let bit = 0; bit < 8; bit++) {
+            const px = bx * 8 + bit;
+            const offset = (py * width + px) * 4;
+            const lum = (imgData[offset] + imgData[offset + 1] + imgData[offset + 2]) / 3;
+            if (lum < 160) byteVal |= (1 << (7 - bit));
+          }
+          chunks.push(byteVal);
+        }
+      }
+    }
+
+    chunks.push(0x1B, 0x64, 0x03);
+    chunks.push(0x1D, 0x56, 0x42, 0x00);
+    return new Uint8Array(chunks);
+  };
+
+  window.printDirectToOcpp58 = async function(customReceipt = null) {
+    showToast('⏳ กำลังส่งสลิป 58mm เข้า OCPP-C582...');
+    const packet = await window.buildOcpp58mmRasterBytes(customReceipt);
+    const ok = await window.sendRawBytesToOcpp(packet);
+    if (ok) {
+      showToast('🖨️ ส่งคำสั่งพิมพ์ OCPP-C582 สำเร็จ!');
+    } else {
+      alert('⚠️ ยังไม่ได้เชื่อมต่อเครื่องพิมพ์\n• หากต่อสาย USB: กด "จับคู่สาย USB" ก่อน\n• หากใช้ Android: ติดตั้งและตั้งค่าแอป RawBT ให้พร้อมใช้งานครับ');
+    }
+  };
+
+  window.printReceiptPaper = async function() {
+    const cfg = (typeof getOcppSettings === 'function') ? getOcppSettings() : { mode: 'ocpp_direct' };
+    if (cfg.mode === 'normal_printer') {
+      await window.kickDrawerOnly();
+      window.print();
+      return;
+    }
+    if (cfg.mode === 'ask_every_time') {
+      const useOcpp = confirm('กด "ตกลง (OK)" เพื่อพิมพ์สลิป 58mm ออก OCPP-C582\nกด "ยกเลิก (Cancel)" เพื่อพิมพ์ออกปริ๊นเตอร์ A4 ปกติ');
+      if (useOcpp) await window.printDirectToOcpp58();
+      else { await window.kickDrawerOnly(); window.print(); }
+      return;
+    }
+    await window.printDirectToOcpp58();
+  };
+
+  /* =========================================================
+     4. แก้ปุ่ม "พิมพ์ซ้ำ / ดูบิล" ในประวัติใบเสร็จให้เปิด Modal ในแอป
+        (แก้ปัญหาแอปแท้ PWA บล็อก window.open + แก้ index ผิดตอนค้นหา)
+     ========================================================= */
+  let activeArchivedReceipt = null;
+
+  window.renderReceiptsArchive = function() {
+    const list = state.receiptsArchive || [];
+    const cntBadge = document.getElementById('rcp-total-cnt');
+    if (cntBadge) cntBadge.textContent = list.length;
+
+    const box = document.getElementById('receipts-archive-list');
+    if (!box) return;
+
+    const q = (document.getElementById('rcp-search-inp')?.value || '').trim().toLowerCase();
+    const filtered = list.filter(r =>
+      !q ||
+      (r.receiptId || '').toLowerCase().includes(q) ||
+      (r.roomNumber || '').includes(q) ||
+      (r.guestName || '').toLowerCase().includes(q) ||
+      (r.date || '').includes(q)
+    );
+
+    if (filtered.length === 0) {
+      box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px;">ไม่พบประวัติใบเสร็จรับเงิน</div>';
+      return;
+    }
+
+    box.innerHTML = filtered.map((r) => {
+      const realIdx = list.indexOf(r);
+      return `
+      <div class="between" style="background:#030712;border:1px solid #1f2937;border-radius:12px;padding:12px 16px;">
+        <div>
+          <div class="row">
+            <b style="font-size:14px;color:#c084fc;">📄 ${r.receiptId}</b>
+            <span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:2px 7px;border-radius:6px;font-weight:800;">ห้อง ${r.roomNumber} (${r.roomType})</span>
+            <span style="font-size:11px;color:#cbd5e1;">👤 ${r.guestName}</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">
+            📅 วันที่: <b>${r.date} ${r.time || ''}</b> | ยอดสุทธิ: <b style="color:#34d399;font-size:13px;">฿${(r.calc?.grand || 0).toLocaleString()}</b> ${r.vatEnabled ? '<span style="color:#fde68a;">(มี VAT)</span>' : ''}
+          </div>
+        </div>
+        <div class="row">
+          <button onclick="reprintArchivedReceipt(${realIdx})" class="btn btn-amber" style="padding:6px 12px;font-size:11px;">🖨️ พิมพ์ซ้ำ / ดูบิล</button>
+          <button onclick="if(confirm('ลบประวัติใบเสร็จนี้?')){state.receiptsArchive.splice(${realIdx},1);saveDatabase();renderReceiptsArchive();}" class="btn btn-dark" style="padding:6px 8px;font-size:11px;color:#fda4af;">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  window.reprintArchivedReceipt = function(idx) {
+    const r = (state.receiptsArchive || [])[idx];
+    if (!r) return;
+    activeArchivedReceipt = r;
+    const calc = r.calc || {};
+    const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน');
+
+    let itemsHtml = `<div class="between" style="margin-bottom:5px;"><span>ค่าห้องพัก (${stayLabel} x${r.nights || 1})</span><b>฿${Number(calc.roomCost || 0).toFixed(0)}</b></div>`;
+    if (calc.elecCost > 0) itemsHtml += `<div class="between" style="margin-bottom:5px;"><span>ค่าไฟ (${calc.elecUnits} หน่วย)</span><b>฿${Number(calc.elecCost).toFixed(0)}</b></div>`;
+    if (calc.waterCost > 0) itemsHtml += `<div class="between" style="margin-bottom:5px;"><span>ค่าน้ำ (${calc.waterUnits} หน่วย)</span><b>฿${Number(calc.waterCost).toFixed(0)}</b></div>`;
+    if (calc.lateCost > 0) itemsHtml += `<div class="between" style="margin-bottom:5px;color:#dc2626;"><span>ค่าเลทเช็คเอาท์</span><b>฿${Number(calc.lateCost).toFixed(0)}</b></div>`;
+    (r.orders || []).forEach(o => {
+      itemsHtml += `<div class="between" style="margin-bottom:5px;"><span>${o.name} (x${o.qty})</span><b>฿${(o.price * o.qty).toFixed(0)}</b></div>`;
+    });
+
+    const hotelTh = state.hotelInfo?.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล';
+    const hotelEn = state.hotelInfo?.nameEn || 'PHUBESTH INTER HOTEL';
+    const hotelAddr = state.hotelInfo?.address || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120';
+    const hotelPhone = state.hotelInfo?.phone || '037231232';
+    const preVat = (r.vatEnabled && r.vatMode === 'include') ? (calc.grand - (calc.vat || 0)) : (calc.subtotal || 0);
+
+    const bodyEl = document.getElementById('arc-rcp-preview-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = `
+        <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px;">
+          <div style="font-size:20px;font-weight:900;">${hotelTh}</div>
+          <div style="font-size:11px;font-weight:700;">${hotelEn}</div>
+          <div style="font-size:11px;">${hotelAddr}</div>
+          <div style="font-size:11px;">โทร: ${hotelPhone}</div>
+          <div style="display:inline-block;margin-top:6px;padding:2px 10px;border:1.5px solid #000;border-radius:6px;font-size:12px;font-weight:800;">
+            ${r.vatEnabled ? 'ใบเสร็จรับเงิน / ใบกำกับภาษี (สำเนา)' : 'ใบเสร็จรับเงิน (สำเนา)'}
+          </div>
+          <div style="font-size:11px;margin-top:4px;color:#444;">เลขที่: <b>${r.receiptId}</b></div>
+        </div>
+        <div style="font-size:12.5px;border-bottom:1px dashed #666;padding-bottom:6px;margin-bottom:8px;">
+          <div class="between"><span><b>ห้อง:</b> ${r.roomNumber} (${r.roomType})</span><span><b>วันที่:</b> ${r.date} ${r.time || ''}</span></div>
+          <div><b>ลูกค้า:</b> ${r.guestName || 'ลูกค้าทั่วไป'}</div>
+          ${r.guestTax ? `<div><b>เลขผู้เสียภาษี:</b> ${r.guestTax}</div>` : ''}
+        </div>
+        <div style="font-size:13px;min-height:40px;">${itemsHtml}</div>
+        <div style="border-top:1.5px solid #000;margin-top:8px;padding-top:6px;font-size:13px;">
+          <div class="between"><span>รวมเป็นเงิน:</span><span>฿${Number(preVat).toFixed(2)}</span></div>
+          ${r.discount > 0 ? `<div class="between"><span>ส่วนลดพิเศษ:</span><span>-฿${Number(r.discount).toFixed(2)}</span></div>` : ''}
+          ${r.vatEnabled ? `<div class="between"><span>VAT 7%:</span><span>฿${Number(calc.vat || 0).toFixed(2)}</span></div>` : ''}
+          <div class="between" style="font-size:17px;font-weight:900;border-top:1px dashed #666;margin-top:5px;padding-top:5px;">
+            <span>ยอดสุทธิ (TOTAL):</span><span>฿${Number(calc.grand || 0).toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }
+    const modal = document.getElementById('archived-receipt-modal');
+    if (modal) modal.classList.remove('hidden');
+  };
+
+  window.printArchivedToOcpp58 = async function() {
+    if (!activeArchivedReceipt) return;
+    await window.printDirectToOcpp58(activeArchivedReceipt);
+  };
+
+  /* =========================================================
+     5. จัดระเบียบปุ่ม Header & Drawer + ป้ายสถานะซิงค์จริง
+     ========================================================= */
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const quickBar = document.querySelector('.pro-quick-actions');
+      const hwBox = document.getElementById('drw-sec-hw');
+      const mainTabs = document.querySelector('.hotel-main-tabs');
+
+      if (mainTabs && hwBox) {
+        const oldDrawerBtn = mainTabs.querySelector('button[onclick*="kickDrawerOnly"]');
+        if (oldDrawerBtn) hwBox.insertBefore(oldDrawerBtn, hwBox.firstChild);
+      }
+      if (quickBar && hwBox) {
+        const pillDrawer = hwBox.querySelector('.pro-pill-btn');
+        if (pillDrawer) quickBar.insertBefore(pillDrawer, quickBar.firstChild);
+      }
+
+      if (quickBar && !document.getElementById('pro-fb-live-badge')) {
+        const badge = document.createElement('button');
+        badge.id = 'pro-fb-live-badge';
+        badge.type = 'button';
+        badge.className = 'pro-pill-btn active-emerald';
+        badge.textContent = '🟢 กำลังซิงค์...';
+        badge.title = 'แตะเพื่อดึงข้อมูลล่าสุดจาก Firebase ทันที';
+        badge.onclick = () => window.pullFromFirebaseNow(true);
+        quickBar.insertBefore(badge, quickBar.firstChild);
+      }
+
+      const oldSyncBtn = document.querySelector('#drw-sec-cloud button[onclick="openSyncModal()"]');
+      if (oldSyncBtn) oldSyncBtn.style.display = 'none';
+
+      const origRenderSettings = window.renderSettingsMenuAndRooms;
+      if (typeof origRenderSettings === 'function') {
+        window.renderSettingsMenuAndRooms = function() {
+          origRenderSettings();
+          document.querySelectorAll('#set-rooms-list input[onchange*="rateOver"]').forEach((inp, i) => {
+            inp.onchange = function() {
+              const v = Number(this.value) || 0;
+              if (state.rooms[i]) {
+                state.rooms[i].rateOver = v;
+                state.rooms[i].customRate = v;
+                saveDatabase();
+                renderRooms();
+              }
+            };
+          });
+        };
+      }
+
+      window.pullFromFirebaseNow(false);
+      window.startFirebaseRealtimeListener();
+    }, 360);
+  });
+})();
+</script>
 </body>
 </html>
