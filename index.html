@@ -6500,5 +6500,120 @@ window.kickDrawerOnly = async function() {
   });
 })();
 </script>
+ <!-- ================= FIX: แก้สั่งอาหารไม่ได้หลังเชื่อม Firebase (กู้คืน Array ว่างอัตโนมัติ) ================= -->
+<script>
+(function fixFirebaseEmptyArraysAndFoodOrder() {
+  function toSafeArray(val, fallback) {
+    if (Array.isArray(val)) return val.filter(x => x !== null && x !== undefined);
+    if (val && typeof val === 'object') return Object.values(val).filter(x => x !== null && x !== undefined);
+    return fallback ? fallback.slice() : [];
+  }
+
+  window.normalizeHotelStateArrays = function() {
+    if (typeof state === 'undefined' || !state || typeof state !== 'object') return;
+    state.rooms = toSafeArray(state.rooms, []);
+    state.transactions = toSafeArray(state.transactions, []);
+    state.customers = toSafeArray(state.customers, []);
+    state.reservations = toSafeArray(state.reservations, []);
+    state.receiptsArchive = toSafeArray(state.receiptsArchive, []);
+    state.housekeepingLogs = toSafeArray(state.housekeepingLogs, []);
+    state.menu = toSafeArray(state.menu, []);
+    state.expenseCategories = toSafeArray(state.expenseCategories, ['🛒 ซื้อของใช้เข้าโรงแรม', '🧺 ค่าซักรีด / แม่บ้าน', '🔧 ค่าซ่อมบำรุง', '⚡ ค่าน้ำ / ค่าไฟ / เน็ต', '📦 เบ็ดเตล็ดทั่วไป']);
+    state.incomeCategories = toSafeArray(state.incomeCategories, ['🏨 รายรับจาก Agoda / Booking', '🏢 ลูกค้าบริษัทโอนเหมา', '⚡💧 รายรับค่าน้ำ-ค่าไฟผู้เช่า', '🍽️ ขายอาหาร/เครื่องดื่มหน้าร้าน', '💰 รายรับค่ามัดจำ / อื่นๆ']);
+
+    state.rooms.forEach(r => {
+      if (r && typeof r === 'object') {
+        r.orders = toSafeArray(r.orders, []);
+      }
+    });
+    state.customers.forEach(c => {
+      if (c && typeof c === 'object') {
+        c.stayHistory = toSafeArray(c.stayHistory, []);
+      }
+    });
+  };
+
+  window.addOrderFromMenu = function(i) {
+    window.normalizeHotelStateArrays();
+    if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+    const m = state.menu[i];
+    if (!m) return;
+    const r = state.rooms[activeRoomIndex];
+    if (!Array.isArray(r.orders)) r.orders = [];
+    const priceNum = Number(m.price) || 0;
+    const ex = r.orders.find(o => o.name === m.name && Number(o.price) === priceNum);
+    if (ex) ex.qty = (Number(ex.qty) || 1) + 1;
+    else r.orders.push({ name: m.name, price: priceNum, qty: 1 });
+    saveDatabase();
+    renderModalMenuAndOrders();
+    if (typeof renderRooms === 'function') renderRooms();
+    if (typeof showToast === 'function') showToast('เพิ่ม ' + m.name + ' ลงห้อง ' + r.number + ' แล้ว');
+  };
+
+  window.addCustomOrderToRoom = function() {
+    window.normalizeHotelStateArrays();
+    if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+    const nameEl = document.getElementById('custom-item-name');
+    const priceEl = document.getElementById('custom-item-price');
+    const name = (nameEl ? nameEl.value : '').trim();
+    const priceInput = priceEl ? priceEl.value : '';
+    if (!name || priceInput === '') {
+      if (typeof showToast === 'function') showToast('กรุณากรอกชื่ออาหารและราคา');
+      return;
+    }
+    const price = Number(priceInput) || 0;
+    const r = state.rooms[activeRoomIndex];
+    if (!Array.isArray(r.orders)) r.orders = [];
+    r.orders.push({ name: name, price: price, qty: 1 });
+    if (nameEl) nameEl.value = '';
+    if (priceEl) priceEl.value = '';
+    saveDatabase();
+    renderModalMenuAndOrders();
+    if (typeof renderRooms === 'function') renderRooms();
+    if (typeof showToast === 'function') showToast('เพิ่ม ' + name + ' ลงห้อง ' + r.number + ' แล้ว');
+  };
+
+  window.changeOrderQty = function(i, d) {
+    window.normalizeHotelStateArrays();
+    if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+    const r = state.rooms[activeRoomIndex];
+    if (!Array.isArray(r.orders) || !r.orders[i]) return;
+    r.orders[i].qty = (Number(r.orders[i].qty) || 1) + d;
+    if (r.orders[i].qty <= 0) r.orders.splice(i, 1);
+    saveDatabase();
+    renderModalMenuAndOrders();
+    if (typeof renderRooms === 'function') renderRooms();
+  };
+
+  function hookNormalize() {
+    window.normalizeHotelStateArrays();
+
+    if (typeof window.renderAll === 'function' && !window.renderAll._arrFixed) {
+      const _origRenderAll = window.renderAll;
+      const wrapped = function() {
+        window.normalizeHotelStateArrays();
+        return _origRenderAll.apply(this, arguments);
+      };
+      wrapped._arrFixed = true;
+      window.renderAll = wrapped;
+    }
+
+    if (typeof window.openRoomModal === 'function' && !window.openRoomModal._arrFixed) {
+      const _origOpen = window.openRoomModal;
+      const wrapped = function() {
+        window.normalizeHotelStateArrays();
+        return _origOpen.apply(this, arguments);
+      };
+      wrapped._arrFixed = true;
+      window.openRoomModal = wrapped;
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(hookNormalize, 50);
+    setTimeout(hookNormalize, 450);
+  });
+})();
+</script>
 </body>
 </html>
