@@ -6615,5 +6615,1586 @@ window.kickDrawerOnly = async function() {
   });
 })();
 </script>
+ <!-- ================= ADD-ON V4: EXECUTIVE WOW DASHBOARD + MAINTENANCE ROOMS + DEPOSIT DEDUCTION + EXPENSE DATE + DUAL FIRE-EXIT CORRIDOR ================= -->
+<style>
+  /* 1. Executive Command Hero Dashboard */
+  #wow-exec-dashboard {
+    position: relative;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(17, 24, 39, 0.94) 55%, rgba(30, 27, 75, 0.82) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 18px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  #wow-exec-dashboard::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.16) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .wow-exec-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .wow-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d399;
+    display: inline-block;
+    box-shadow: 0 0 10px #10b981;
+    animation: blinkGreen 1.5s infinite;
+  }
+  .wow-exec-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  @media(min-width: 760px) {
+    .wow-exec-grid {
+      grid-template-columns: 1.15fr 1.35fr 1.1fr;
+    }
+  }
+  .wow-panel {
+    background: rgba(3, 7, 18, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 14px;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px);
+  }
+  .wow-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .wow-ring-svg {
+    width: 78px;
+    height: 78px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.35));
+  }
+  .wow-dist-bar {
+    height: 8px;
+    border-radius: 99px;
+    background: #1e293b;
+    overflow: hidden;
+    display: flex;
+    margin-top: 8px;
+    gap: 1px;
+  }
+  .wow-dist-seg { height: 100%; transition: width 0.4s ease; }
+  .wow-stat-mini {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+  .wow-stat-box {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 7px 9px;
+  }
+  .wow-stat-lbl { font-size: 10px; color: #94a3b8; }
+  .wow-stat-val { font-size: 15px; font-weight: 900; margin-top: 2px; }
+
+  /* 7-Day Sparkline Bars */
+  .wow-spark-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 5px;
+    height: 62px;
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+  .wow-spark-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 3px;
+  }
+  .wow-spark-bar {
+    width: 100%;
+    max-width: 24px;
+    border-radius: 5px 5px 2px 2px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    min-height: 4px;
+    transition: height 0.35s ease;
+  }
+  .wow-spark-bar.is-today {
+    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+  }
+  .wow-spark-lbl { font-size: 9px; color: #94a3b8; }
+
+  /* 2. Maintenance / ปิดปรับปรุง Styling (2D, Floor Plan, 3D) */
+  .pro-room-card.st-maintenance {
+    border: 1px dashed rgba(148, 163, 184, 0.45) !important;
+    border-left: 5px solid #94a3b8 !important;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(15, 23, 42, 0.96),
+      rgba(15, 23, 42, 0.96) 10px,
+      rgba(30, 41, 59, 0.72) 10px,
+      rgba(30, 41, 59, 0.72) 20px
+    ) !important;
+    opacity: 0.92;
+  }
+  .pro-3d-cube.c-maintenance {
+    background: repeating-linear-gradient(
+      -45deg,
+      #1e293b,
+      #1e293b 6px,
+      #334155 6px,
+      #334155 12px
+    );
+    border: 1.5px dashed #f59e0b;
+    box-shadow: 0 5px 0 #0f172a, 0 8px 14px rgba(0, 0, 0, 0.55);
+  }
+  .wow-maint-note-pill {
+    display: inline-block;
+    background: rgba(244, 63, 94, 0.18);
+    border: 1px solid rgba(251, 113, 133, 0.45);
+    color: #fecdd3;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 3. Short-stay Progress Bar on Room Card */
+  .wow-stay-progress {
+    height: 3.5px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .wow-stay-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  /* 4. 3D Stage Responsive Polishing */
+  .pro-3d-stage {
+    padding: 22px 14px 32px !important;
+  }
+  .pro-3d-floor-plate {
+    max-width: 640px !important;
+    width: 92% !important;
+  }
+
+  /* 5. Finance 4-Column Form Grid (เพิ่มช่องเลือกวันที่) */
+  .wow-tx-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  @media(min-width: 700px) {
+    .wow-tx-grid-4 {
+      grid-template-columns: 155px 1fr 1.2fr 130px;
+    }
+  }
+</style>
+
+<script>
+(function initHotelWowExecutiveV4() {
+  const EXEC_COLLAPSE_KEY = 'PHUBESTH_WOW_EXEC_COLLAPSE_V4';
+  const UI_MODE_KEY = 'PHUBESTH_PRO_VIEW_MODE_V1';
+  const FLOOR_FLT_KEY = 'PHUBESTH_PRO_FLOOR_FLT_V1';
+  const LIGHT_WATCH_KEY = 'PHUBESTH_LIGHT_WATCH_V1';
+
+  let execCollapsed = localStorage.getItem(EXEC_COLLAPSE_KEY) === 'true';
+  let wowViewMode = localStorage.getItem(UI_MODE_KEY) || '2d';
+  let wowFloorFilter = localStorage.getItem(FLOOR_FLT_KEY) || 'all';
+  let wow3dTilt = 32;
+  let wow3dRotate = -8;
+  let wow3dExploded = false;
+  let isRenderingWowRooms = false;
+
+  function esc(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+
+  function localDateISO(offsetDays = 0) {
+    const d = new Date();
+    if (offsetDays) d.setDate(d.getDate() + offsetDays);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function getRoomFloorKey(roomNum) {
+    const s = String(roomNum || '').trim();
+    const ch = s.charAt(0);
+    return /^[1-9]$/.test(ch) ? ch : '0';
+  }
+
+  function getBedBadgeHtml(type) {
+    const t = String(type || '');
+    if (t.includes('Twin')) return `<span class="pro-bed-pill bed-twin">🛏️🛏️ Twin</span>`;
+    if (t.includes('VIP')) return `<span class="pro-bed-pill bed-vip">👑 VIP</span>`;
+    if (t.includes('Single')) return `<span class="pro-bed-pill bed-single">🛏️ Single</span>`;
+    return `<span class="pro-bed-pill bed-double">🛏️ Double</span>`;
+  }
+
+  function calcDirtyMins(dirtyStr) {
+    if (!dirtyStr) return null;
+    const m = String(dirtyStr).match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    const now = new Date();
+    let diff = (now.getHours() * 60 + now.getMinutes()) - (parseInt(m[1], 10) * 60 + parseInt(m[2], 10));
+    if (diff < -720) diff += 1440;
+    return diff >= 0 ? diff : 0;
+  }
+
+  function getLightWatchAlerts() {
+    if (!state || !Array.isArray(state.rooms)) return [];
+    let map = {};
+    try { map = JSON.parse(localStorage.getItem(LIGHT_WATCH_KEY) || '{}'); } catch (e) {}
+    const now = Date.now();
+    const alerts = [];
+    let changed = false;
+    state.rooms.forEach((r, idx) => {
+      const k = String(r.number);
+      if (r.status === 'vacant' && r.light) {
+        if (!map[k]) { map[k] = now; changed = true; }
+        alerts.push({ idx, number: r.number, mins: Math.floor((now - Number(map[k])) / 60000) });
+      } else if (map[k]) {
+        delete map[k];
+        changed = true;
+      }
+    });
+    if (changed) { try { localStorage.setItem(LIGHT_WATCH_KEY, JSON.stringify(map)); } catch (e) {} }
+    return alerts;
+  }
+
+  function getTodayBookingMap() {
+    const todayStr = localDateISO(0);
+    const todayBookings = (state.reservations || []).filter(b => b.status === 'confirmed' && b.checkIn === todayStr);
+    const queues = {};
+    todayBookings.forEach(b => {
+      if (!queues[b.roomType]) queues[b.roomType] = [];
+      for (let i = 0; i < (Number(b.qty) || 1); i++) queues[b.roomType].push(b);
+    });
+    const assigned = {};
+    (state.rooms || []).forEach((r, idx) => {
+      if (r.status === 'vacant' && queues[r.type] && queues[r.type].length > 0) {
+        assigned[idx] = queues[r.type].shift();
+      }
+    });
+    return assigned;
+  }
+
+  /* =========================================================================
+     HELPER: คำนวณยอดหักมัดจำ & ยอดต้องชำระเพิ่ม (Deposit Settlement)
+     ========================================================================= */
+  window.getRoomSettlement = function(r) {
+    const calc = (typeof calcRoomTotal === 'function')
+      ? calcRoomTotal(r)
+      : { roomCost: 0, elecUnits: 0, elecCost: 0, waterUnits: 0, waterCost: 0, lateCost: 0, subtotal: 0, vat: 0, grand: 0 };
+    const deposit = Math.max(0, Number(r && r.keyDeposit) || 0);
+    const shouldDeduct = deposit > 0 && (r.deductDeposit !== false);
+    const depositDeducted = shouldDeduct ? deposit : 0;
+    const netToPay = shouldDeduct ? Math.max(0, Number((calc.grand - deposit).toFixed(2))) : calc.grand;
+    const refundDue = shouldDeduct ? Math.max(0, Number((deposit - calc.grand).toFixed(2))) : 0;
+    return { calc, deposit, shouldDeduct, depositDeducted, netToPay, refundDue };
+  };
+
+  /* =========================================================================
+     1. EXECUTIVE WOW DASHBOARD (วงแหวน Occupancy + กราฟ 7 วัน + สถานะไฟสด)
+     ========================================================================= */
+  function ensureWowDashboardContainer() {
+    const viewRooms = document.getElementById('view-rooms');
+    if (!viewRooms) return null;
+    let dash = document.getElementById('wow-exec-dashboard');
+    if (!dash) {
+      dash = document.createElement('div');
+      dash.id = 'wow-exec-dashboard';
+      viewRooms.insertBefore(dash, viewRooms.firstChild);
+    }
+    return dash;
+  }
+
+  function renderWowExecDashboard() {
+    const dash = ensureWowDashboardContainer();
+    if (!dash || !state || !Array.isArray(state.rooms)) return;
+
+    const assignedMap = getTodayBookingMap();
+    const resToday = Object.keys(assignedMap).length;
+    const total = state.rooms.length;
+    const maint = state.rooms.filter(r => r.status === 'maintenance').length;
+    const occ = state.rooms.filter(r => r.status === 'occupied').length;
+    const cln = state.rooms.filter(r => r.status === 'cleaning').length;
+    const sellable = Math.max(0, total - maint);
+    const trueVacant = Math.max(0, sellable - occ - cln - resToday);
+    const activeSold = occ + resToday;
+    const occPct = sellable > 0 ? Math.min(100, Math.round((activeSold / sellable) * 100)) : 0;
+    const litCount = state.rooms.filter(r => r.light).length;
+    const vacantLit = state.rooms.filter(r => r.status === 'vacant' && r.light).length;
+
+    const todayStr = localDateISO(0);
+    const monthPrefix = todayStr.slice(0, 7);
+    let todayInc = 0, todayExp = 0, monthInc = 0, monthExp = 0;
+    (state.transactions || []).forEach(t => {
+      const amt = Number(t.amount) || 0;
+      if (t.date === todayStr) {
+        if (t.type === 'income') todayInc += amt; else todayExp += amt;
+      }
+      if ((t.date || '').startsWith(monthPrefix)) {
+        if (t.type === 'income') monthInc += amt; else monthExp += amt;
+      }
+    });
+
+    const last7 = [];
+    for (let i = 6; i >= 0; i--) {
+      const iso = localDateISO(-i);
+      const dObj = new Date();
+      dObj.setDate(dObj.getDate() - i);
+      const lbl = i === 0 ? 'วันนี้' : dObj.toLocaleDateString('th-TH', { weekday: 'short' });
+      const inc = (state.transactions || [])
+        .filter(t => t.date === iso && t.type === 'income')
+        .reduce((s, t) => s + (Number(t.amount) || 0), 0);
+      last7.push({ iso, lbl, inc, isToday: i === 0 });
+    }
+    const maxInc7 = Math.max(1000, ...last7.map(x => x.inc));
+
+    const inHouseValue = state.rooms
+      .filter(r => r.status === 'occupied')
+      .reduce((s, r) => s + (calcRoomTotal(r).grand || 0), 0);
+
+    const isFront = (typeof currentRole !== 'undefined' && currentRole === 'front');
+    const now = new Date();
+    const h = now.getHours();
+    const greet = h < 12 ? '🌅 สวัสดีตอนเช้า' : (h < 17 ? '☀️ สวัสดีตอนบ่าย' : '🌙 สวัสดีตอนค่ำ');
+    const timeNow = `${String(h).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
+
+    const radius = 31;
+    const circ = 2 * Math.PI * radius;
+    const dashOffset = circ * (1 - occPct / 100);
+    const ringColor = occPct >= 75 ? '#34d399' : (occPct >= 35 ? '#38bdf8' : '#f59e0b');
+
+    const pOcc = total ? (occ / total) * 100 : 0;
+    const pRes = total ? (resToday / total) * 100 : 0;
+    const pVac = total ? (trueVacant / total) * 100 : 0;
+    const pCln = total ? (cln / total) * 100 : 0;
+    const pMnt = total ? (maint / total) * 100 : 0;
+
+    dash.innerHTML = `
+      <div class="wow-exec-top">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="wow-live-dot"></span>
+          <b style="font-size:13.5px;color:#fff;">${greet} • Executive Command Center</b>
+          <span style="font-size:11px;color:#fbbf24;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);padding:2px 8px;border-radius:99px;font-weight:800;">🕒 ${timeNow}</span>
+          ${maint > 0 ? `<span style="font-size:11px;color:#fecdd3;background:rgba(244,63,94,0.18);border:1px solid rgba(244,63,94,0.45);padding:2px 8px;border-radius:99px;font-weight:800;">🛠️ ปิดปรับปรุง ${maint} ห้อง</span>` : ''}
+        </div>
+        <button type="button" onclick="window.__hotelWow.toggleExecDash()" class="pro-pill-btn" style="padding:4px 10px;font-size:11px;">
+          ${execCollapsed ? '🔽 กางแดชบอร์ด' : '🔼 ย่อแดชบอร์ด'}
+        </button>
+      </div>
+
+      ${execCollapsed ? '' : `
+      <div class="wow-exec-grid">
+        <div class="wow-panel">
+          <div class="wow-ring-wrap">
+            <svg class="wow-ring-svg" viewBox="0 0 78 78">
+              <circle cx="39" cy="39" r="${radius}" fill="none" stroke="#1e293b" stroke-width="7"></circle>
+              <circle cx="39" cy="39" r="${radius}" fill="none" stroke="${ringColor}" stroke-width="7"
+                stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${dashOffset.toFixed(1)}"
+                transform="rotate(-90 39 39)"></circle>
+              <text x="39" y="37" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="900">${occPct}%</text>
+              <text x="39" y="50" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-weight="700">OCCUPANCY</text>
+            </svg>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:11px;color:#94a3b8;font-weight:700;">สถานะห้องพร้อมขาย (${sellable}/${total} ห้อง)</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:11px;font-weight:800;">
+                <span style="color:#34d399;">● ว่าง ${trueVacant}</span>
+                <span style="color:#fda4af;">● พัก ${occ}</span>
+                <span style="color:#38bdf8;">● จอง ${resToday}</span>
+                <span style="color:#fbbf24;">● เคลียร์ ${cln}</span>
+                ${maint > 0 ? `<span style="color:#cbd5e1;">● ซ่อม ${maint}</span>` : ''}
+              </div>
+              <div class="wow-dist-bar">
+                <div class="wow-dist-seg" style="width:${pVac}%;background:#10b981;"></div>
+                <div class="wow-dist-seg" style="width:${pOcc}%;background:#f43f5e;"></div>
+                <div class="wow-dist-seg" style="width:${pRes}%;background:#38bdf8;"></div>
+                <div class="wow-dist-seg" style="width:${pCln}%;background:#f59e0b;"></div>
+                <div class="wow-dist-seg" style="width:${pMnt}%;background:#64748b;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wow-panel">
+          <div class="wow-stat-mini">
+            <div class="wow-stat-box">
+              <div class="wow-stat-lbl">💰 รายรับวันนี้ (รับแล้ว)</div>
+              <div class="wow-stat-val" style="color:#34d399;">฿${todayInc.toLocaleString()}</div>
+            </div>
+            <div class="wow-stat-box">
+              <div class="wow-stat-lbl">🏨 ยอดแขกพักอยู่ในตึก</div>
+              <div class="wow-stat-val" style="color:#fbbf24;">฿${inHouseValue.toLocaleString()}</div>
+            </div>
+            <div class="wow-stat-box">
+              <div class="wow-stat-lbl">📈 กำไรสุทธิเดือนนี้</div>
+              <div class="wow-stat-val" style="color:#38bdf8;">${isFront ? '🔒 ล็อกสิทธิ์' : '฿' + (monthInc - monthExp).toLocaleString()}</div>
+            </div>
+            <div class="wow-stat-box">
+              <div class="wow-stat-lbl">💡 ไฟเปิดอยู่ในตึก</div>
+              <div class="wow-stat-val" style="color:${vacantLit > 0 ? '#fb7185' : '#fde68a'};">${litCount}/${total} ห้อง ${vacantLit > 0 ? '⚠️' : ''}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wow-panel">
+          <div class="between" style="gap:4px;">
+            <span style="font-size:11px;font-weight:800;color:#e2e8f0;">📊 แนวโน้มรายรับ 7 วัน</span>
+            <span style="font-size:10px;color:#38bdf8;font-weight:700;">${isFront ? '🔒 เฉพาะผู้บริหาร' : 'รวม ฿' + last7.reduce((s, x) => s + x.inc, 0).toLocaleString()}</span>
+          </div>
+          ${isFront
+            ? `<div style="height:68px;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:11px;">ล็อกสิทธิ์สำหรับผู้จัดการ / เจ้าของ</div>`
+            : `<div class="wow-spark-bars">
+                ${last7.map(d => {
+                  const pct = Math.max(8, Math.round((d.inc / maxInc7) * 100));
+                  return `<div class="wow-spark-col" title="${d.iso}: ฿${d.inc.toLocaleString()}">
+                    <div style="font-size:8.5px;color:${d.isToday ? '#fbbf24' : '#94a3b8'};font-weight:700;">${d.inc > 0 ? (d.inc >= 1000 ? (d.inc/1000).toFixed(1)+'k' : d.inc) : ''}</div>
+                    <div class="wow-spark-bar ${d.isToday ? 'is-today' : ''}" style="height:${d.inc > 0 ? pct : 6}%;"></div>
+                    <div class="wow-spark-lbl" style="${d.isToday ? 'color:#fbbf24;font-weight:800;' : ''}">${d.lbl}</div>
+                  </div>`;
+                }).join('')}
+              </div>`
+          }
+        </div>
+      </div>`}
+    `;
+  }
+
+  /* =========================================================================
+     2. ปุ่มกรอง "🛠️ ปิดปรับปรุง" + ผังทางเดิน (ซ้าย-ขวา บันไดหนีไฟ ไม่มีลิฟต์)
+        + แสดงห้องปิดปรับปรุงครบทั้ง 2D / 3D / ผังทางเดิน + แถบเวลานับถอยหลังชั่วคราว
+     ========================================================================= */
+  function ensureMaintenanceFilterPill() {
+    const cleanBtn = document.getElementById('flt-cleaning');
+    if (cleanBtn && !document.getElementById('flt-maintenance')) {
+      const mBtn = document.createElement('button');
+      mBtn.id = 'flt-maintenance';
+      mBtn.className = 'btn';
+      mBtn.style.cssText = 'background:#334155;color:#e2e8f0;border-radius:99px;padding:4px 10px;font-size:11px;font-weight:700;';
+      mBtn.innerHTML = '🛠️ ปิดปรับปรุง (<span id="cnt-maintenance">0</span>)';
+      mBtn.onclick = () => window.setRoomFilter('maintenance');
+      cleanBtn.parentNode.insertBefore(mBtn, cleanBtn.nextSibling);
+    }
+  }
+
+  function buildWowRoomMeta(r, idx, assignedMap, lightAlerts) {
+    const now = Date.now();
+    const isMaint = r.status === 'maintenance';
+    const isOcc = r.status === 'occupied';
+    const isClean = r.status === 'cleaning';
+    const assignedB = assignedMap[idx];
+    const isRes = !isMaint && !isOcc && !isClean && !!assignedB;
+    const lightWarn = lightAlerts.find(a => a.idx === idx);
+
+    let isOverdue = false;
+    let subInfo = '';
+    let progressPct = null;
+    let progressColor = '#38bdf8';
+
+    if (isOcc) {
+      if (r.stayType === 'short' && r.checkInTimestamp) {
+        const passed = Math.floor((now - r.checkInTimestamp) / 60000);
+        const rem = 180 - passed;
+        progressPct = Math.max(0, Math.min(100, Math.round((rem / 180) * 100)));
+        if (rem <= 0) {
+          isOverdue = true;
+          progressPct = 100;
+          progressColor = '#f43f5e';
+          subInfo = `<span style="color:#fda4af;font-weight:900;">🚨 เกินชั่วคราว ${Math.abs(rem)} น.</span>`;
+        } else {
+          if (rem <= 30) progressColor = '#f59e0b';
+          subInfo = `<span style="color:#38bdf8;font-weight:800;">⏱️ เหลือ ${Math.floor(rem / 60)}:${String(rem % 60).padStart(2, '0')} ชม.</span>`;
+        }
+      } else if (r.stayType === 'overnight') {
+        const curDate = new Date();
+        const curH = curDate.getHours();
+        const curM = curDate.getMinutes();
+        if (curH === 11) {
+          subInfo = `<span style="color:#fbbf24;font-weight:800;">⚠️ เตือนเที่ยง (${60 - curM} น.)</span>`;
+        } else if (curH >= 12 && curH < 18) {
+          isOverdue = true;
+          subInfo = `<span style="color:#fda4af;font-weight:900;">🚨 เลทเช็คเอาท์ +฿299</span>`;
+        }
+      }
+      if (!subInfo) {
+        const stayLbl = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'complimentary' ? 'ห้องฟรี' : 'ค้างคืน');
+        subInfo = `${stayLbl}${r.checkInTime ? ' • ' + esc(r.checkInTime) : ''}`;
+      }
+    }
+
+    const dirtyMins = isClean ? calcDirtyMins(r.dirtySince) : null;
+    return { isMaint, isOcc, isClean, isRes, assignedB, isOverdue, subInfo, dirtyMins, lightWarn, progressPct, progressColor };
+  }
+
+  function renderWowRoomCard(r, idx, meta) {
+    const stClass = meta.isMaint ? 'st-maintenance'
+      : (meta.isOcc ? 'st-occupied'
+      : (meta.isClean ? 'st-cleaning'
+      : (meta.isRes ? 'st-reserved' : 'st-vacant')));
+
+    const depBadge = (Number(r.keyDeposit) > 0)
+      ? `<span style="font-size:9px;background:#312e81;color:#c7d2fe;padding:1px 5px;border-radius:4px;margin-left:3px;">🔑฿${r.keyDeposit}</span>`
+      : '';
+    const lightWarnBadge = (!meta.isOcc && !meta.isMaint && meta.lightWarn)
+      ? `<div style="font-size:9.5px;color:#fbbf24;font-weight:800;margin-top:2px;">⚠️ ไฟเปิดค้าง ${meta.lightWarn.mins} น.</div>`
+      : '';
+
+    let footerHtml = '';
+    if (meta.isMaint) {
+      const note = (r.maintenanceNote || '').trim() || 'งดให้บริการชั่วคราว';
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#fbbf24;font-weight:900;font-size:11px;">🛠️ ปิดปรับปรุง</div>
+          <div class="wow-maint-note-pill" style="margin-top:3px;" title="${esc(note)}">🔧 ${esc(note)}</div>
+        </div>
+      `;
+    } else if (meta.isOcc) {
+      const settle = window.getRoomSettlement(r);
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#fda4af;font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">👤 ${esc(r.guestName || 'มีผู้เข้าพัก')}${depBadge}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:1px;">${meta.subInfo}</div>
+          ${meta.progressPct !== null ? `<div class="wow-stay-progress"><div class="wow-stay-progress-fill" style="width:${meta.progressPct}%;background:${meta.progressColor};"></div></div>` : ''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <b style="color:#fbbf24;font-size:13px;">฿${settle.calc.grand}</b>
+          ${settle.shouldDeduct ? `<div style="font-size:9px;color:#6ee7b7;font-weight:800;">ค้าง ฿${settle.netToPay}</div>` : ''}
+        </div>
+      `;
+    } else if (meta.isClean) {
+      const elapsedTxt = meta.dirtyMins !== null ? `⏱️ ${meta.dirtyMins} น.` : esc(r.dirtySince || '');
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#fcd34d;font-weight:800;font-size:11.5px;">🧹 รอแม่บ้าน</div>
+          <div style="font-size:9.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${elapsedTxt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();markRoomCleaned(${idx})" class="btn btn-emerald" style="padding:3px 8px;font-size:10.5px;flex-shrink:0;">✓ เสร็จ</button>
+      `;
+    } else if (meta.isRes) {
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <div style="color:#38bdf8;font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 ${esc(meta.assignedB.guest)}</div>
+          <div style="font-size:9.5px;color:#94a3b8;">จองวันนี้ • ฿${meta.assignedB.rate || 650}${meta.assignedB.deposit > 0 ? ' • มัดจำ ฿' + meta.assignedB.deposit : ''}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();quickCheckInBooking(${idx}, '${esc(meta.assignedB.id)}')" class="btn btn-sky" style="padding:3px 8px;font-size:10.5px;flex-shrink:0;">เช็คอิน</button>
+      `;
+    } else {
+      footerHtml = `
+        <div style="min-width:0;flex:1;">
+          <span style="color:#34d399;font-weight:800;font-size:11.5px;">● พร้อมขาย</span>
+          ${lightWarnBadge}
+        </div>
+        <span style="color:#94a3b8;font-weight:800;font-size:12px;">฿${r.rateOver || r.customRate || state.rates.overnight}</span>
+      `;
+    }
+
+    return `
+      <div onclick="openRoomModal(${idx})" class="pro-room-card ${stClass} ${meta.isOverdue ? 'st-overdue' : ''}">
+        <div class="between" style="margin-bottom:7px;align-items:flex-start;">
+          <div>
+            <div style="font-size:19px;font-weight:900;line-height:1.1;color:#fff;margin-bottom:4px;">${esc(r.number)}</div>
+            ${getBedBadgeHtml(r.type)}
+          </div>
+          ${meta.isMaint
+            ? `<div style="width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,0.16);border:1px solid rgba(245,158,11,0.45);display:flex;align-items:center;justify-content:center;font-size:16px;">🛠️</div>`
+            : `<button type="button" onclick="event.stopPropagation();toggleRoomLight(${idx})" class="pro-lamp-btn ${r.light ? 'on' : 'off'}" title="เปิด/ปิดไฟห้อง ${esc(r.number)}"><span>💡</span><span>${r.light ? 'ON' : 'OFF'}</span></button>`
+          }
+        </div>
+        <div class="between" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:6px;gap:6px;">
+          ${footerHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderWowRoomsUI() {
+    if (isRenderingWowRooms) return;
+    isRenderingWowRooms = true;
+    try {
+      ensureMaintenanceFilterPill();
+      const gridEl = document.getElementById('rooms-grid');
+      if (!gridEl || !state || !Array.isArray(state.rooms)) return;
+
+      const assignedMap = getTodayBookingMap();
+      const lightAlerts = getLightWatchAlerts();
+      const total = state.rooms.length;
+      const maint = state.rooms.filter(r => r.status === 'maintenance').length;
+      const occ = state.rooms.filter(r => r.status === 'occupied').length;
+      const cln = state.rooms.filter(r => r.status === 'cleaning').length;
+      const resToday = Object.keys(assignedMap).length;
+      const sellable = Math.max(0, total - maint);
+      const trueVacant = Math.max(0, sellable - occ - cln - resToday);
+      const occRate = sellable > 0 ? Math.round(((occ + resToday) / sellable) * 100) : 0;
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt('room-total-cnt', total);
+      setTxt('cnt-all', total);
+      setTxt('cnt-vacant', trueVacant);
+      setTxt('cnt-reserved', resToday);
+      setTxt('cnt-occupied', occ);
+      setTxt('cnt-cleaning', cln);
+      setTxt('cnt-maintenance', maint);
+      setTxt('kpi-occ-rate', `${occRate}% (${occ + resToday}/${sellable})`);
+      setTxt('kpi-reserved-today', `${resToday} ห้อง`);
+      setTxt('kpi-ready-cnt', `${trueVacant} ห้อง`);
+      setTxt('kpi-cln-cnt', maint > 0 ? `${cln} เคลียร์ • ${maint} ซ่อม` : `${cln} ห้อง`);
+
+      renderWowExecDashboard();
+
+      ['2d', '3d', 'plan'].forEach(m => {
+        const b = document.getElementById('pro-mode-' + m);
+        if (b) b.classList.toggle('active', wowViewMode === m);
+      });
+      const floorSet = new Set();
+      state.rooms.forEach(r => floorSet.add(getRoomFloorKey(r.number)));
+      const floorsSorted = Array.from(floorSet).sort((a, b) => Number(a) - Number(b));
+      const wrap = document.getElementById('pro-floor-chips-wrap');
+      if (wrap) {
+        let chHtml = `<button type="button" class="pro-floor-chip ${wowFloorFilter === 'all' ? 'active' : ''}" onclick="window.__hotelPro.setFloor('all')">ทุกชั้น (${total})</button>`;
+        floorsSorted.forEach(fk => {
+          chHtml += `<button type="button" class="pro-floor-chip ${wowFloorFilter === fk ? 'active' : ''}" onclick="window.__hotelPro.setFloor('${fk}')">${fk === '0' ? 'อื่นๆ' : 'ชั้น ' + fk}</button>`;
+        });
+        wrap.innerHTML = chHtml;
+      }
+
+      const q = (document.getElementById('room-search')?.value || '').trim().toLowerCase();
+      const entries = [];
+      state.rooms.forEach((r, idx) => {
+        const meta = buildWowRoomMeta(r, idx, assignedMap, lightAlerts);
+        if (roomFilter === 'vacant' && (meta.isOcc || meta.isClean || meta.isRes || meta.isMaint)) return;
+        if (roomFilter === 'reserved' && !meta.isRes) return;
+        if (roomFilter === 'occupied' && !meta.isOcc) return;
+        if (roomFilter === 'cleaning' && !meta.isClean) return;
+        if (roomFilter === 'maintenance' && !meta.isMaint) return;
+
+        const fk = getRoomFloorKey(r.number);
+        if (wowFloorFilter !== 'all' && fk !== wowFloorFilter) return;
+
+        if (q) {
+          const mNum = String(r.number || '').toLowerCase().includes(q);
+          const mGuest = String(r.guestName || '').toLowerCase().includes(q);
+          const mBook = meta.isRes && String(meta.assignedB.guest || '').toLowerCase().includes(q);
+          const mNote = meta.isMaint && String(r.maintenanceNote || '').toLowerCase().includes(q);
+          if (!mNum && !mGuest && !mBook && !mNote) return;
+        }
+        entries.push({ r, idx, meta, fk });
+      });
+
+      gridEl.classList.add('pro-custom-container');
+      gridEl.setAttribute('data-wow-v4', '1');
+
+      if (entries.length === 0) {
+        gridEl.innerHTML = `<div class="card" data-wow-marker="1" style="text-align:center;color:#94a3b8;padding:28px;">ไม่พบห้องพักตามเงื่อนไขที่เลือก</div>`;
+        return;
+      }
+
+      const byFloor = {};
+      entries.forEach(item => {
+        if (!byFloor[item.fk]) byFloor[item.fk] = [];
+        byFloor[item.fk].push(item);
+      });
+      const activeFloors = Object.keys(byFloor).sort((a, b) => Number(a) - Number(b));
+
+      // โหมด 2D แยกชั้น
+      if (wowViewMode === '2d') {
+        gridEl.innerHTML = `<div data-wow-marker="1">` + activeFloors.map(fk => {
+          const list = byFloor[fk];
+          const vacCnt = list.filter(x => !x.meta.isOcc && !x.meta.isClean && !x.meta.isRes && !x.meta.isMaint).length;
+          const occCnt = list.filter(x => x.meta.isOcc).length;
+          const clnCnt = list.filter(x => x.meta.isClean).length;
+          const resCnt = list.filter(x => x.meta.isRes).length;
+          const mntCnt = list.filter(x => x.meta.isMaint).length;
+          return `
+            <div class="pro-floor-section">
+              <div class="pro-floor-header">
+                <div class="pro-floor-badge">
+                  <span class="pro-floor-num-tag">${fk === '0' ? 'โซนพิเศษ' : 'ชั้น ' + fk}</span>
+                  <span>(${list.length} ห้อง)</span>
+                </div>
+                <div style="display:flex;gap:8px;font-size:11px;font-weight:800;flex-wrap:wrap;">
+                  <span style="color:#34d399;">ว่าง ${vacCnt}</span>
+                  <span style="color:#fda4af;">พัก ${occCnt}</span>
+                  ${resCnt > 0 ? `<span style="color:#38bdf8;">จอง ${resCnt}</span>` : ''}
+                  ${clnCnt > 0 ? `<span style="color:#fbbf24;">เคลียร์ ${clnCnt}</span>` : ''}
+                  ${mntCnt > 0 ? `<span style="color:#cbd5e1;">🛠️ ซ่อม ${mntCnt}</span>` : ''}
+                </div>
+              </div>
+              <div class="pro-floor-grid">
+                ${list.map(x => renderWowRoomCard(x.r, x.idx, x.meta)).join('')}
+              </div>
+            </div>
+          `;
+        }).join('') + `</div>`;
+        return;
+      }
+
+      // โหมด 3D Isometric (รองรับห้องปิดปรับปรุง)
+      if (wowViewMode === '3d') {
+        const topDownFloors = [...activeFloors].sort((a, b) => Number(b) - Number(a));
+        const plateTransform = `rotateX(${wow3dTilt}deg) rotateZ(${wow3dRotate}deg)`;
+        gridEl.innerHTML = `<div data-wow-marker="1">
+          <div class="pro-3d-controls">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <b style="color:#38bdf8;font-size:12.5px;">🧊 มุมมองตึก 3D (แตะห้องเพื่อเช็คอิน/ดูอาการซ่อม)</b>
+              <button type="button" onclick="window.__hotelPro.toggle3dExplode()" class="pro-pill-btn ${wow3dExploded ? 'active-amber' : ''}">
+                ${wow3dExploded ? '🔽 ยุบชั้นตึก' : '🔼 กางชั้นตึก 3D'}
+              </button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:#94a3b8;">
+              <label style="display:flex;align-items:center;gap:5px;">เอียง
+                <input type="range" min="0" max="50" value="${wow3dTilt}" oninput="window.__hotelPro.set3dAngle(this.value, null)" style="width:72px;accent-color:#f59e0b;">
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;">หมุน
+                <input type="range" min="-24" max="24" value="${wow3dRotate}" oninput="window.__hotelPro.set3dAngle(null, this.value)" style="width:72px;accent-color:#38bdf8;">
+              </label>
+            </div>
+          </div>
+          <div class="pro-3d-stage ${wow3dExploded ? 'exploded' : ''}">
+            ${topDownFloors.map(fk => {
+              const list = byFloor[fk];
+              const litCnt = list.filter(x => x.r.light).length;
+              const occCnt = list.filter(x => x.meta.isOcc).length;
+              const mntCnt = list.filter(x => x.meta.isMaint).length;
+              return `
+                <div class="pro-3d-floor-plate" style="transform:${plateTransform};">
+                  <div class="pro-3d-floor-label">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <span class="pro-floor-num-tag">${fk === '0' ? 'F0' : 'ชั้น ' + fk}</span>
+                      <span style="font-size:11.5px;font-weight:800;color:#e2e8f0;">พัก ${occCnt}/${list.length - mntCnt}</span>
+                      ${mntCnt > 0 ? `<span style="font-size:10.5px;color:#fbbf24;font-weight:800;">• 🛠️ ${mntCnt}</span>` : ''}
+                    </div>
+                    <span style="font-size:11px;color:#fbbf24;font-weight:800;">💡 เปิดไฟ ${litCnt} ห้อง</span>
+                  </div>
+                  <div class="pro-3d-room-grid">
+                    ${list.map(x => {
+                      const cls = x.meta.isMaint ? 'c-maintenance'
+                        : (x.meta.isOcc ? 'c-occupied'
+                        : (x.meta.isClean ? 'c-cleaning'
+                        : (x.meta.isRes ? 'c-reserved' : 'c-vacant')));
+                      const bedIcon = x.meta.isMaint ? '🛠️' : (String(x.r.type || '').includes('Twin') ? '🛏️🛏️' : (String(x.r.type || '').includes('VIP') ? '👑' : '🛏️'));
+                      const shortTag = x.meta.isMaint
+                        ? esc((x.r.maintenanceNote || 'ปิดซ่อม').slice(0, 8))
+                        : (x.meta.isOcc ? esc((x.r.guestName || 'พักอยู่').slice(0, 7))
+                        : (x.meta.isClean ? 'เคลียร์'
+                        : (x.meta.isRes ? 'จอง' : '฿' + (x.r.rateOver || x.r.customRate || 650))));
+                      return `
+                        <div onclick="openRoomModal(${x.idx})" class="pro-3d-cube ${cls} ${(!x.meta.isMaint && x.r.light) ? 'lit-room' : ''}">
+                          <div style="font-size:14px;font-weight:900;color:#fff;">${esc(x.r.number)}</div>
+                          <div style="font-size:9px;opacity:0.95;">${bedIcon}</div>
+                          <div style="font-size:9.5px;font-weight:800;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${shortTag}</div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>`;
+        return;
+      }
+
+      // โหมดผังทางเดิน (ซ้าย-ขวา เป็นบันไดหนีไฟ ไม่มีลิฟต์)
+      if (wowViewMode === 'plan') {
+        gridEl.innerHTML = `<div data-wow-marker="1">` + activeFloors.map(fk => {
+          const list = byFloor[fk];
+          const leftWing = [];
+          const rightWing = [];
+          list.forEach((x, i) => {
+            const numVal = parseInt(String(x.r.number).replace(/\D/g, ''), 10);
+            if (!isNaN(numVal)) {
+              if (numVal % 2 === 1) leftWing.push(x);
+              else rightWing.push(x);
+            } else {
+              if (i % 2 === 0) leftWing.push(x);
+              else rightWing.push(x);
+            }
+          });
+          return `
+            <div class="pro-corridor-wrap">
+              <div class="pro-floor-header">
+                <div class="pro-floor-badge">
+                  <span class="pro-floor-num-tag">${fk === '0' ? 'โซนพิเศษ' : 'ผังชั้น ' + fk}</span>
+                  <span style="font-size:11.5px;color:#94a3b8;">${leftWing.length > 0 && rightWing.length > 0 ? 'ฝั่งเลขคี่ ↔ ฝั่งเลขคู่' : 'โถงทางเดินชั้น ' + fk}</span>
+                </div>
+              </div>
+              ${leftWing.length > 0 ? `<div class="pro-corridor-wing">${leftWing.map(x => renderWowRoomCard(x.r, x.idx, x.meta)).join('')}</div>` : ''}
+              <div class="pro-hallway-bar">
+                <span>🚪 บันไดหนีไฟ</span>
+                <span>━━ โถงทางเดิน ชั้น ${fk} ━━</span>
+                <span>🚪 บันไดหนีไฟ</span>
+              </div>
+              ${rightWing.length > 0 ? `<div class="pro-corridor-wing">${rightWing.map(x => renderWowRoomCard(x.r, x.idx, x.meta)).join('')}</div>` : ''}
+            </div>
+          `;
+        }).join('') + `</div>`;
+      }
+    } finally {
+      isRenderingWowRooms = false;
+    }
+  }
+
+  /* =========================================================================
+     3. ตั้งค่าโรงแรม: จัดการห้อง "ปิดปรับปรุง" + ระบุอาการเสีย
+        + แถบจัดการปิดปรับปรุงในหน้าต่างห้องพัก (Room Modal Tab 1)
+     ========================================================================= */
+  window.toggleRoomMaintenanceInSettings = function(i) {
+    const r = state.rooms[i];
+    if (!r) return;
+    if (r.status === 'occupied') {
+      alert(`⚠️ ห้อง ${r.number} มีผู้เข้าพักอยู่ กรุณาเช็คเอาท์หรือย้ายห้องลูกค้าก่อนสั่งปิดปรับปรุงครับ`);
+      return;
+    }
+    if (r.status === 'maintenance') {
+      r.status = 'vacant';
+      r.maintenanceNote = '';
+      showToast(`เปิดใช้งานห้อง ${r.number} กลับมาพร้อมขายแล้ว`);
+    } else {
+      r.status = 'maintenance';
+      r.light = false;
+      if (!r.maintenanceNote) r.maintenanceNote = 'รอตรวจเช็ก/ซ่อมบำรุง';
+      showToast(`ตั้งค่าห้อง ${r.number} เป็น "ปิดปรับปรุง" แล้ว`);
+    }
+    saveDatabase();
+    renderSettingsMenuAndRooms();
+    renderRooms();
+  };
+
+  window.updateRoomMaintenanceNoteInSettings = function(i, val) {
+    const r = state.rooms[i];
+    if (!r) return;
+    r.maintenanceNote = String(val || '').trim();
+    saveDatabase();
+    renderRooms();
+  };
+
+  function ensureRoomModalMaintenanceBanner() {
+    const tab1 = document.getElementById('rcontent-1');
+    if (!tab1 || document.getElementById('m-maint-banner')) return;
+    const html = `
+      <div id="m-maint-banner" class="subcard hidden" style="background:rgba(120,53,15,0.28);border:1.5px dashed #f59e0b;margin-bottom:10px;">
+        <div class="between" style="margin-bottom:6px;">
+          <b style="color:#fbbf24;font-size:13px;">🛠️ ห้องนี้อยู่ระหว่างปิดปรับปรุง (งดขาย)</b>
+          <button type="button" onclick="window.__hotelWow.finishRoomMaintenance()" class="btn btn-emerald" style="padding:5px 10px;font-size:11px;">✅ ซ่อมเสร็จแล้ว (เปิดขาย)</button>
+        </div>
+        <input type="text" id="m-maint-note-input" placeholder="ระบุอาการเสีย เช่น แอร์เสีย, น้ำรั่ว..." oninput="window.__hotelWow.saveRoomMaintNoteModal(this.value)" style="border-color:#f59e0b;color:#fde68a;">
+      </div>
+    `;
+    tab1.insertAdjacentHTML('afterbegin', html);
+
+    const clearBtn = tab1.querySelector('button[onclick="clearRoomToVacant()"]');
+    if (clearBtn && !document.getElementById('m-btn-mark-maint')) {
+      const mBtn = document.createElement('button');
+      mBtn.id = 'm-btn-mark-maint';
+      mBtn.type = 'button';
+      mBtn.className = 'btn btn-dark';
+      mBtn.style.cssText = 'padding:12px;color:#fbbf24;border-color:#f59e0b;';
+      mBtn.textContent = '🛠️ ปิดปรับปรุง';
+      mBtn.onclick = () => window.__hotelWow.markRoomMaintenanceFromModal();
+      clearBtn.parentNode.insertBefore(mBtn, clearBtn.nextSibling);
+    }
+
+    const depInp = document.getElementById('m-key-deposit');
+    if (depInp && depInp.previousElementSibling) {
+      depInp.previousElementSibling.textContent = '🔑 เงินมัดจำ (จอง/กุญแจ)';
+    }
+  }
+
+  /* =========================================================================
+     4. หักเงินมัดจำตอนเคลียร์เงิน & แสดงยอดต้องชำระเพิ่ม (Tab 3 + Receipt + QR + 58mm + CFD)
+     ========================================================================= */
+  function upgradeDepositBoxUI() {
+    const depBox = document.getElementById('m-deposit-warn-box');
+    if (!depBox || document.getElementById('m-deduct-deposit-chk')) return;
+    depBox.innerHTML = `
+      <div class="between" style="margin-bottom:6px;">
+        <div style="color:#c7d2fe;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">
+          <span>🔑 เงินมัดจำที่เก็บไว้แล้ว:</span>
+          <b id="m-deposit-warn-amt" style="color:#a5b4fc;font-size:16px;">฿0</b>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:800;color:#6ee7b7;">
+          <input type="checkbox" id="m-deduct-deposit-chk" onchange="window.__hotelWow.toggleDeductDeposit()" style="width:16px;height:16px;accent-color:#10b981;">
+          หักมัดจำออกจากยอดบิล
+        </label>
+      </div>
+      <div id="m-deposit-settlement-summary" style="background:rgba(3,7,18,0.65);border:1px solid rgba(99,102,241,0.45);border-radius:10px;padding:8px 10px;font-size:12px;"></div>
+    `;
+  }
+
+  function ensureReceiptDepositRows() {
+    const rcpGrandEl = document.getElementById('rcp-grand');
+    if (!rcpGrandEl || document.getElementById('rcp-dep-deduct-row')) return;
+    const grandRow = rcpGrandEl.closest('.between');
+    if (!grandRow) return;
+    grandRow.insertAdjacentHTML('afterend', `
+      <div id="rcp-dep-deduct-row" class="between" style="display:none;color:#047857;font-weight:700;margin-top:3px;">
+        <span>หักเงินมัดจำที่ชำระไว้:</span><span id="rcp-dep-deduct">-฿0.00</span>
+      </div>
+      <div id="rcp-balance-row" class="between" style="display:none;font-size:16px;font-weight:900;border-top:1.5px solid #000;margin-top:4px;padding-top:4px;">
+        <span id="rcp-balance-lbl">ยอดต้องชำระเพิ่ม:</span><span id="rcp-balance-val">฿0.00</span>
+      </div>
+    `);
+  }
+
+  function refreshDepositSettlementUI() {
+    upgradeDepositBoxUI();
+    ensureReceiptDepositRows();
+    if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+    const r = state.rooms[activeRoomIndex];
+    const settle = window.getRoomSettlement(r);
+
+    const depBox = document.getElementById('m-deposit-warn-box');
+    const depAmt = document.getElementById('m-deposit-warn-amt');
+    const chk = document.getElementById('m-deduct-deposit-chk');
+    const sumBox = document.getElementById('m-deposit-settlement-summary');
+
+    if (depBox && depAmt && chk && sumBox) {
+      if (settle.deposit > 0) {
+        depBox.classList.remove('hidden');
+        depAmt.textContent = '฿' + settle.deposit.toLocaleString();
+        chk.checked = settle.shouldDeduct;
+
+        if (settle.shouldDeduct) {
+          if (settle.refundDue > 0) {
+            sumBox.innerHTML = `
+              <div class="between"><span>ยอดรวมทั้งหมด:</span><b>฿${settle.calc.grand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b></div>
+              <div class="between" style="color:#6ee7b7;"><span>หักเงินมัดจำ:</span><b>-฿${settle.deposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b></div>
+              <div class="between" style="margin-top:5px;padding-top:5px;border-top:1px dashed #475569;font-size:14px;color:#fbbf24;">
+                <b>💵 มัดจำเกินบิล • ต้องคืนลูกค้า:</b><b>฿${settle.refundDue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b>
+              </div>
+            `;
+          } else {
+            sumBox.innerHTML = `
+              <div class="between"><span>ยอดรวมทั้งหมด:</span><b>฿${settle.calc.grand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b></div>
+              <div class="between" style="color:#6ee7b7;"><span>หักเงินมัดจำ:</span><b>-฿${settle.deposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b></div>
+              <div class="between" style="margin-top:5px;padding-top:5px;border-top:1px dashed #475569;font-size:14px;color:#34d399;">
+                <b>💳 ยอดต้องชำระเพิ่มสุทธิ:</b><b>฿${settle.netToPay.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b>
+              </div>
+            `;
+          }
+        } else {
+          sumBox.innerHTML = `<div style="color:#cbd5e1;">ไม่ได้หักมัดจำในบิล • ลูกค้าชำระเต็ม <b>฿${settle.calc.grand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b> (คืนเงินสดมัดจำ ฿${settle.deposit.toLocaleString()} แยกต่างหาก)</div>`;
+        }
+      } else {
+        depBox.classList.add('hidden');
+      }
+    }
+
+    const depRow = document.getElementById('rcp-dep-deduct-row');
+    const balRow = document.getElementById('rcp-balance-row');
+    if (depRow && balRow) {
+      if (settle.shouldDeduct) {
+        depRow.style.display = 'flex';
+        document.getElementById('rcp-dep-deduct').textContent = '-฿' + settle.depositDeducted.toFixed(2);
+        balRow.style.display = 'flex';
+        if (settle.refundDue > 0) {
+          document.getElementById('rcp-balance-lbl').textContent = 'เงินทอนคืนลูกค้า:';
+          document.getElementById('rcp-balance-val').textContent = '฿' + settle.refundDue.toFixed(2);
+        } else {
+          document.getElementById('rcp-balance-lbl').textContent = 'ยอดต้องชำระเพิ่ม:';
+          document.getElementById('rcp-balance-val').textContent = '฿' + settle.netToPay.toFixed(2);
+        }
+        document.getElementById('rcp-qr-amount').textContent = settle.refundDue > 0
+          ? 'ชำระครบแล้ว (คืนลูกค้า ฿' + settle.refundDue.toFixed(2) + ')'
+          : 'ยอดโอนชำระเพิ่ม: ฿' + settle.netToPay.toFixed(2);
+        if (typeof renderQrElement === 'function') {
+          renderQrElement('rcp-qr-box', 140, settle.netToPay);
+        }
+      } else {
+        depRow.style.display = 'none';
+        balRow.style.display = 'none';
+      }
+    }
+  }
+
+  /* =========================================================================
+     5. ช่องระบุวันที่สำหรับ "รายรับ / รายจ่าย"
+     ========================================================================= */
+  function upgradeFinanceFormWithDate() {
+    const catEl = document.getElementById('tx-cat');
+    if (!catEl || document.getElementById('tx-date')) return;
+    const formGrid = catEl.closest('.grid-3');
+    if (!formGrid) return;
+
+    formGrid.classList.remove('grid-3');
+    formGrid.classList.add('wow-tx-grid-4');
+
+    const dateDiv = document.createElement('div');
+    dateDiv.innerHTML = `
+      <div style="font-size:11px;color:#38bdf8;margin-bottom:3px;font-weight:700;">📅 วันที่ทำรายการ</div>
+      <input type="date" id="tx-date" value="${localDateISO(0)}" style="color:#38bdf8;font-weight:800;border-color:#0284c7;">
+    `;
+    formGrid.insertBefore(dateDiv, formGrid.firstChild);
+  }
+
+  /* =========================================================================
+     PUBLIC CONTROLLER
+     ========================================================================= */
+  window.__hotelWow = {
+    toggleExecDash() {
+      execCollapsed = !execCollapsed;
+      try { localStorage.setItem(EXEC_COLLAPSE_KEY, String(execCollapsed)); } catch (e) {}
+      renderWowExecDashboard();
+    },
+    toggleDeductDeposit() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const chk = document.getElementById('m-deduct-deposit-chk');
+      state.rooms[activeRoomIndex].deductDeposit = chk ? chk.checked : true;
+      saveDatabase();
+      updateReceiptPreview();
+      renderRooms();
+    },
+    markRoomMaintenanceFromModal() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const r = state.rooms[activeRoomIndex];
+      if (r.status === 'occupied') {
+        alert(`⚠️ ห้อง ${r.number} มีผู้เข้าพักอยู่ กรุณาเช็คเอาท์หรือย้ายห้องก่อนสั่งปิดปรับปรุงครับ`);
+        return;
+      }
+      const note = prompt(`🛠️ ระบุอาการเสีย / สาเหตุที่ปิดปรับปรุงห้อง ${r.number}:`, r.maintenanceNote || 'แอร์เสีย');
+      if (note === null) return;
+      r.status = 'maintenance';
+      r.light = false;
+      r.maintenanceNote = note.trim() || 'อยู่ระหว่างซ่อมบำรุง';
+      saveDatabase();
+      closeRoomModal();
+      renderAll();
+      showToast(`ปิดปรับปรุงห้อง ${r.number} (${r.maintenanceNote})`);
+    },
+    finishRoomMaintenance() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const r = state.rooms[activeRoomIndex];
+      r.status = 'vacant';
+      r.maintenanceNote = '';
+      saveDatabase();
+      closeRoomModal();
+      renderAll();
+      showToast(`✅ ห้อง ${r.number} ซ่อมเสร็จพร้อมเปิดขายแล้ว`);
+    },
+    saveRoomMaintNoteModal(val) {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      state.rooms[activeRoomIndex].maintenanceNote = String(val || '').trim();
+      saveDatabase();
+      renderRooms();
+    }
+  };
+
+  /* =========================================================================
+     6. BOOT & HOOKS (รันหลังระบบเดิมทั้งหมดเซ็ตอัพเสร็จ)
+     ========================================================================= */
+  function bootWowExecutiveV4() {
+    ensureMaintenanceFilterPill();
+    ensureRoomModalMaintenanceBanner();
+    upgradeDepositBoxUI();
+    ensureReceiptDepositRows();
+    upgradeFinanceFormWithDate();
+
+    window.setRoomFilter = function(f) {
+      roomFilter = f;
+      ['all', 'vacant', 'reserved', 'occupied', 'cleaning', 'maintenance'].forEach(k => {
+        const el = document.getElementById('flt-' + k);
+        if (el) el.style.border = (k === f) ? '2px solid #fff' : 'none';
+      });
+      renderRooms();
+    };
+
+    window.getAvailableRoomsOnDate = function(targetDateStr, roomType) {
+      const allRoomsOfType = (state.rooms || []).filter(r => r.status !== 'maintenance' && (!roomType || r.type === roomType));
+      const totalCount = allRoomsOfType.length;
+      const todayStr = localDateISO(0);
+      let occupiedNow = 0;
+      if (targetDateStr === todayStr) {
+        occupiedNow = allRoomsOfType.filter(r => r.status === 'occupied' || r.status === 'cleaning').length;
+      }
+      const bookings = state.reservations || [];
+      let bookedCount = 0;
+      bookings.forEach(b => {
+        if (b.status === 'cancelled') return;
+        if (roomType && b.roomType !== roomType) return;
+        if (targetDateStr >= b.checkIn && targetDateStr < b.checkOut) {
+          bookedCount += (Number(b.qty) || 1);
+        }
+      });
+      const totalOccupied = Math.max(occupiedNow, bookedCount);
+      return { total: totalCount, booked: totalOccupied, available: Math.max(0, totalCount - totalOccupied) };
+    };
+
+    if (window.__hotelPro) {
+      window.__hotelPro.setMode = function(mode) {
+        wowViewMode = mode;
+        try { localStorage.setItem(UI_MODE_KEY, mode); } catch (e) {}
+        renderWowRoomsUI();
+      };
+      window.__hotelPro.setFloor = function(fk) {
+        wowFloorFilter = fk;
+        try { localStorage.setItem(FLOOR_FLT_KEY, fk); } catch (e) {}
+        renderWowRoomsUI();
+      };
+      window.__hotelPro.toggle3dExplode = function() {
+        wow3dExploded = !wow3dExploded;
+        renderWowRoomsUI();
+      };
+      window.__hotelPro.set3dAngle = function(tilt, rot) {
+        if (tilt !== null) wow3dTilt = Number(tilt);
+        if (rot !== null) wow3dRotate = Number(rot);
+        document.querySelectorAll('.pro-3d-floor-plate').forEach(el => {
+          el.style.transform = `rotateX(${wow3dTilt}deg) rotateZ(${wow3dRotate}deg)`;
+        });
+      };
+    }
+
+    const _prevRenderRooms = window.renderRooms;
+    window.renderRooms = function() {
+      if (_prevRenderRooms) _prevRenderRooms.apply(this, arguments);
+      renderWowRoomsUI();
+    };
+
+    const gridEl = document.getElementById('rooms-grid');
+    if (gridEl && 'MutationObserver' in window) {
+      const obs = new MutationObserver(() => {
+        if (!isRenderingWowRooms && !gridEl.querySelector('[data-wow-marker="1"]')) {
+          renderWowRoomsUI();
+        }
+      });
+      obs.observe(gridEl, { childList: true });
+    }
+
+    window.renderSettingsMenuAndRooms = function() {
+      const menuBox = document.getElementById('set-menu-list');
+      if (menuBox) {
+        menuBox.innerHTML = (state.menu || []).map((m, i) => `
+          <div class="between" style="background:#090d16;padding:8px 12px;border-radius:10px;border:1px solid #334155;">
+            <span style="font-weight:bold;">${esc(m.name)} <span style="color:var(--amber);">(฿${m.price})</span></span>
+            <button onclick="state.menu.splice(${i},1);saveDatabase();renderSettingsMenuAndRooms();" class="btn btn-rose" style="padding:4px 10px;">ลบ</button>
+          </div>
+        `).join('');
+      }
+
+      const roomsBox = document.getElementById('set-rooms-list');
+      if (!roomsBox) return;
+      const maintCount = (state.rooms || []).filter(r => r.status === 'maintenance').length;
+      const summaryHtml = maintCount > 0
+        ? `<div style="background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.45);color:#fde68a;border-radius:10px;padding:7px 10px;font-size:11.5px;font-weight:800;">🛠️ ขณะนี้มีห้องปิดปรับปรุงอยู่ทั้งหมด ${maintCount} ห้อง (ระบบจะงดขายห้องเหล่านี้อัตโนมัติ)</div>`
+        : `<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;">✅ ห้องพักทั้งหมดพร้อมใช้งาน (แตะปุ่ม "🛠️ ปิดปรับปรุง" ด้านหลังห้องเพื่อแจ้งซ่อมและระบุอาการเสียได้)</div>`;
+
+      roomsBox.innerHTML = summaryHtml + (state.rooms || []).map((r, i) => {
+        const isMaint = r.status === 'maintenance';
+        return `
+        <div style="background:${isMaint ? 'rgba(120,53,15,0.22)' : '#090d16'};padding:10px;border-radius:12px;border:1px solid ${isMaint ? '#f59e0b' : '#334155'};display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:6px;flex:1;min-width:250px;align-items:center;flex-wrap:wrap;">
+              <span style="font-size:11px;color:var(--muted);">ห้อง:</span>
+              <input type="text" value="${esc(r.number)}" onchange="state.rooms[${i}].number=this.value.trim();saveDatabase();renderRooms();" style="width:54px;font-weight:900;text-align:center;padding:5px;background:var(--card);border:1px solid #1f2937;color:#fff;border-radius:6px;">
+              <select onchange="state.rooms[${i}].type=this.value;saveDatabase();renderRooms();" style="width:98px;padding:5px;background:var(--card);border:1px solid #1f2937;color:#6ee7b7;font-weight:bold;border-radius:6px;font-size:11px;">
+                <option value="Single Bed" ${r.type === 'Single Bed' ? 'selected' : ''}>Single Bed</option>
+                <option value="Double Bed" ${r.type === 'Double Bed' ? 'selected' : ''}>Double Bed</option>
+                <option value="Twin Bed" ${r.type === 'Twin Bed' ? 'selected' : ''}>Twin Bed</option>
+                <option value="VIP Suite" ${r.type === 'VIP Suite' ? 'selected' : ''}>VIP Suite</option>
+              </select>
+              <span style="font-size:11px;color:var(--muted);">ชั่วคราว:</span>
+              <input type="number" value="${r.rateShort || state.rates.short}" onchange="state.rooms[${i}].rateShort=Number(this.value)||0;saveDatabase();renderRooms();" style="width:62px;font-weight:900;text-align:right;padding:5px;background:var(--card);border:1px solid #1f2937;color:#38bdf8;border-radius:6px;">
+              <span style="font-size:11px;color:var(--muted);">ค้างคืน:</span>
+              <input type="number" value="${r.rateOver || r.customRate || state.rates.overnight}" onchange="const v=Number(this.value)||0;state.rooms[${i}].rateOver=v;state.rooms[${i}].customRate=v;saveDatabase();renderRooms();" style="width:62px;font-weight:900;text-align:right;padding:5px;background:var(--card);border:1px solid #1f2937;color:var(--amber);border-radius:6px;">
+            </div>
+            <div style="display:flex;gap:5px;align-items:center;">
+              <button type="button" onclick="toggleRoomMaintenanceInSettings(${i})" class="btn" style="padding:5px 9px;font-size:11px;${isMaint ? 'background:#10b981;color:#fff;' : 'background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);'}">
+                ${isMaint ? '✅ เปิดขายห้องนี้' : '🛠️ ปิดปรับปรุง'}
+              </button>
+              <button type="button" onclick="if(confirm('ลบห้อง ${esc(r.number)}?')){state.rooms.splice(${i},1);saveDatabase();renderSettingsMenuAndRooms();renderRooms();}" style="background:rgba(244,63,94,0.2);color:#fda4af;border-radius:8px;padding:5px 9px;font-weight:bold;border:1px solid rgba(244,63,94,0.4);font-size:11px;">ลบ</button>
+            </div>
+          </div>
+          ${isMaint ? `
+          <div style="display:flex;align-items:center;gap:6px;padding-top:4px;border-top:1px dashed rgba(245,158,11,0.35);">
+            <span style="font-size:11px;color:#fbbf24;font-weight:800;white-space:nowrap;">🔧 อาการเสีย:</span>
+            <input type="text" value="${esc(r.maintenanceNote || '')}" placeholder="ระบุสิ่งที่เสีย เช่น แอร์ไม่เย็น, ท่อน้ำรั่ว, กำลังทาสี..." onchange="updateRoomMaintenanceNoteInSettings(${i}, this.value)" style="flex:1;padding:6px 9px;font-size:12px;background:#030712;border:1px solid #f59e0b;color:#fde68a;border-radius:8px;">
+          </div>` : ''}
+        </div>`;
+      }).join('');
+    };
+
+    const _prevOpenModal = window.openRoomModal;
+    window.openRoomModal = function(idx) {
+      if (_prevOpenModal) _prevOpenModal.apply(this, arguments);
+      ensureRoomModalMaintenanceBanner();
+      const r = state.rooms[idx];
+      const banner = document.getElementById('m-maint-banner');
+      const noteInp = document.getElementById('m-maint-note-input');
+      const markBtn = document.getElementById('m-btn-mark-maint');
+      if (banner && r) {
+        if (r.status === 'maintenance') {
+          banner.classList.remove('hidden');
+          if (noteInp) noteInp.value = r.maintenanceNote || '';
+          if (markBtn) markBtn.classList.add('hidden');
+        } else {
+          banner.classList.add('hidden');
+          if (markBtn) markBtn.classList.toggle('hidden', r.status === 'occupied');
+        }
+      }
+    };
+
+    const _prevQuickCI = window.quickCheckInBooking;
+    window.quickCheckInBooking = function(roomIdx, bookingId) {
+      const b = (state.reservations || []).find(x => x.id === bookingId);
+      const origQty = b ? Math.max(1, Number(b.qty) || 1) : 1;
+      const origDep = b ? (Number(b.deposit) || 0) : 0;
+      if (_prevQuickCI) _prevQuickCI.apply(this, arguments);
+      const r = state.rooms[roomIdx];
+      if (r && r.status === 'occupied' && origDep > 0) {
+        const perRoomDep = Math.round(origDep / origQty);
+        r.keyDeposit = perRoomDep;
+        r.deductDeposit = true;
+        if (b && b.qty >= 1 && b.status === 'confirmed') {
+          b.deposit = Math.max(0, origDep - perRoomDep);
+        }
+        saveDatabase();
+        renderAll();
+      }
+    };
+
+    const _prevSwitchTab = window.switchRoomTab;
+    window.switchRoomTab = function(n) {
+      if (_prevSwitchTab) _prevSwitchTab.apply(this, arguments);
+      if (n === 3) refreshDepositSettlementUI();
+    };
+
+    const _prevUpdateReceipt = window.updateReceiptPreview;
+    window.updateReceiptPreview = function() {
+      if (_prevUpdateReceipt) _prevUpdateReceipt.apply(this, arguments);
+      refreshDepositSettlementUI();
+    };
+
+    window.openBigQrModal = function() {
+      if (activeRoomIndex === null) return;
+      const r = state.rooms[activeRoomIndex];
+      const settle = window.getRoomSettlement(r);
+      const qrAmt = settle.shouldDeduct ? settle.netToPay : settle.calc.grand;
+      document.getElementById('big-qr-amt').textContent = settle.shouldDeduct
+        ? (settle.refundDue > 0 ? 'ชำระครบแล้ว (คืน ฿' + settle.refundDue.toFixed(2) + ')' : 'ยอดโอนชำระเพิ่ม ฿' + qrAmt.toFixed(2))
+        : 'ยอดโอน ฿' + qrAmt.toFixed(2);
+      document.getElementById('big-qr-acc').textContent = state.payment.mode === 'bank'
+        ? `${state.payment.bankName} เลขบัญชี: ${state.payment.bankAcc || '-'}`
+        : `พร้อมเพย์: ${state.payment.promptPayId} (${state.payment.promptPayName})`;
+      renderQrElement('big-qr-box', 200, qrAmt);
+      document.getElementById('big-qr-modal').classList.remove('hidden');
+    };
+
+    window.pushCurrentRoomToCustomerDisplay = function(showNotice = false) {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const r = state.rooms[activeRoomIndex];
+      const settle = window.getRoomSettlement(r);
+      const calc = settle.calc;
+      const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : (r.stayType === 'complimentary' ? 'อภินันทนาการ' : 'ค้างคืน'));
+
+      const items = [{ label: `ค่าห้องพัก (${stayLabel} x${r.nights || 1})`, amount: '฿' + calc.roomCost.toFixed(0) }];
+      if (calc.elecCost > 0) items.push({ label: `ค่าไฟฟ้า (${calc.elecUnits} หน่วย)`, amount: '฿' + calc.elecCost.toFixed(0) });
+      if (calc.waterCost > 0) items.push({ label: `ค่าน้ำประปา (${calc.waterUnits} หน่วย)`, amount: '฿' + calc.waterCost.toFixed(0) });
+      if (calc.lateCost > 0) items.push({ label: 'ค่าเลทเช็คเอาท์ (เกินเที่ยง)', amount: '฿' + calc.lateCost.toFixed(0) });
+      (r.orders || []).forEach(o => items.push({ label: `${o.name} (x${o.qty})`, amount: '฿' + (o.price * o.qty).toFixed(0) }));
+      if (settle.shouldDeduct) {
+        items.push({ label: 'หักเงินมัดจำที่ชำระไว้แล้ว', amount: '-฿' + settle.depositDeducted.toFixed(0) });
+      }
+
+      const preVat = (r.vatEnabled && r.vatMode === 'include') ? (calc.grand - calc.vat) : calc.subtotal;
+      const payNow = settle.shouldDeduct ? settle.netToPay : calc.grand;
+      const isBank = state.payment.mode === 'bank';
+      const qrPayload = isBank ? '' : buildPromptPayPayload(state.payment.promptPayId || '0847177566', payNow);
+
+      pushCustomerDisplayPacket({
+        status: 'billing',
+        hotelNameTh: (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล',
+        hotelNameEn: (state.hotelInfo && state.hotelInfo.nameEn) || 'PHUBESTH INTER HOTEL',
+        roomNumber: r.number,
+        roomType: r.type,
+        guestName: r.guestName || 'ลูกค้าทั่วไป',
+        items: items,
+        subtotal: Number(preVat.toFixed(2)),
+        discount: Number(r.discount || 0),
+        vatEnabled: !!r.vatEnabled,
+        vat: Number(calc.vat.toFixed(2)),
+        grand: Number(payNow.toFixed(2)),
+        paymentMode: state.payment.mode || 'promptpay',
+        qrPayload: qrPayload,
+        bankQrImage: (isBank && state.payment.bankQrImage) ? state.payment.bankQrImage : '',
+        qrTitle: settle.shouldDeduct ? 'สแกนชำระยอดคงเหลือ (หักมัดจำแล้ว)' : (isBank ? 'สแกนโอนเข้าบัญชีธนาคาร' : 'สแกนชำระเงินผ่าน Thai QR พร้อมเพย์'),
+        qrAcc: isBank
+          ? `${state.payment.bankName} ${state.payment.bankAcc || ''} (${state.payment.promptPayName || ''})`
+          : `${state.payment.promptPayName || ''} (${state.payment.promptPayId || ''})`
+      });
+      if (showNotice) showToast('📺 ส่งยอดห้อง ' + r.number + ' ขึ้นจอลูกค้าแล้ว!');
+    };
+
+    const _prevCheckout = window.completeCheckOutAndPay;
+    window.completeCheckOutAndPay = function() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const r = state.rooms[activeRoomIndex];
+      const settle = window.getRoomSettlement(r);
+
+      if (settle.shouldDeduct) {
+        const msg = settle.refundDue > 0
+          ? `🧾 สรุปเคลียร์เงินห้อง ${r.number}\n• ยอดรวมทั้งหมด: ฿${settle.calc.grand.toFixed(2)}\n• หักมัดจำไว้แล้ว: -฿${settle.deposit.toFixed(2)}\n• 💵 ต้องคืนเงินส่วนต่างให้ลูกค้า: ฿${settle.refundDue.toFixed(2)}\n\nกด OK เพื่อยืนยันเช็คเอาท์ครับ`
+          : `🧾 สรุปเคลียร์เงินห้อง ${r.number}\n• ยอดรวมทั้งหมด: ฿${settle.calc.grand.toFixed(2)}\n• หักมัดจำไว้แล้ว: -฿${settle.deposit.toFixed(2)}\n• 💳 ยอดต้องเก็บเพิ่มจากลูกค้า: ฿${settle.netToPay.toFixed(2)}\n\nกด OK เพื่อยืนยันเช็คเอาท์ครับ`;
+        if (!confirm(msg)) return;
+        r.keyDeposit = 0;
+      }
+
+      const prevTxLen = (state.transactions || []).length;
+      const prevRcpLen = (state.receiptsArchive || []).length;
+      if (_prevCheckout) _prevCheckout.apply(this, arguments);
+
+      if (settle.shouldDeduct) {
+        if ((state.receiptsArchive || []).length > prevRcpLen && state.receiptsArchive[0]) {
+          state.receiptsArchive[0].depositDeducted = settle.depositDeducted;
+          state.receiptsArchive[0].netToPay = settle.netToPay;
+          state.receiptsArchive[0].refundDue = settle.refundDue;
+        }
+        if ((state.transactions || []).length > prevTxLen && state.transactions[0]) {
+          const noteTxt = settle.refundDue > 0
+            ? ` [หักมัดจำ ฿${settle.depositDeducted} • คืน ฿${settle.refundDue}]`
+            : ` [หักมัดจำ ฿${settle.depositDeducted} • รับเพิ่ม ฿${settle.netToPay}]`;
+          state.transactions[0].title += noteTxt;
+        }
+        r.deductDeposit = true;
+        saveDatabase();
+        renderAll();
+      }
+    };
+
+    const _prevBuildRaster = window.buildOcpp58mmRasterBytes;
+    window.buildOcpp58mmRasterBytes = async function(customReceipt = null) {
+      let r, settle, dateStr, titleSuffix = '';
+      if (customReceipt) {
+        r = {
+          number: customReceipt.roomNumber,
+          type: customReceipt.roomType,
+          guestName: customReceipt.guestName,
+          guestTax: customReceipt.guestTax,
+          stayType: customReceipt.stayType,
+          nights: customReceipt.nights || 1,
+          orders: customReceipt.orders || [],
+          discount: customReceipt.discount || 0,
+          vatEnabled: !!customReceipt.vatEnabled,
+          keyDeposit: Number(customReceipt.depositDeducted) || 0,
+          deductDeposit: Number(customReceipt.depositDeducted) > 0
+        };
+        const calc = customReceipt.calc || { roomCost: 0, elecUnits: 0, elecCost: 0, waterUnits: 0, waterCost: 0, lateCost: 0, subtotal: 0, vat: 0, grand: 0 };
+        settle = {
+          calc,
+          deposit: r.keyDeposit,
+          shouldDeduct: r.keyDeposit > 0,
+          depositDeducted: r.keyDeposit,
+          netToPay: customReceipt.netToPay !== undefined ? Number(customReceipt.netToPay) : Math.max(0, calc.grand - r.keyDeposit),
+          refundDue: customReceipt.refundDue !== undefined ? Number(customReceipt.refundDue) : Math.max(0, r.keyDeposit - calc.grand)
+        };
+        dateStr = customReceipt.date || localDateISO(0);
+        titleSuffix = ' (สำเนา)';
+      } else {
+        r = (activeRoomIndex !== null && state.rooms[activeRoomIndex])
+          ? state.rooms[activeRoomIndex]
+          : { number: '101', type: 'Double Bed', guestName: 'ลูกค้าทั่วไป', nights: 1, stayType: 'overnight', customRate: 650, orders: [] };
+        settle = window.getRoomSettlement(r);
+        dateStr = localDateISO(0);
+      }
+
+      if (!settle.shouldDeduct && _prevBuildRaster) {
+        return _prevBuildRaster(customReceipt);
+      }
+
+      const calc = settle.calc;
+      const width = 384;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = 1400;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, canvas.height);
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+
+      const hotelTh = (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล';
+      const hotelEn = (state.hotelInfo && state.hotelInfo.nameEn) || 'PHUBESTH INTER HOTEL';
+      const hotelAddr = (state.hotelInfo && state.hotelInfo.address) || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120';
+      const hotelPhone = (state.hotelInfo && state.hotelInfo.phone) || '037231232';
+
+      let y = 34;
+      ctx.font = '30px Tahoma, sans-serif';
+      ctx.fillText(hotelTh, width / 2, y);
+      y += 24;
+      ctx.font = '16px Tahoma, sans-serif';
+      ctx.fillText(hotelEn, width / 2, y);
+      y += 22;
+      ctx.fillText(hotelAddr.slice(0, 42), width / 2, y);
+      y += 22;
+      ctx.font = '17px Tahoma, sans-serif';
+      ctx.fillText('โทร: ' + hotelPhone, width / 2, y);
+      y += 28;
+      ctx.font = '19px Tahoma, sans-serif';
+      ctx.fillText((r.vatEnabled ? '[ ใบเสร็จรับเงิน / ใบกำกับภาษี' : '[ ใบเสร็จรับเงิน') + titleSuffix + ' ]', width / 2, y);
+
+      y += 14;
+      ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 2; ctx.stroke();
+
+      y += 28;
+      ctx.textAlign = 'left'; ctx.font = '20px Tahoma, sans-serif';
+      ctx.fillText('ห้อง: ' + r.number + ' (' + r.type + ')', 6, y);
+      ctx.textAlign = 'right'; ctx.font = '17px Tahoma, sans-serif';
+      ctx.fillText(dateStr, width - 6, y);
+      y += 26;
+      ctx.textAlign = 'left'; ctx.font = '20px Tahoma, sans-serif';
+      ctx.fillText('ลูกค้า: ' + (r.guestName || 'ลูกค้าทั่วไป'), 6, y);
+
+      y += 14;
+      ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 1; ctx.stroke();
+
+      const drawRow = (lTxt, rTxt, fontSpec = '20px Tahoma, sans-serif') => {
+        y += 30;
+        ctx.font = fontSpec;
+        ctx.textAlign = 'left'; ctx.fillText(lTxt, 6, y);
+        ctx.textAlign = 'right'; ctx.fillText(rTxt, width - 6, y);
+      };
+
+      const stayLabel = r.stayType === 'short' ? 'ชั่วคราว' : (r.stayType === 'monthly' ? 'รายเดือน' : 'ค้างคืน');
+      drawRow('ค่าห้อง (' + stayLabel + ' x' + (r.nights || 1) + ')', '฿' + Number(calc.roomCost || 0).toFixed(0));
+      if (calc.elecCost > 0) drawRow('ค่าไฟ (' + calc.elecUnits + ' หน่วย)', '฿' + Number(calc.elecCost).toFixed(0));
+      if (calc.waterCost > 0) drawRow('ค่าน้ำ (' + calc.waterUnits + ' หน่วย)', '฿' + Number(calc.waterCost).toFixed(0));
+      if (calc.lateCost > 0) drawRow('ค่าเลทเช็คเอาท์', '฿' + Number(calc.lateCost).toFixed(0));
+      (r.orders || []).forEach(o => drawRow(o.name + ' (x' + o.qty + ')', '฿' + (o.price * o.qty).toFixed(0)));
+
+      y += 14;
+      ctx.beginPath(); ctx.moveTo(6, y); ctx.lineTo(width - 6, y); ctx.lineWidth = 2; ctx.stroke();
+
+      if (r.discount > 0) drawRow('ส่วนลดพิเศษ', '-฿' + Number(r.discount).toFixed(2));
+      if (r.vatEnabled) drawRow('VAT 7%', '฿' + Number(calc.vat || 0).toFixed(2));
+      drawRow('ยอดรวมทั้งหมด', '฿' + Number(calc.grand || 0).toFixed(2), '21px Tahoma, sans-serif');
+      drawRow('หักเงินมัดจำ', '-฿' + Number(settle.depositDeducted || 0).toFixed(2), '21px Tahoma, sans-serif');
+      if (settle.refundDue > 0) {
+        drawRow('เงินคืนลูกค้า', '฿' + Number(settle.refundDue).toFixed(2), 'bold 24px Tahoma, sans-serif');
+      } else {
+        drawRow('ยอดชำระเพิ่ม', '฿' + Number(settle.netToPay).toFixed(2), 'bold 25px Tahoma, sans-serif');
+      }
+
+      y += 28;
+      ctx.textAlign = 'center'; ctx.font = '18px Tahoma, sans-serif';
+      ctx.fillText('ขอบคุณที่ใช้บริการ ' + hotelTh, width / 2, y);
+
+      const finalHeight = Math.ceil((y + 18) / 24) * 24;
+      const imgData = ctx.getImageData(0, 0, width, finalHeight).data;
+      const bytesPerLine = width / 8;
+      const chunks = [0x1B, 0x40];
+      if (!customReceipt) chunks.push(0x1B, 0x70, 0x00, 0x19, 0xFA, 0x1B, 0x70, 0x01, 0x19, 0xFA);
+
+      for (let by = 0; by < finalHeight; by += 24) {
+        const curBandH = Math.min(24, finalHeight - by);
+        chunks.push(0x1D, 0x76, 0x30, 0x00, bytesPerLine & 0xFF, (bytesPerLine >> 8) & 0xFF, curBandH & 0xFF, (curBandH >> 8) & 0xFF);
+        for (let py = by; py < by + curBandH; py++) {
+          for (let bx = 0; bx < bytesPerLine; bx++) {
+            let byteVal = 0;
+            for (let bit = 0; bit < 8; bit++) {
+              const offset = (py * width + bx * 8 + bit) * 4;
+              const lum = (imgData[offset] + imgData[offset + 1] + imgData[offset + 2]) / 3;
+              if (lum < 160) byteVal |= (1 << (7 - bit));
+            }
+            chunks.push(byteVal);
+          }
+        }
+      }
+      chunks.push(0x1B, 0x64, 0x03, 0x1D, 0x56, 0x42, 0x00);
+      return new Uint8Array(chunks);
+    };
+
+    window.saveTransaction = function() {
+      const cat = document.getElementById('tx-cat').value;
+      const title = document.getElementById('tx-title').value.trim() || cat;
+      const amount = Number(document.getElementById('tx-amount').value) || 0;
+      if (amount <= 0) return alert('กรุณากรอกจำนวนเงิน');
+
+      const txDateEl = document.getElementById('tx-date');
+      let targetDate = (txDateEl && txDateEl.value) ? txDateEl.value : (document.getElementById('fin-filter-date')?.value || localDateISO(0));
+
+      const newTx = { type: currentTxType, category: cat, title, amount, date: targetDate };
+      if (!Array.isArray(state.transactions)) state.transactions = [];
+      state.transactions.unshift(newTx);
+      document.getElementById('tx-title').value = '';
+      document.getElementById('tx-amount').value = '';
+
+      const monthInp = document.getElementById('fin-filter-month');
+      if (monthInp && targetDate) monthInp.value = targetDate.slice(0, 7);
+
+      saveDatabase();
+      renderFinance();
+      renderWowExecDashboard();
+      if (typeof sendToGoogleSheet === 'function') sendToGoogleSheet('SAVE_TX', newTx);
+      showToast(`บันทึกรายการวันที่ ${targetDate} เรียบร้อย`);
+    };
+
+    const _prevRenderFinance = window.renderFinance;
+    window.renderFinance = function() {
+      upgradeFinanceFormWithDate();
+      if (_prevRenderFinance) _prevRenderFinance.apply(this, arguments);
+      renderWowExecDashboard();
+    };
+
+    const _prevReprint = window.reprintArchivedReceipt;
+    window.reprintArchivedReceipt = function(idx) {
+      if (_prevReprint) _prevReprint.apply(this, arguments);
+      const r = (state.receiptsArchive || [])[idx];
+      if (!r || !(Number(r.depositDeducted) > 0)) return;
+      const bodyEl = document.getElementById('arc-rcp-preview-body');
+      if (!bodyEl) return;
+      const dep = Number(r.depositDeducted) || 0;
+      const net = Number(r.netToPay) || 0;
+      const ref = Number(r.refundDue) || 0;
+      bodyEl.insertAdjacentHTML('beforeend', `
+        <div style="border-top:1px dashed #666;margin-top:6px;padding-top:6px;font-size:13px;">
+          <div class="between" style="color:#047857;font-weight:700;"><span>หักเงินมัดจำที่ชำระไว้:</span><span>-฿${dep.toFixed(2)}</span></div>
+          <div class="between" style="font-size:16px;font-weight:900;margin-top:3px;">
+            <span>${ref > 0 ? 'คืนส่วนต่างลูกค้า:' : 'ยอดชำระเพิ่มสุทธิ:'}</span>
+            <span>฿${(ref > 0 ? ref : net).toFixed(2)}</span>
+          </div>
+        </div>
+      `);
+    };
+
+    renderWowRoomsUI();
+    setInterval(() => {
+      const viewRooms = document.getElementById('view-rooms');
+      const roomModal = document.getElementById('room-modal');
+      if (viewRooms && !viewRooms.classList.contains('hidden') && roomModal && roomModal.classList.contains('hidden')) {
+        renderWowRoomsUI();
+      }
+    }, 30000);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(bootWowExecutiveV4, 600);
+  });
+})();
+</script>
 </body>
 </html>
