@@ -8196,5 +8196,2502 @@ window.kickDrawerOnly = async function() {
   });
 })();
 </script>
+ <!-- ================= ADD-ON V5: ULTRA LUXURY DASHBOARD + TRIPLE ROOM + HOUSEKEEPING IPAD MODE + ID/PASSPORT SCAN & VAULT + MAINTENANCE TICKETS WITH PHOTO + CASH/TRANSFER SPLIT & LINE SHIFT HANDOVER ================= -->
+<style>
+  /* 1. Ultra-Luxury 5-Star Executive Dashboard Upgrade */
+  #wow-exec-dashboard {
+    background: linear-gradient(135deg, rgba(10, 15, 30, 0.98) 0%, rgba(17, 24, 39, 0.96) 50%, rgba(45, 27, 78, 0.88) 100%) !important;
+    border: 1.5px solid rgba(251, 191, 36, 0.48) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65), 0 0 28px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+  .v5-luxury-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(251, 191, 36, 0.25);
+  }
+  .v5-pay-split-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .v5-cash-chip {
+    background: rgba(16, 185, 129, 0.14);
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    color: #6ee7b7;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .v5-qr-chip {
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    color: #7dd3fc;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .v5-action-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .v5-gold-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    font-weight: 900;
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 99px;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+  .v5-line-btn {
+    background: linear-gradient(135deg, #06c755, #059669);
+    color: #fff;
+    font-weight: 900;
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 99px;
+    box-shadow: 0 4px 12px rgba(6, 199, 85, 0.35);
+  }
+  .v5-hk-btn {
+    background: rgba(147, 51, 234, 0.22);
+    border: 1px solid rgba(192, 132, 252, 0.55);
+    color: #e9d5ff;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 99px;
+  }
+
+  /* 2. Triple Room Badge */
+  .bed-triple {
+    background: rgba(20, 184, 166, 0.22) !important;
+    color: #5eead4 !important;
+    border: 1px solid rgba(45, 212, 191, 0.5) !important;
+  }
+
+  /* 3. Dedicated Housekeeping Mode Overlay (iPad Wall Board & Maid PIN) */
+  #hk-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999990;
+    background: radial-gradient(circle at top, #0f172a 0%, #030712 100%);
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif;
+  }
+  .hk-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(11, 15, 25, 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(245, 158, 11, 0.45);
+  }
+  .hk-body {
+    max-width: 1160px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  .hk-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media(min-width: 720px) {
+    .hk-kpi-row { grid-template-columns: repeat(4, 1fr); }
+  }
+  .hk-kpi-card {
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 16px;
+    padding: 12px 14px;
+    border-left: 4px solid #f59e0b;
+  }
+  .hk-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media(min-width: 640px) {
+    .hk-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media(min-width: 960px) {
+    .hk-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .hk-room-card {
+    background: linear-gradient(155deg, #1f1708 0%, #0f131f 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  }
+  .hk-room-card.in-progress {
+    background: linear-gradient(155deg, #0b2239 0%, #0a101d 100%);
+    border-color: #38bdf8;
+    box-shadow: 0 0 22px rgba(56, 189, 248, 0.25);
+  }
+  .hk-room-card.maint-card {
+    background: linear-gradient(155deg, #27131a 0%, #110c14 100%);
+    border: 2px dashed #fb7185;
+  }
+
+  /* 4. Checkout Payment Method Selector */
+  .v5-pay-method-box {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    border-radius: 12px;
+    padding: 9px 10px;
+    margin-bottom: 8px;
+  }
+  .v5-pay-method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-top: 6px;
+  }
+  .v5-pm-btn {
+    padding: 9px 8px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 12.5px;
+    background: #0b1120;
+    color: #94a3b8;
+    border: 1.5px solid #334155;
+  }
+  .v5-pm-btn.active-cash {
+    background: rgba(16, 185, 129, 0.22);
+    color: #6ee7b7;
+    border-color: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+  }
+  .v5-pm-btn.active-transfer {
+    background: rgba(14, 165, 233, 0.22);
+    color: #7dd3fc;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  }
+
+  /* 5. Photo Thumbnails & Lightbox */
+  .v5-thumb {
+    width: 66px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1.5px solid #38bdf8;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .v5-role-grid-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+  }
+</style>
+
+<!-- ================= OVERLAY: โหมดแม่บ้านเฉพาะทาง (Housekeeping iPad Wall Board) ================= -->
+<div id="hk-overlay" class="hidden">
+  <div class="hk-topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:22px;">🧹</div>
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#fff;">ศูนย์งานแม่บ้าน • ภูเบศร์อินเตอร์โฮเต็ล</div>
+        <div style="font-size:11px;color:#fbbf24;font-weight:700;">HOUSEKEEPING LIVE BOARD • ซิงค์ตรงจากเคาน์เตอร์ฟร้อนท์</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+      <span id="hk-clock-badge" style="font-size:12px;font-weight:900;color:#38bdf8;background:#0b1120;border:1px solid #0284c7;padding:5px 10px;border-radius:99px;">🕒 --:--</span>
+      <button type="button" onclick="window.__hotelV5.openMaintModal('')" class="btn btn-amber" style="padding:6px 11px;font-size:11.5px;">📸 แจ้งซ่อมพร้อมรูป</button>
+      <button type="button" onclick="window.__hotelV5.refreshHkBoard(true)" class="btn btn-sky" style="padding:6px 11px;font-size:11.5px;">🔄 รีเฟรช</button>
+      <button type="button" onclick="toggleFullScreenMode()" class="btn btn-dark" style="padding:6px 10px;font-size:11.5px;">⛶ เต็มจอ</button>
+      <button type="button" onclick="window.__hotelV5.exitHousekeepingMode()" class="btn btn-rose" style="padding:6px 11px;font-size:11.5px;">🚪 ออก</button>
+    </div>
+  </div>
+  <div class="hk-body" id="hk-board-content"></div>
+</div>
+
+<!-- ================= MODAL: คลังระบบแจ้งซ่อมพร้อมรูปถ่าย (Maintenance Ticket Log) ================= -->
+<div id="maint-tickets-modal" class="modal-backdrop hidden" style="z-index: 9960;">
+  <div class="modal-box" style="max-width: 720px; border: 2px solid #f59e0b;">
+    <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
+      <div>
+        <b style="font-size:16px;color:var(--amber);">🛠️ ระบบแจ้งซ่อมพร้อมรูปถ่าย (Maintenance Ticket Log)</b>
+        <div style="font-size:11px;color:var(--muted);">แนบรูปจุดที่เสีย เก็บประวัติการซ่อมย้อนหลัง และสรุปค่าซ่อมบำรุงรายห้อง</div>
+      </div>
+      <button onclick="document.getElementById('maint-tickets-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+
+    <div class="subcard" style="border-color:rgba(245,158,11,0.45);">
+      <b style="color:#fbbf24;display:block;margin-bottom:8px;">➕ เปิดใบแจ้งซ่อมใหม่</b>
+      <div class="grid-3" style="margin-bottom:8px;">
+        <div>
+          <span style="font-size:11px;color:var(--muted);">เลือกห้องพัก *</span>
+          <select id="mt-room-sel"></select>
+        </div>
+        <div>
+          <span style="font-size:11px;color:var(--muted);">ระดับความเร่งด่วน</span>
+          <select id="mt-priority">
+            <option value="urgent">🔴 ด่วน (ปิดขายห้องชั่วคราว)</option>
+            <option value="normal">🟡 ปกติ (แจ้งช่างเข้าตรวจ)</option>
+          </select>
+        </div>
+        <div>
+          <span style="font-size:11px;color:var(--muted);">ประเมินค่าซ่อม (บาท)</span>
+          <input type="number" id="mt-cost" value="0" placeholder="0">
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:8px;">
+        <div>
+          <span style="font-size:11px;color:var(--muted);">อาการเสีย / อุปกรณ์ที่ชำรุด *</span>
+          <input type="text" id="mt-issue" placeholder="เช่น รีโมตแอร์เสีย, ก๊อกน้ำรั่ว, แอร์ไม่เย็น...">
+        </div>
+        <div>
+          <span style="font-size:11px;color:#38bdf8;font-weight:700;">📸 ถ่ายรูป / แนบรูปจุดที่เสีย</span>
+          <input type="file" id="mt-photo-input" accept="image/*" capture="environment" onchange="window.__hotelV5.handleMaintPhotoSelect(event)" style="padding:5px;font-size:11px;background:#090d16;border:1px solid #0284c7;border-radius:10px;width:100%;">
+        </div>
+      </div>
+      <div id="mt-photo-preview-wrap" class="hidden" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;background:#090d16;padding:6px 10px;border-radius:10px;border:1px solid #334155;">
+        <img id="mt-photo-preview" class="v5-thumb" onclick="window.__hotelV5.openPhotoViewer(this.src, 'ตัวอย่างรูปแจ้งซ่อม')">
+        <span style="font-size:11px;color:#6ee7b7;flex:1;">✅ แนบรูปจุดที่เสียแล้ว (บีบอัดอัตโนมัติพร้อมซิงค์ Cloud)</span>
+        <button type="button" onclick="window.__hotelV5.clearMaintPhoto()" class="btn btn-rose" style="padding:4px 8px;font-size:11px;">ลบรูป</button>
+      </div>
+      <button type="button" onclick="window.__hotelV5.saveMaintTicket()" class="btn btn-amber" style="width:100%;padding:10px;">💾 บันทึกใบแจ้งซ่อมลงประวัติ</button>
+    </div>
+
+    <div class="between" style="margin-bottom:8px;">
+      <div class="row" style="gap:6px;">
+        <button type="button" id="mt-flt-all" onclick="window.__hotelV5.setMaintFilter('all')" class="btn btn-amber" style="padding:4px 10px;font-size:11px;">ทั้งหมด</button>
+        <button type="button" id="mt-flt-open" onclick="window.__hotelV5.setMaintFilter('open')" class="btn btn-dark" style="padding:4px 10px;font-size:11px;">🔧 กำลังซ่อม</button>
+        <button type="button" id="mt-flt-done" onclick="window.__hotelV5.setMaintFilter('done')" class="btn btn-dark" style="padding:4px 10px;font-size:11px;">✅ ซ่อมเสร็จแล้ว</button>
+      </div>
+      <div id="mt-total-cost-badge" style="font-size:11.5px;color:#fbbf24;font-weight:800;">ค่าซ่อมรวม: ฿0</div>
+    </div>
+
+    <div id="mt-tickets-list" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL: สรุปปิดกะส่งเข้า LINE (Shift Handover) ================= -->
+<div id="shift-handover-modal" class="modal-backdrop hidden" style="z-index: 9965;">
+  <div class="modal-box" style="max-width: 560px; border: 2px solid #06c755;">
+    <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
+      <div>
+        <b style="font-size:16px;color:#34d399;">🔒 สรุปยอดปิดกะ & ส่งรายงานเข้า LINE</b>
+        <div style="font-size:11px;color:var(--muted);">แยกเงินสดในเก๊ะ / ยอดโอน QR / สถานะห้องพัก ส่งถึงเจ้าของโรงแรมทันที</div>
+      </div>
+      <button onclick="document.getElementById('shift-handover-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:8px;">
+      <div>
+        <span style="font-size:11px;color:var(--muted);">วันที่สรุปยอด</span>
+        <input type="date" id="sh-date" onchange="window.__hotelV5.refreshShiftPreview()">
+      </div>
+      <div>
+        <span style="font-size:11px;color:var(--muted);">รอบกะ / พนักงาน</span>
+        <input type="text" id="sh-staff" placeholder="เช่น กะเช้า (น้องเอ)" oninput="window.__hotelV5.refreshShiftPreview()">
+      </div>
+      <div>
+        <span style="font-size:11px;color:var(--muted);">เงินทอนตั้งต้น (฿)</span>
+        <input type="number" id="sh-float" value="1000" oninput="window.__hotelV5.refreshShiftPreview()">
+      </div>
+    </div>
+
+    <div class="subcard" style="background:#081a14;border-color:#10b981;">
+      <div id="sh-summary-cards" class="grid-2" style="margin-bottom:8px;"></div>
+      <div class="between" style="padding-top:8px;border-top:1px dashed rgba(16,185,129,0.4);">
+        <span style="font-size:12px;font-weight:800;color:#6ee7b7;">💵 นับเงินสดจริงในเก๊ะ (บาท):</span>
+        <input type="number" id="sh-actual-cash" placeholder="ใส่ยอดที่นับได้จริง" oninput="window.__hotelV5.refreshShiftPreview()" style="width:150px;text-align:right;font-weight:900;color:#fbbf24;border-color:#10b981;">
+      </div>
+      <div id="sh-diff-box" style="margin-top:6px;font-size:12px;font-weight:800;text-align:right;"></div>
+    </div>
+
+    <div class="subcard">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ตัวอย่างข้อความรายงานที่จะส่งเข้า LINE:</div>
+      <textarea id="sh-line-preview" rows="8" style="font-size:11.5px;line-height:1.45;color:#e2e8f0;"></textarea>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:8px;">
+      <button type="button" onclick="window.__hotelV5.sendShiftToLine()" class="btn" style="background:linear-gradient(135deg,#06c755,#059669);color:#fff;padding:12px;font-size:13.5px;font-weight:900;">💚 ส่งเข้า LINE เจ้าของทันที</button>
+      <button type="button" onclick="window.__hotelV5.copyShiftText()" class="btn btn-amber" style="padding:12px;font-size:13px;">📋 คัดลอก + บันทึกปิดกะ</button>
+    </div>
+    <div id="sh-history-box" style="font-size:11px;color:var(--muted);"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL: ดูรูปถ่ายขยายใหญ่ (บัตร ปชช. / รูปแจ้งซ่อม) ================= -->
+<div id="v5-photo-viewer-modal" class="modal-backdrop hidden" style="z-index: 999998;">
+  <div class="modal-box" style="max-width: 560px; text-align: center; border: 2px solid #38bdf8;">
+    <div class="between" style="margin-bottom:10px;">
+      <b id="v5-pv-title" style="color:#38bdf8;font-size:14px;">🖼️ ดูรูปภาพ</b>
+      <button onclick="document.getElementById('v5-photo-viewer-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+    <img id="v5-pv-img" src="" style="max-width:100%;max-height:68vh;border-radius:12px;border:1px solid #334155;margin-bottom:10px;">
+    <div class="grid-2">
+      <a id="v5-pv-download" download="phubesth_photo.jpg" class="btn btn-emerald" style="text-decoration:none;padding:10px;">⬇️ บันทึกรูปลงเครื่อง</a>
+      <button onclick="document.getElementById('v5-photo-viewer-modal').classList.add('hidden')" class="btn btn-dark" style="padding:10px;">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function initHotelUltimateV5() {
+  let activeCheckoutPayMethod = 'cash';
+  let activeMaintFilter = 'all';
+  let pendingMaintPhoto = '';
+  let hkActive = false;
+  let hkClockTimer = null;
+  let lastHkCleanCount = -1;
+
+  function esc(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+
+  function localDateISO(offsetDays = 0) {
+    const d = new Date();
+    if (offsetDays) d.setDate(d.getDate() + offsetDays);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function compressImageFile(file, maxW = 680, quality = 0.65) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * (maxW / w)); w = maxW; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = ev.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function ensureV5StateFields() {
+    if (typeof state === 'undefined' || !state) return;
+    if (!state.pins) state.pins = { front: '1111', manager: '8888', owner: '9999', housekeeping: '2222' };
+    if (!state.pins.housekeeping) state.pins.housekeeping = '2222';
+    if (!Array.isArray(state.maintenanceTickets)) {
+      state.maintenanceTickets = state.maintenanceTickets && typeof state.maintenanceTickets === 'object'
+        ? Object.values(state.maintenanceTickets) : [];
+    }
+    if (!Array.isArray(state.shiftLogs)) {
+      state.shiftLogs = state.shiftLogs && typeof state.shiftLogs === 'object'
+        ? Object.values(state.shiftLogs) : [];
+    }
+    if (!Array.isArray(state.idVault)) {
+      state.idVault = state.idVault && typeof state.idVault === 'object'
+        ? Object.values(state.idVault) : [];
+    }
+    let migrated = false;
+    (state.rooms || []).forEach(r => {
+      if (r && r.type === 'Single Bed') { r.type = 'Triple Room'; migrated = true; }
+    });
+    (state.reservations || []).forEach(b => {
+      if (b && b.roomType === 'Single Bed') { b.roomType = 'Triple Room'; migrated = true; }
+    });
+    if (migrated) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+  }
+
+  /* =========================================================================
+     1. TRIPLE ROOM REPLACEMENT ACROSS ALL SELECTS, AVAILABILITY, TAPE CHART & CARDS
+     ========================================================================= */
+  function replaceSingleToTripleInSelects() {
+    ['nb-type', 'm-room-type'].forEach(selId => {
+      const sel = document.getElementById(selId);
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        if (opt.value === 'Single Bed' || opt.textContent.includes('Single Bed')) {
+          opt.value = 'Triple Room';
+          opt.textContent = 'Triple Room (3 เตียง)';
+        }
+      });
+    });
+  }
+
+  function patchTripleBadgesOnGrid() {
+    const gridEl = document.getElementById('rooms-grid');
+    if (!gridEl || !state || !Array.isArray(state.rooms)) return;
+    gridEl.querySelectorAll('[onclick^="openRoomModal("]').forEach(card => {
+      const m = (card.getAttribute('onclick') || '').match(/openRoomModal\((\d+)\)/);
+      if (!m) return;
+      const r = state.rooms[Number(m[1])];
+      if (!r) return;
+      if (r.type === 'Triple Room') {
+        const pill = card.querySelector('.pro-bed-pill');
+        if (pill) {
+          pill.className = 'pro-bed-pill bed-triple';
+          pill.textContent = '🛏️×3 Triple';
+        } else if (card.classList.contains('pro-3d-cube')) {
+          const iconDiv = card.children[1];
+          if (iconDiv && iconDiv.textContent !== '🛠️') iconDiv.textContent = '🛏️×3';
+        }
+      }
+      if (r.status === 'cleaning' && r.cleaningStartedAt && !card.querySelector('.v5-cleaning-active-tag')) {
+        const footer = card.querySelector('.between:last-child');
+        if (footer && footer.innerHTML.includes('รอแม่บ้าน')) {
+          footer.innerHTML = footer.innerHTML.replace('🧹 รอแม่บ้าน', '<span class="v5-cleaning-active-tag" style="color:#38bdf8;">🧽 แม่บ้านกำลังทำ</span>');
+        }
+      }
+    });
+  }
+
+  /* =========================================================================
+     2. CASH / TRANSFER SUMMARY HELPER
+     ========================================================================= */
+  function calcCashTransferSummary(dateStr) {
+    let cashInc = 0, transferInc = 0, cashExp = 0, transferExp = 0;
+    (state.transactions || []).forEach(t => {
+      if (t.date !== dateStr) return;
+      const amt = Number(t.amount) || 0;
+      const pm = t.paymentMethod || ((t.title || '').includes('[โอน') || (t.category || '').includes('Agoda') || (t.category || '').includes('โอน') ? 'transfer' : 'cash');
+      if (t.type === 'income') {
+        if (pm === 'transfer') transferInc += amt; else cashInc += amt;
+      } else {
+        if (pm === 'transfer') transferExp += amt; else cashExp += amt;
+      }
+    });
+    return {
+      cashInc, transferInc, cashExp, transferExp,
+      totalInc: cashInc + transferInc,
+      totalExp: cashExp + transferExp,
+      netCashInDrawer: cashInc - cashExp
+    };
+  }
+
+  /* =========================================================================
+     3. ULTRA-LUXURY DASHBOARD ENHANCEMENT BAR
+     ========================================================================= */
+  function enhanceExecutiveDashboardV5() {
+    const dash = document.getElementById('wow-exec-dashboard');
+    if (!dash || !state) return;
+
+    const todayStr = localDateISO(0);
+    const sum = calcCashTransferSummary(todayStr);
+    const openTickets = (state.maintenanceTickets || []).filter(t => t.status !== 'done').length;
+
+    let bar = document.getElementById('v5-exec-luxury-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'v5-exec-luxury-bar';
+      bar.className = 'v5-luxury-bar';
+      dash.appendChild(bar);
+    }
+
+    bar.innerHTML = `
+      <div class="v5-pay-split-strip">
+        <span class="v5-cash-chip">💵 เงินสดวันนี้: ฿${sum.cashInc.toLocaleString()}</span>
+        <span class="v5-qr-chip">📱 โอน QR วันนี้: ฿${sum.transferInc.toLocaleString()}</span>
+        <span class="pro-pill-btn" style="color:#fde68a;border-color:rgba(245,158,11,0.4);">🗄️ เงินสดสุทธิในเก๊ะ: ฿${sum.netCashInDrawer.toLocaleString()}</span>
+      </div>
+      <div class="v5-action-pills">
+        <button type="button" onclick="window.__hotelV5.openShiftModal()" class="v5-line-btn">🔒 ปิดกะ / ส่ง LINE</button>
+        <button type="button" onclick="window.__hotelV5.openMaintModal('')" class="v5-gold-btn">🛠️ แจ้งซ่อม (${openTickets})</button>
+        <button type="button" onclick="window.__hotelV5.enterHousekeepingMode()" class="v5-hk-btn">🧹 จอแม่บ้าน (iPad)</button>
+      </div>
+    `;
+  }
+
+  /* =========================================================================
+     4. CHECKOUT PAYMENT METHOD SPLIT & FINANCE CASH/TRANSFER CARDS
+     ========================================================================= */
+  function injectCheckoutPaymentMethodUI() {
+    const coBtn = document.querySelector('#rcontent-3 button[onclick="completeCheckOutAndPay()"]');
+    if (!coBtn || document.getElementById('v5-co-paymethod-box')) return;
+    const html = `
+      <div id="v5-co-paymethod-box" class="v5-pay-method-box">
+        <div style="font-size:11.5px;font-weight:800;color:#7dd3fc;">💳 ช่องทางที่ลูกค้าชำระเงิน (สำหรับแยกยอดปิดกะ):</div>
+        <div class="v5-pay-method-grid">
+          <button type="button" id="v5-pm-cash" onclick="window.__hotelV5.setCheckoutPayMethod('cash')" class="v5-pm-btn active-cash">💵 เงินสด (เข้าเก๊ะ)</button>
+          <button type="button" id="v5-pm-transfer" onclick="window.__hotelV5.setCheckoutPayMethod('transfer')" class="v5-pm-btn">📱 โอนเงิน / QR</button>
+        </div>
+      </div>
+    `;
+    coBtn.insertAdjacentHTML('beforebegin', html);
+  }
+
+  function injectFinanceCashTransferUI() {
+    const viewFin = document.getElementById('view-finance');
+    if (!viewFin) return;
+
+    let splitCard = document.getElementById('v5-fin-split-card');
+    if (!splitCard) {
+      splitCard = document.createElement('div');
+      splitCard.id = 'v5-fin-split-card';
+      splitCard.className = 'card';
+      splitCard.style.cssText = 'background:linear-gradient(135deg,#091914,#0b172a);border-color:rgba(16,185,129,0.45);padding:10px 12px;';
+      const kpiGrid = viewFin.querySelector('.grid-4');
+      if (kpiGrid) kpiGrid.parentNode.insertBefore(splitCard, kpiGrid.nextSibling);
+    }
+
+    const selDate = document.getElementById('fin-filter-date')?.value || localDateISO(0);
+    const s = calcCashTransferSummary(selDate);
+    splitCard.innerHTML = `
+      <div class="between" style="margin-bottom:8px;">
+        <b style="color:#6ee7b7;font-size:13px;">💵📱 สรุปแยกเงินสด & โอน QR (${selDate})</b>
+        <button type="button" onclick="window.__hotelV5.openShiftModal()" class="v5-line-btn" style="padding:6px 12px;">🔒 สรุปปิดกะส่งเข้า LINE</button>
+      </div>
+      <div class="grid-4">
+        <div style="background:#030712;border:1px solid #065f46;border-radius:10px;padding:7px 10px;">
+          <div style="font-size:10.5px;color:#94a3b8;">💵 รายรับเงินสด</div>
+          <div style="font-size:16px;font-weight:900;color:#34d399;">฿${s.cashInc.toLocaleString()}</div>
+        </div>
+        <div style="background:#030712;border:1px solid #075985;border-radius:10px;padding:7px 10px;">
+          <div style="font-size:10.5px;color:#94a3b8;">📱 รายรับโอน QR</div>
+          <div style="font-size:16px;font-weight:900;color:#38bdf8;">฿${s.transferInc.toLocaleString()}</div>
+        </div>
+        <div style="background:#030712;border:1px solid #881337;border-radius:10px;padding:7px 10px;">
+          <div style="font-size:10.5px;color:#94a3b8;">💸 จ่ายสด / โอน</div>
+          <div style="font-size:13.5px;font-weight:900;color:#fda4af;">สด ฿${s.cashExp.toLocaleString()} • โอน ฿${s.transferExp.toLocaleString()}</div>
+        </div>
+        <div style="background:#030712;border:1px solid #b45309;border-radius:10px;padding:7px 10px;">
+          <div style="font-size:10.5px;color:#fde68a;">🗄️ เงินสดสุทธิในเก๊ะ</div>
+          <div style="font-size:16px;font-weight:900;color:#fbbf24;">฿${s.netCashInDrawer.toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+
+    const saveTxBtn = viewFin.querySelector('button[onclick="saveTransaction()"]');
+    if (saveTxBtn && !document.getElementById('tx-pay-method')) {
+      saveTxBtn.insertAdjacentHTML('beforebegin', `
+        <div class="between" style="margin-bottom:8px;background:#090d16;padding:6px 10px;border-radius:10px;border:1px solid #334155;">
+          <span style="font-size:11.5px;color:#cbd5e1;font-weight:700;">ช่องทางรับ/จ่ายเงิน:</span>
+          <select id="tx-pay-method" style="width:auto;min-width:165px;padding:5px 10px;color:#6ee7b7;font-weight:800;">
+            <option value="cash">💵 เงินสด (Cash / เก๊ะ)</option>
+            <option value="transfer">📱 โอนเงิน / QR ธนาคาร</option>
+          </select>
+        </div>
+      `);
+    }
+  }
+
+  /* =========================================================================
+     5. ID CARD / PASSPORT SCANNER + OCR + VAULT
+     ========================================================================= */
+  function injectIdScannerUI() {
+    const taxInp = document.getElementById('m-guest-tax');
+    if (!taxInp || document.getElementById('v5-id-scan-bar')) return;
+    const gridParent = taxInp.closest('.grid-3');
+    if (!gridParent) return;
+
+    gridParent.insertAdjacentHTML('afterend', `
+      <div id="v5-id-scan-bar" style="margin-top:8px;padding:8px 10px;background:#090d16;border:1px dashed #38bdf8;border-radius:10px;">
+        <div class="between" style="gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <label class="btn btn-sky" style="padding:6px 11px;font-size:11.5px;cursor:pointer;">
+              📷 ถ่าย/สแกนบัตร ปชช. / พาสปอร์ต
+              <input type="file" id="v5-id-file-inp" accept="image/*" capture="environment" onchange="window.__hotelV5.handleIdCardScan(event)" style="display:none;">
+            </label>
+            <span id="v5-id-ocr-status" style="font-size:11px;color:#94a3b8;">ถ่ายรูปเก็บบัตรหลังบ้าน + อ่านเลขบัตรอัตโนมัติ</span>
+          </div>
+          <div id="v5-id-preview-box" class="hidden" style="display:flex;align-items:center;gap:6px;">
+            <img id="v5-id-thumb" class="v5-thumb" onclick="window.__hotelV5.openPhotoViewer(this.src, 'ภาพบัตรประชาชน / พาสปอร์ตผู้เข้าพัก')">
+            <button type="button" onclick="window.__hotelV5.removeRoomIdPhoto()" class="btn btn-rose" style="padding:4px 7px;font-size:10.5px;">ลบ</button>
+          </div>
+        </div>
+      </div>
+    `);
+
+    const maintBtn = document.getElementById('m-btn-mark-maint');
+    if (maintBtn && !document.getElementById('m-btn-open-ticket')) {
+      const tBtn = document.createElement('button');
+      tBtn.id = 'm-btn-open-ticket';
+      tBtn.type = 'button';
+      tBtn.className = 'btn btn-dark';
+      tBtn.style.cssText = 'padding:12px;color:#38bdf8;border-color:#0284c7;';
+      tBtn.textContent = '📸 แจ้งซ่อม';
+      tBtn.onclick = () => {
+        const rNum = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex].number : '';
+        window.__hotelV5.openMaintModal(rNum);
+      };
+      maintBtn.parentNode.insertBefore(tBtn, maintBtn.nextSibling);
+    }
+  }
+
+  function refreshRoomIdThumb() {
+    const box = document.getElementById('v5-id-preview-box');
+    const img = document.getElementById('v5-id-thumb');
+    const st = document.getElementById('v5-id-ocr-status');
+    if (!box || !img) return;
+    if (activeRoomIndex !== null && state.rooms[activeRoomIndex] && state.rooms[activeRoomIndex].guestIdPhoto) {
+      img.src = state.rooms[activeRoomIndex].guestIdPhoto;
+      box.classList.remove('hidden');
+      if (st) st.textContent = '✅ เก็บภาพบัตรผู้เข้าพักไว้หลังบ้านแล้ว (แตะรูปเพื่อขยาย)';
+    } else {
+      img.src = '';
+      box.classList.add('hidden');
+      if (st) st.textContent = 'ถ่ายรูปเก็บบัตรหลังบ้าน + อ่านเลขบัตรอัตโนมัติ';
+    }
+  }
+
+  function loadTesseractLib() {
+    return new Promise((resolve) => {
+      if (window.Tesseract) return resolve(window.Tesseract);
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.onload = () => resolve(window.Tesseract || null);
+      s.onerror = () => resolve(null);
+      document.head.appendChild(s);
+    });
+  }
+
+  function parseOcrTextForIdOrPassport(rawText) {
+    const clean = String(rawText || '').replace(/\r/g, '\n');
+    let idNum = '';
+    let nameFound = '';
+
+    const thaiIdMatch = clean.match(/\b(\d[\s-]?\d{4}[\s-]?\d{5}[\s-]?\d{2}[\s-]?\d)\b/);
+    if (thaiIdMatch) {
+      idNum = thaiIdMatch[1].replace(/\D/g, '');
+    } else {
+      const digits13 = clean.replace(/[^\d\n]/g, '').match(/\d{13}/);
+      if (digits13) idNum = digits13[0];
+    }
+
+    const mrzName = clean.match(/P<[A-Z]{3}([A-Z]+)<<([A-Z<]+)/);
+    if (mrzName) {
+      const last = mrzName[1].replace(/</g, ' ').trim();
+      const first = mrzName[2].replace(/</g, ' ').replace(/\s+/g, ' ').trim();
+      nameFound = (first + ' ' + last).trim();
+    }
+    if (!idNum) {
+      const ppMatch = clean.match(/\b([A-Z]{1,2}\d{6,8})\b/);
+      if (ppMatch) idNum = ppMatch[1];
+    }
+    if (!nameFound) {
+      const engName = clean.match(/(?:Name|Mr\.|Mrs\.|Miss)\s+([A-Za-z]+(?:\s+[A-Za-z]+){1,2})/i);
+      if (engName) nameFound = engName[1].trim();
+    }
+    return { idNum, nameFound };
+  }
+
+  /* =========================================================================
+     6. LOGIN SCREEN & SETTINGS FOR HOUSEKEEPING
+     ========================================================================= */
+  function upgradeLoginAndSettingsForHousekeeping() {
+    const ownerBtn = document.getElementById('role-owner');
+    if (ownerBtn && !document.getElementById('role-housekeeping')) {
+      const roleGrid = ownerBtn.parentNode;
+      roleGrid.classList.remove('grid-3');
+      roleGrid.classList.add('v5-role-grid-4');
+
+      const hkBtn = document.createElement('button');
+      hkBtn.id = 'role-housekeeping';
+      hkBtn.className = 'btn btn-dark';
+      hkBtn.style.cssText = 'flex-direction:column;padding:7px;font-size:11.5px;';
+      hkBtn.innerHTML = '🧹<span>แม่บ้าน</span>';
+      hkBtn.onclick = () => window.selectRole('housekeeping');
+      roleGrid.appendChild(hkBtn);
+
+      const forgotBtn = document.querySelector('#login-screen button[onclick*="รหัสเริ่มต้น"]');
+      if (forgotBtn) {
+        forgotBtn.setAttribute('onclick', "alert('รหัสเริ่มต้น: ฟร้อนท์ = 1111 | แม่บ้าน = 2222 | ผู้จัดการ = 8888 | เจ้าของ = 9999')");
+      }
+    }
+
+    const cfdLoginBtn = document.getElementById('btn-login-cfd');
+    if (cfdLoginBtn && !document.getElementById('btn-login-hk-ipad')) {
+      const hkIpadBtn = document.createElement('button');
+      hkIpadBtn.id = 'btn-login-hk-ipad';
+      hkIpadBtn.className = 'btn btn-dark';
+      hkIpadBtn.style.cssText = 'width:100%;margin-top:6px;padding:9px;font-size:12px;color:#e9d5ff;border-color:#9333ea;';
+      hkIpadBtn.innerHTML = '🧹 เปิดเครื่องนี้เป็นจอแม่บ้าน (iPad ห้องแม่บ้าน)';
+      hkIpadBtn.onclick = () => window.__hotelV5.enterHousekeepingMode();
+      cfdLoginBtn.parentNode.insertBefore(hkIpadBtn, cfdLoginBtn.nextSibling);
+    }
+
+    const pinOwn = document.getElementById('set-pin-own');
+    if (pinOwn && !document.getElementById('set-pin-hk')) {
+      const pinGrid = pinOwn.closest('.grid-3');
+      if (pinGrid) {
+        pinGrid.classList.remove('grid-3');
+        pinGrid.classList.add('grid-4');
+        const hkDiv = document.createElement('div');
+        hkDiv.innerHTML = '<span style="font-size:11px;color:#e9d5ff;">PIN แม่บ้าน</span><input type="text" id="set-pin-hk" value="2222">';
+        pinGrid.appendChild(hkDiv);
+      }
+    }
+
+    const hwBox = document.getElementById('drw-sec-hw');
+    if (hwBox && !document.getElementById('drw-btn-maint-tickets')) {
+      const tBtn = document.createElement('button');
+      tBtn.id = 'drw-btn-maint-tickets';
+      tBtn.className = 'btn btn-dark';
+      tBtn.style.cssText = 'color:#fbbf24;border-color:#f59e0b;';
+      tBtn.innerHTML = '🛠️ คลังแจ้งซ่อมพร้อมรูปถ่าย';
+      tBtn.onclick = () => window.__hotelV5.openMaintModal('');
+      hwBox.appendChild(tBtn);
+
+      const shBtn = document.createElement('button');
+      shBtn.id = 'drw-btn-shift-handover';
+      shBtn.className = 'btn btn-emerald';
+      shBtn.innerHTML = '🔒 สรุปปิดกะส่งเข้า LINE';
+      shBtn.onclick = () => window.__hotelV5.openShiftModal();
+      hwBox.appendChild(shBtn);
+    }
+
+    const cloudBox = document.getElementById('drw-sec-cloud');
+    if (cloudBox && !document.getElementById('drw-btn-hk-link')) {
+      const hkLinkBtn = document.createElement('button');
+      hkLinkBtn.id = 'drw-btn-hk-link';
+      hkLinkBtn.className = 'btn btn-purple';
+      hkLinkBtn.innerHTML = '🧹 คัดลอกลิงก์ iPad ห้องแม่บ้าน';
+      hkLinkBtn.onclick = () => window.__hotelV5.copyHousekeepingLink();
+      cloudBox.appendChild(hkLinkBtn);
+    }
+  }
+
+  /* =========================================================================
+     7. HOUSEKEEPING LIVE BOARD RENDERER
+     ========================================================================= */
+  function renderHousekeepingBoard() {
+    const box = document.getElementById('hk-board-content');
+    if (!box || !hkActive) return;
+    ensureV5StateFields();
+
+    const rooms = state.rooms || [];
+    const cleaningRooms = rooms.map((r, idx) => ({ r, idx })).filter(x => x.r.status === 'cleaning');
+    const inProgRooms = cleaningRooms.filter(x => !!x.r.cleaningStartedAt);
+    const waitingRooms = cleaningRooms.filter(x => !x.r.cleaningStartedAt);
+    const maintRooms = rooms.map((r, idx) => ({ r, idx })).filter(x => x.r.status === 'maintenance');
+    const todayStr = localDateISO(0);
+    const dueInBookings = (state.reservations || []).filter(b => b.status === 'confirmed' && b.checkIn === todayStr);
+    const logs = (state.housekeepingLogs || []).slice(0, 10);
+
+    if (lastHkCleanCount !== -1 && cleaningRooms.length > lastHkCleanCount) {
+      try {
+        if ('speechSynthesis' in window) {
+          const u = new SpeechSynthesisUtterance('แจ้งเตือนแม่บ้าน มีห้องพักรอทำความสะอาดเพิ่มค่ะ');
+          u.lang = 'th-TH';
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {}
+    }
+    lastHkCleanCount = cleaningRooms.length;
+
+    const now = Date.now();
+    const clk = document.getElementById('hk-clock-badge');
+    if (clk) {
+      const d = new Date();
+      clk.textContent = `🕒 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} น.`;
+    }
+
+    const renderCleanCard = ({ r, idx }) => {
+      const inProg = !!r.cleaningStartedAt;
+      const elapsedRun = inProg ? Math.max(0, Math.floor((now - Number(r.cleaningStartedAt)) / 60000)) : 0;
+      const bedLabel = r.type === 'Triple Room' ? '🛏️×3 Triple' : (r.type === 'Twin Bed' ? '🛏️🛏️ Twin' : (r.type === 'VIP Suite' ? '👑 VIP' : '🛏️ Double'));
+      return `
+        <div class="hk-room-card ${inProg ? 'in-progress' : ''}">
+          <div class="between" style="margin-bottom:10px;">
+            <div>
+              <div style="font-size:32px;font-weight:900;line-height:1;color:#fff;">ห้อง ${esc(r.number)}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;align-items:center;">
+                <span class="pro-bed-pill ${r.type === 'Triple Room' ? 'bed-triple' : (r.type === 'Twin Bed' ? 'bed-twin' : 'bed-double')}">${bedLabel}</span>
+                <span style="font-size:11px;font-weight:800;color:${inProg ? '#38bdf8' : '#fbbf24'};">
+                  ${inProg ? `🧽 กำลังทำ (${elapsedRun} นาที)` : `⏳ แจ้งล้าง: ${esc(r.dirtySince || '-')}`}
+                </span>
+              </div>
+            </div>
+            <button type="button" onclick="window.__hotelV5.openMaintModal('${esc(r.number)}')" class="btn btn-dark" style="padding:7px 10px;font-size:11px;color:#fbbf24;border-color:#f59e0b;">📸 แจ้งเสีย</button>
+          </div>
+          <div class="grid-2" style="gap:8px;margin-top:10px;">
+            ${inProg
+              ? `<button type="button" disabled class="btn btn-dark" style="padding:12px;opacity:0.65;color:#38bdf8;">🧽 กำลังทำความสะอาด...</button>`
+              : `<button type="button" onclick="window.__hotelV5.startCleaningRoom(${idx})" class="btn btn-sky" style="padding:12px;font-size:13.5px;">▶️ เริ่มทำห้องนี้</button>`
+            }
+            <button type="button" onclick="window.__hotelV5.finishCleaningRoom(${idx})" class="btn btn-emerald" style="padding:12px;font-size:13.5px;">✅ ทำเสร็จแล้ว</button>
+          </div>
+        </div>
+      `;
+    };
+
+    box.innerHTML = `
+      <div class="hk-kpi-row">
+        <div class="hk-kpi-card" style="border-left-color:#f59e0b;">
+          <div style="font-size:11.5px;color:#94a3b8;">🧹 รอทำความสะอาด</div>
+          <div style="font-size:26px;font-weight:900;color:#fbbf24;">${waitingRooms.length} ห้อง</div>
+        </div>
+        <div class="hk-kpi-card" style="border-left-color:#38bdf8;">
+          <div style="font-size:11.5px;color:#94a3b8;">🧽 กำลังทำความสะอาด</div>
+          <div style="font-size:26px;font-weight:900;color:#38bdf8;">${inProgRooms.length} ห้อง</div>
+        </div>
+        <div class="hk-kpi-card" style="border-left-color:#f43f5e;">
+          <div style="font-size:11.5px;color:#94a3b8;">🛠️ ปิดปรับปรุง / แจ้งซ่อม</div>
+          <div style="font-size:26px;font-weight:900;color:#fda4af;">${maintRooms.length} ห้อง</div>
+        </div>
+        <div class="hk-kpi-card" style="border-left-color:#10b981;">
+          <div style="font-size:11.5px;color:#94a3b8;">📌 จองเข้าพักวันนี้</div>
+          <div style="font-size:26px;font-weight:900;color:#34d399;">${dueInBookings.reduce((s,b)=>s+(Number(b.qty)||1),0)} ห้อง</div>
+        </div>
+      </div>
+
+      <div style="font-size:16px;font-weight:900;color:#fbbf24;margin-bottom:10px;">🧹 คิวห้องรอทำความสะอาด (${cleaningRooms.length} ห้อง)</div>
+      ${cleaningRooms.length === 0
+        ? `<div class="card" style="text-align:center;padding:32px;border:1.5px dashed #10b981;background:rgba(6,78,59,0.2);">
+             <div style="font-size:38px;margin-bottom:6px;">✨</div>
+             <b style="font-size:17px;color:#34d399;">ยอดเยี่ยม! ไม่มีห้องค้างทำความสะอาดในขณะนี้</b>
+             <div style="font-size:12px;color:#94a3b8;margin-top:4px;">เมื่อฟร้อนท์กดเช็คเอาท์ห้องพัก รายการจะเด้งขึ้นมาที่หน้าจอนี้โดยอัตโนมัติ</div>
+           </div>`
+        : `<div class="hk-grid">${cleaningRooms.map(renderCleanCard).join('')}</div>`
+      }
+
+      ${maintRooms.length > 0 ? `
+        <div style="font-size:15px;font-weight:900;color:#fda4af;margin:14px 0 8px;">🛠️ ห้องปิดปรับปรุง / รอช่างซ่อม (${maintRooms.length} ห้อง)</div>
+        <div class="hk-grid">
+          ${maintRooms.map(({ r }) => `
+            <div class="hk-room-card maint-card">
+              <div class="between">
+                <b style="font-size:22px;color:#fff;">ห้อง ${esc(r.number)}</b>
+                <span style="font-size:11px;color:#fbbf24;font-weight:800;">🛠️ งดขาย</span>
+              </div>
+              <div style="margin-top:6px;font-size:13px;color:#fecdd3;">🔧 อาการ: <b>${esc(r.maintenanceNote || 'รอตรวจเช็ก')}</b></div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <div class="card" style="margin-top:12px;">
+        <b style="color:#38bdf8;font-size:13.5px;display:block;margin-bottom:8px;">📋 ประวัติทำความสะอาดล่าสุด</b>
+        ${logs.length === 0
+          ? `<div style="color:#64748b;font-size:12px;">ยังไม่มีประวัติการเคลียร์ห้อง</div>`
+          : logs.map(l => `<div class="between" style="padding:6px 10px;background:#030712;border-radius:8px;margin-bottom:5px;border:1px solid #1f2937;font-size:12px;">
+               <b>ห้อง ${esc(l.room)}</b>
+               <span style="color:#6ee7b7;">${esc(l.time)} (${esc(l.duration)})</span>
+             </div>`).join('')
+        }
+      </div>
+    `;
+  }
+
+  /* =========================================================================
+     8. MAINTENANCE TICKETS WITH PHOTO RENDERER
+     ========================================================================= */
+  function renderMaintTicketsList() {
+    ensureV5StateFields();
+    const list = state.maintenanceTickets || [];
+    const box = document.getElementById('mt-tickets-list');
+    if (!box) return;
+
+    ['all', 'open', 'done'].forEach(k => {
+      const b = document.getElementById('mt-flt-' + k);
+      if (b) b.className = activeMaintFilter === k ? 'btn btn-amber' : 'btn btn-dark';
+    });
+
+    const filtered = list.filter(t => activeMaintFilter === 'all' || (activeMaintFilter === 'open' ? t.status !== 'done' : t.status === 'done'));
+    const totalCost = list.reduce((s, t) => s + (Number(t.cost) || 0), 0);
+    const badge = document.getElementById('mt-total-cost-badge');
+    if (badge) badge.textContent = `ค่าซ่อมสะสมทั้งหมด: ฿${totalCost.toLocaleString()} (${list.length} ใบงาน)`;
+
+    if (filtered.length === 0) {
+      box.innerHTML = `<div style="text-align:center;color:var(--muted);padding:20px;">ยังไม่มีใบแจ้งซ่อมในหมวดนี้</div>`;
+      return;
+    }
+
+    box.innerHTML = filtered.map(t => {
+      const realIdx = list.indexOf(t);
+      const isDone = t.status === 'done';
+      return `
+        <div style="background:#030712;border:1px solid ${isDone ? '#1f2937' : '#f59e0b'};border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;">
+          <div style="display:flex;gap:10px;flex:1;min-width:230px;">
+            ${t.photo
+              ? `<img src="${t.photo}" class="v5-thumb" onclick="window.__hotelV5.openPhotoViewer(this.src, 'รูปแจ้งซ่อม ห้อง ${esc(t.roomNumber)}: ${esc(t.issue)}')">`
+              : `<div style="width:66px;height:48px;border-radius:8px;background:#111827;border:1px dashed #334155;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🔧</div>`
+            }
+            <div style="min-width:0;flex:1;">
+              <div class="row" style="gap:6px;">
+                <b style="color:#fff;font-size:13.5px;">ห้อง ${esc(t.roomNumber)}</b>
+                <span style="font-size:10px;padding:2px 6px;border-radius:5px;font-weight:800;${isDone ? 'background:#064e3b;color:#6ee7b7;' : 'background:#7f1d1d;color:#fecdd3;'}">${isDone ? '✅ ซ่อมเสร็จแล้ว' : (t.priority === 'urgent' ? '🔴 ด่วน/ปิดห้อง' : '🟡 รอซ่อม')}</span>
+                ${Number(t.cost) > 0 ? `<span style="font-size:10.5px;color:#fbbf24;font-weight:800;">฿${Number(t.cost).toLocaleString()}</span>` : ''}
+              </div>
+              <div style="font-size:12.5px;color:#fde68a;margin-top:3px;font-weight:700;">${esc(t.issue)}</div>
+              <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">📅 แจ้งเมื่อ: ${esc(t.date)} ${esc(t.time || '')} ${t.doneDate ? `• เสร็จ: ${esc(t.doneDate)}` : ''}</div>
+            </div>
+          </div>
+          <div class="row" style="gap:5px;">
+            ${!isDone
+              ? `<button type="button" onclick="window.__hotelV5.completeMaintTicket(${realIdx})" class="btn btn-emerald" style="padding:5px 10px;font-size:11px;">✅ ปิดงานซ่อม</button>`
+              : ''
+            }
+            <button type="button" onclick="window.__hotelV5.deleteMaintTicket(${realIdx})" class="btn btn-rose" style="padding:5px 8px;font-size:11px;">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* =========================================================================
+     9. PUBLIC API (window.__hotelV5)
+     ========================================================================= */
+  window.__hotelV5 = {
+    openPhotoViewer(src, title) {
+      if (!src) return;
+      document.getElementById('v5-pv-title').textContent = title || '🖼️ ดูรูปภาพ';
+      document.getElementById('v5-pv-img').src = src;
+      document.getElementById('v5-pv-download').href = src;
+      document.getElementById('v5-photo-viewer-modal').classList.remove('hidden');
+    },
+    setCheckoutPayMethod(m) {
+      activeCheckoutPayMethod = m;
+      const bCash = document.getElementById('v5-pm-cash');
+      const bTrf = document.getElementById('v5-pm-transfer');
+      if (bCash) bCash.className = 'v5-pm-btn' + (m === 'cash' ? ' active-cash' : '');
+      if (bTrf) bTrf.className = 'v5-pm-btn' + (m === 'transfer' ? ' active-transfer' : '');
+    },
+
+    async handleIdCardScan(e) {
+      const f = e.target.files && e.target.files[0];
+      if (!f || activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const st = document.getElementById('v5-id-ocr-status');
+      if (st) st.textContent = '⏳ กำลังบีบอัดและเก็บรูปบัตร...';
+      try {
+        const dataUrl = await compressImageFile(f, 700, 0.66);
+        const r = state.rooms[activeRoomIndex];
+        r.guestIdPhoto = dataUrl;
+        r.guestIdPhotoAt = localDateISO(0);
+        refreshRoomIdThumb();
+        saveDatabase();
+
+        if (st) st.textContent = '🔍 เก็บรูปบัตรแล้ว • กำลังอ่านตัวเลขจากบัตร (OCR)...';
+        const Tess = await loadTesseractLib();
+        if (Tess) {
+          const result = await Tess.recognize(dataUrl, 'eng', { logger: () => {} });
+          const parsed = parseOcrTextForIdOrPassport(result && result.data ? result.data.text : '');
+          let filled = [];
+          if (parsed.idNum) {
+            const taxEl = document.getElementById('m-guest-tax');
+            if (taxEl) { taxEl.value = parsed.idNum; filled.push('เลขบัตร: ' + parsed.idNum); }
+          }
+          if (parsed.nameFound) {
+            const nameEl = document.getElementById('m-guest-name');
+            if (nameEl && !nameEl.value.trim()) { nameEl.value = parsed.nameFound; filled.push('ชื่อ: ' + parsed.nameFound); }
+          }
+          if (filled.length > 0) {
+            saveCurrentRoomData();
+            if (st) st.textContent = '✅ สแกนสำเร็จ (' + filled.join(' | ') + ') กรุณาตรวจความถูกต้อง';
+            showToast('📷 สแกนบัตรและดึงเลขบัตรเรียบร้อย!');
+          } else {
+            if (st) st.textContent = '✅ เก็บภาพบัตรไว้หลังบ้านแล้ว (กรุณาพิมพ์ชื่อ/เลขบัตรเพิ่มเติม)';
+          }
+        } else {
+          if (st) st.textContent = '✅ เก็บภาพบัตรไว้หลังบ้านเรียบร้อยแล้ว';
+        }
+      } catch (err) {
+        if (st) st.textContent = '⚠️ ไม่สามารถอ่านไฟล์รูปภาพนี้ได้';
+      }
+      e.target.value = '';
+    },
+    removeRoomIdPhoto() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      if (!confirm('ลบรูปบัตรประชาชน/พาสปอร์ตออกจากห้องนี้?')) return;
+      state.rooms[activeRoomIndex].guestIdPhoto = '';
+      saveDatabase();
+      refreshRoomIdThumb();
+    },
+
+    openMaintModal(presetRoomNum) {
+      ensureV5StateFields();
+      const sel = document.getElementById('mt-room-sel');
+      if (sel) {
+        sel.innerHTML = (state.rooms || []).map(r => `<option value="${esc(r.number)}">ห้อง ${esc(r.number)} (${esc(r.type)})</option>`).join('');
+        if (presetRoomNum) sel.value = presetRoomNum;
+      }
+      renderMaintTicketsList();
+      document.getElementById('maint-tickets-modal').classList.remove('hidden');
+    },
+    setMaintFilter(f) {
+      activeMaintFilter = f;
+      renderMaintTicketsList();
+    },
+    async handleMaintPhotoSelect(e) {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      try {
+        pendingMaintPhoto = await compressImageFile(f, 600, 0.62);
+        const prev = document.getElementById('mt-photo-preview');
+        const wrap = document.getElementById('mt-photo-preview-wrap');
+        if (prev) prev.src = pendingMaintPhoto;
+        if (wrap) wrap.classList.remove('hidden');
+      } catch (err) {
+        alert('ไม่สามารถอ่านรูปภาพได้');
+      }
+    },
+    clearMaintPhoto() {
+      pendingMaintPhoto = '';
+      const inp = document.getElementById('mt-photo-input');
+      const wrap = document.getElementById('mt-photo-preview-wrap');
+      if (inp) inp.value = '';
+      if (wrap) wrap.classList.add('hidden');
+    },
+    saveMaintTicket() {
+      ensureV5StateFields();
+      const roomNum = document.getElementById('mt-room-sel')?.value || '';
+      const issue = (document.getElementById('mt-issue')?.value || '').trim();
+      const priority = document.getElementById('mt-priority')?.value || 'urgent';
+      const cost = Number(document.getElementById('mt-cost')?.value) || 0;
+      if (!roomNum || !issue) return alert('กรุณาเลือกห้องและระบุอาการเสียครับ');
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const ticket = {
+        id: 'MT-' + Date.now().toString().slice(-6),
+        roomNumber: roomNum,
+        issue,
+        priority,
+        cost,
+        photo: pendingMaintPhoto || '',
+        date: localDateISO(0),
+        time: timeStr,
+        status: 'open',
+        doneDate: ''
+      };
+      state.maintenanceTickets.unshift(ticket);
+      let photoCount = 0;
+      state.maintenanceTickets.forEach(t => {
+        if (t.photo) {
+          photoCount++;
+          if (photoCount > 25) t.photo = '';
+        }
+      });
+
+      if (priority === 'urgent') {
+        const roomObj = (state.rooms || []).find(r => String(r.number) === String(roomNum));
+        if (roomObj && roomObj.status !== 'occupied') {
+          roomObj.status = 'maintenance';
+          roomObj.light = false;
+          roomObj.maintenanceNote = issue;
+        }
+      }
+
+      document.getElementById('mt-issue').value = '';
+      document.getElementById('mt-cost').value = '0';
+      this.clearMaintPhoto();
+      saveDatabase();
+      renderAll();
+      renderMaintTicketsList();
+      if (hkActive) renderHousekeepingBoard();
+      showToast(`🛠️ บันทึกใบแจ้งซ่อมห้อง ${roomNum} เรียบร้อยแล้ว`);
+    },
+    completeMaintTicket(idx) {
+      const t = (state.maintenanceTickets || [])[idx];
+      if (!t) return;
+      const finalCostStr = prompt(`✅ ปิดงานซ่อมห้อง ${t.roomNumber} (${t.issue})\nกรอกค่าซ่อมจริง (บาท) [ใส่ 0 หากไม่มีค่าใช้จ่าย]:`, String(t.cost || 0));
+      if (finalCostStr === null) return;
+      const finalCost = Math.max(0, Number(finalCostStr) || 0);
+      t.cost = finalCost;
+      t.status = 'done';
+      t.doneDate = localDateISO(0);
+
+      const roomObj = (state.rooms || []).find(r => String(r.number) === String(t.roomNumber));
+      if (roomObj && roomObj.status === 'maintenance') {
+        const hasOtherOpen = (state.maintenanceTickets || []).some(x => x.status !== 'done' && String(x.roomNumber) === String(t.roomNumber));
+        if (!hasOtherOpen) {
+          roomObj.status = 'vacant';
+          roomObj.maintenanceNote = '';
+        }
+      }
+
+      if (finalCost > 0 && confirm(`ต้องการบันทึกค่าซ่อม ฿${finalCost.toLocaleString()} ลงบัญชีรายจ่ายวันนี้ด้วยหรือไม่?`)) {
+        const newTx = {
+          type: 'expense',
+          category: '🔧 ค่าซ่อมบำรุง',
+          title: `ซ่อมห้อง ${t.roomNumber}: ${t.issue} [เงินสด]`,
+          amount: finalCost,
+          date: localDateISO(0),
+          paymentMethod: 'cash'
+        };
+        state.transactions.unshift(newTx);
+        if (typeof sendToGoogleSheet === 'function') sendToGoogleSheet('SAVE_TX', newTx);
+      }
+
+      saveDatabase();
+      renderAll();
+      renderMaintTicketsList();
+      if (hkActive) renderHousekeepingBoard();
+      showToast(`✅ ปิดงานซ่อมห้อง ${t.roomNumber} เรียบร้อยแล้ว`);
+    },
+    deleteMaintTicket(idx) {
+      if (!confirm('ยืนยันลบประวัติใบแจ้งซ่อมนี้?')) return;
+      state.maintenanceTickets.splice(idx, 1);
+      saveDatabase();
+      renderMaintTicketsList();
+      enhanceExecutiveDashboardV5();
+    },
+
+    enterHousekeepingMode() {
+      hkActive = true;
+      lastHkCleanCount = -1;
+      document.getElementById('hk-overlay')?.classList.remove('hidden');
+      renderHousekeepingBoard();
+      clearInterval(hkClockTimer);
+      hkClockTimer = setInterval(renderHousekeepingBoard, 15000);
+      if (typeof window.pullFromFirebaseNow === 'function') window.pullFromFirebaseNow(false);
+    },
+    exitHousekeepingMode() {
+      hkActive = false;
+      clearInterval(hkClockTimer);
+      document.getElementById('hk-overlay')?.classList.add('hidden');
+      if (currentRole === 'housekeeping') logout();
+    },
+    async refreshHkBoard(msg) {
+      if (typeof window.pullFromFirebaseNow === 'function') await window.pullFromFirebaseNow(msg);
+      renderHousekeepingBoard();
+    },
+    startCleaningRoom(idx) {
+      const r = state.rooms[idx];
+      if (!r) return;
+      r.cleaningStartedAt = Date.now();
+      saveDatabase();
+      renderHousekeepingBoard();
+      renderRooms();
+      showToast(`🧽 เริ่มทำความสะอาดห้อง ${r.number}`);
+    },
+    finishCleaningRoom(idx) {
+      const r = state.rooms[idx];
+      if (!r) return;
+      let durText = '';
+      if (r.cleaningStartedAt) {
+        const mins = Math.max(1, Math.round((Date.now() - Number(r.cleaningStartedAt)) / 60000));
+        durText = `ใช้เวลาทำ ${mins} นาที`;
+      }
+      r.cleaningStartedAt = 0;
+      if (typeof window.markRoomCleaned === 'function') window.markRoomCleaned(idx);
+      if (durText && state.housekeepingLogs && state.housekeepingLogs[0]) {
+        state.housekeepingLogs[0].duration = durText;
+        saveDatabase();
+      }
+      renderHousekeepingBoard();
+    },
+    copyHousekeepingLink() {
+      const url = window.location.origin + window.location.pathname + '?mode=housekeeping';
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+          alert('✅ คัดลอกลิงก์จอ iPad ห้องแม่บ้านแล้ว!\n\n' + url + '\n\nนำลิงก์นี้ไปเปิดบน iPad แปะผนังห้องแม่บ้านได้เลย (เปิดแล้วเข้าหน้าคิวแม่บ้านอัตโนมัติ ซิงค์เรียลไทม์ ไม่แสดงตัวเลขการเงิน)');
+        });
+      } else {
+        prompt('คัดลอกลิงก์นี้ไปเปิดบน iPad ห้องแม่บ้าน:', url);
+      }
+    },
+
+    openShiftModal() {
+      ensureV5StateFields();
+      const dtEl = document.getElementById('sh-date');
+      if (dtEl) dtEl.value = localDateISO(0);
+      const stEl = document.getElementById('sh-staff');
+      if (stEl && !stEl.value) {
+        const h = new Date().getHours();
+        stEl.value = h < 15 ? 'กะเช้า' : (h < 22 ? 'กะบ่าย' : 'กะดึก');
+      }
+      document.getElementById('sh-actual-cash').value = '';
+      this.refreshShiftPreview();
+      document.getElementById('shift-handover-modal').classList.remove('hidden');
+    },
+    refreshShiftPreview() {
+      const selDate = document.getElementById('sh-date')?.value || localDateISO(0);
+      const staff = (document.getElementById('sh-staff')?.value || 'ฟร้อนท์').trim();
+      const floatAmt = Number(document.getElementById('sh-float')?.value) || 0;
+      const actualStr = document.getElementById('sh-actual-cash')?.value;
+
+      const s = calcCashTransferSummary(selDate);
+      const expectedCash = floatAmt + s.cashInc - s.cashExp;
+
+      const cardsEl = document.getElementById('sh-summary-cards');
+      if (cardsEl) {
+        cardsEl.innerHTML = `
+          <div style="background:#030712;padding:8px 10px;border-radius:10px;border:1px solid #065f46;">
+            <div style="font-size:10.5px;color:#94a3b8;">💵 รายรับเงินสด</div>
+            <b style="font-size:16px;color:#34d399;">฿${s.cashInc.toLocaleString()}</b>
+          </div>
+          <div style="background:#030712;padding:8px 10px;border-radius:10px;border:1px solid #075985;">
+            <div style="font-size:10.5px;color:#94a3b8;">📱 รายรับโอน QR</div>
+            <b style="font-size:16px;color:#38bdf8;">฿${s.transferInc.toLocaleString()}</b>
+          </div>
+          <div style="background:#030712;padding:8px 10px;border-radius:10px;border:1px solid #881337;">
+            <div style="font-size:10.5px;color:#94a3b8;">💸 รายจ่าย (สด/โอน)</div>
+            <b style="font-size:13px;color:#fda4af;">สด ฿${s.cashExp.toLocaleString()} / โอน ฿${s.transferExp.toLocaleString()}</b>
+          </div>
+          <div style="background:#030712;padding:8px 10px;border-radius:10px;border:1px solid #b45309;">
+            <div style="font-size:10.5px;color:#fde68a;">🗄️ เงินสดควรมีในเก๊ะ</div>
+            <b style="font-size:16px;color:#fbbf24;">฿${expectedCash.toLocaleString()}</b>
+          </div>
+        `;
+      }
+
+      let diffLine = '';
+      const diffBox = document.getElementById('sh-diff-box');
+      if (actualStr !== '' && actualStr !== undefined) {
+        const actual = Number(actualStr) || 0;
+        const diff = actual - expectedCash;
+        if (diff === 0) {
+          if (diffBox) diffBox.innerHTML = `<span style="color:#34d399;">✅ ยอดเงินสดตรงเป๊ะ! (฿${actual.toLocaleString()})</span>`;
+          diffLine = `• นับเงินสดจริงในเก๊ะ: ฿${actual.toLocaleString()} (ตรงเป๊ะ ✅)`;
+        } else if (diff > 0) {
+          if (diffBox) diffBox.innerHTML = `<span style="color:#38bdf8;">➕ เงินสดเกิน +฿${diff.toLocaleString()}</span>`;
+          diffLine = `• นับเงินสดจริงในเก๊ะ: ฿${actual.toLocaleString()} (เกิน +฿${diff.toLocaleString()})`;
+        } else {
+          if (diffBox) diffBox.innerHTML = `<span style="color:#fb7185;">⚠️ เงินสดขาด -฿${Math.abs(diff).toLocaleString()}</span>`;
+          diffLine = `• นับเงินสดจริงในเก๊ะ: ฿${actual.toLocaleString()} (ขาด -฿${Math.abs(diff).toLocaleString()} ⚠️)`;
+        }
+      } else {
+        if (diffBox) diffBox.innerHTML = `<span style="color:#94a3b8;font-weight:400;">กรอกยอดเงินสดที่นับได้จริงเพื่อเทียบส่วนต่าง</span>`;
+      }
+
+      const rooms = state.rooms || [];
+      const occ = rooms.filter(r => r.status === 'occupied').length;
+      const cln = rooms.filter(r => r.status === 'cleaning').length;
+      const maintList = rooms.filter(r => r.status === 'maintenance');
+      const vac = Math.max(0, rooms.length - occ - cln - maintList.length);
+      const maintStr = maintList.length > 0
+        ? maintList.map(r => `${r.number}(${r.maintenanceNote || 'ซ่อม'})`).join(', ')
+        : 'ไม่มี';
+
+      const hotelName = (state.hotelInfo && state.hotelInfo.nameTh) || 'ภูเบศร์อินเตอร์โฮเต็ล';
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} น.`;
+
+      const report = [
+        `🏨 สรุปปิดกะ ${hotelName}`,
+        `📅 วันที่: ${selDate} | 🕒 ${timeStr}`,
+        `👤 รอบกะ: ${staff}`,
+        `━━━━━━━━━━━━━━━━`,
+        `💰 สรุปการเงิน`,
+        `• 💵 รายรับเงินสด: ฿${s.cashInc.toLocaleString()}`,
+        `• 📱 รายรับโอน QR: ฿${s.transferInc.toLocaleString()}`,
+        `• 📈 รวมรายรับทั้งหมด: ฿${s.totalInc.toLocaleString()}`,
+        `• 💸 รายจ่ายเงินสด: ฿${s.cashExp.toLocaleString()} (โอน: ฿${s.transferExp.toLocaleString()})`,
+        `• 🗄️ เงินสดควรมีในเก๊ะ (รวมตั้งต้น ฿${floatAmt.toLocaleString()}): ฿${expectedCash.toLocaleString()}`,
+        diffLine,
+        `━━━━━━━━━━━━━━━━`,
+        `🛌 สถานะห้องพัก (${rooms.length} ห้อง)`,
+        `• 🔴 มีผู้เข้าพัก: ${occ} ห้อง`,
+        `• 🟢 ว่างพร้อมขาย: ${vac} ห้อง`,
+        `• 🟡 รอแม่บ้านเคลียร์: ${cln} ห้อง`,
+        `• 🛠️ ปิดปรับปรุง (${maintList.length}): ${maintStr}`
+      ].filter(Boolean).join('\n');
+
+      const txt = document.getElementById('sh-line-preview');
+      if (txt) txt.value = report;
+
+      const histBox = document.getElementById('sh-history-box');
+      if (histBox) {
+        const lastLog = (state.shiftLogs || [])[0];
+        histBox.textContent = lastLog
+          ? `📜 ปิดกะครั้งล่าสุด: ${lastLog.date} ${lastLog.time} (${lastLog.staff}) • รับสด ฿${(lastLog.cashInc||0).toLocaleString()} / โอน ฿${(lastLog.transferInc||0).toLocaleString()}`
+          : 'ยังไม่มีประวัติการปิดกะที่บันทึกไว้';
+      }
+    },
+    saveShiftLogSnapshot() {
+      ensureV5StateFields();
+      const selDate = document.getElementById('sh-date')?.value || localDateISO(0);
+      const staff = (document.getElementById('sh-staff')?.value || 'ฟร้อนท์').trim();
+      const s = calcCashTransferSummary(selDate);
+      const now = new Date();
+      state.shiftLogs.unshift({
+        date: selDate,
+        time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
+        staff,
+        cashInc: s.cashInc,
+        transferInc: s.transferInc,
+        cashExp: s.cashExp
+      });
+      if (state.shiftLogs.length > 60) state.shiftLogs = state.shiftLogs.slice(0, 60);
+      saveDatabase();
+    },
+    copyShiftText() {
+      const txt = document.getElementById('sh-line-preview')?.value || '';
+      if (!txt) return;
+      this.saveShiftLogSnapshot();
+      navigator.clipboard?.writeText(txt);
+      this.refreshShiftPreview();
+      showToast('📋 คัดลอกสรุปยอดและบันทึกปิดกะแล้ว!');
+    },
+    sendShiftToLine() {
+      const txt = document.getElementById('sh-line-preview')?.value || '';
+      if (!txt) return;
+      this.saveShiftLogSnapshot();
+      navigator.clipboard?.writeText(txt);
+      const shareUrl = 'https://line.me/R/share?text=' + encodeURIComponent(txt);
+      window.open(shareUrl, '_blank');
+      showToast('💚 กำลังเปิด LINE เพื่อส่งรายงานปิดกะ...');
+    }
+  };
+
+  /* =========================================================================
+     10. BOOT & SAFE HOOKS
+     ========================================================================= */
+  function bootUltimateV5() {
+    ensureV5StateFields();
+    replaceSingleToTripleInSelects();
+    upgradeLoginAndSettingsForHousekeeping();
+    injectCheckoutPaymentMethodUI();
+    injectIdScannerUI();
+    injectFinanceCashTransferUI();
+
+    window.selectRole = function(role) {
+      selectedLoginRole = role;
+      ['front', 'manager', 'owner', 'housekeeping'].forEach(r => {
+        const btn = document.getElementById('role-' + r);
+        if (!btn) return;
+        if (r === role) {
+          btn.style.border = '2px solid #10b981';
+          btn.style.background = 'rgba(16,185,129,0.2)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.border = '1px solid #334155';
+          btn.style.background = '#1e293b';
+          btn.style.color = '#cbd5e1';
+        }
+      });
+      clearPin();
+    };
+
+    const _prevSubmitPin = window.submitPin;
+    window.submitPin = function() {
+      ensureV5StateFields();
+      if (selectedLoginRole === 'housekeeping') {
+        const target = state.pins.housekeeping || '2222';
+        if (pinBuffer === target) {
+          currentRole = 'housekeeping';
+          clearPin();
+          document.getElementById('login-screen').classList.add('hidden');
+          window.__hotelV5.enterHousekeepingMode();
+          showToast('เข้าสู่โหมดแม่บ้านสำเร็จ');
+        } else {
+          alert('รหัส PIN แม่บ้านไม่ถูกต้อง! (ค่าเริ่มต้น 2222)');
+          clearPin();
+        }
+        return;
+      }
+      if (_prevSubmitPin) _prevSubmitPin();
+    };
+
+    const _prevOpenSet = window.openSettingsModal;
+    window.openSettingsModal = function() {
+      if (_prevOpenSet) _prevOpenSet.apply(this, arguments);
+      ensureV5StateFields();
+      const hkInp = document.getElementById('set-pin-hk');
+      if (hkInp) hkInp.value = state.pins.housekeeping || '2222';
+    };
+
+    const _prevSaveSet = window.saveAllSettings;
+    window.saveAllSettings = function() {
+      ensureV5StateFields();
+      const hkInp = document.getElementById('set-pin-hk');
+      if (hkInp) state.pins.housekeeping = hkInp.value.trim() || '2222';
+      if (_prevSaveSet) _prevSaveSet.apply(this, arguments);
+    };
+
+    const _prevRenderSetRooms = window.renderSettingsMenuAndRooms;
+    window.renderSettingsMenuAndRooms = function() {
+      if (_prevRenderSetRooms) _prevRenderSetRooms.apply(this, arguments);
+      document.querySelectorAll('#set-rooms-list select').forEach((sel, i) => {
+        Array.from(sel.options).forEach(opt => {
+          if (opt.value === 'Single Bed') {
+            opt.value = 'Triple Room';
+            opt.textContent = 'Triple Room';
+          }
+        });
+        if (state.rooms[i] && state.rooms[i].type === 'Triple Room') {
+          sel.value = 'Triple Room';
+        }
+      });
+    };
+
+    window.checkAvailabilityPreview = function() {
+      const targetDate = document.getElementById('chk-book-date')?.value || localDateISO(0);
+      const types = ['Twin Bed', 'Double Bed', 'Triple Room', 'VIP Suite'];
+      const box = document.getElementById('avail-result-grid');
+      if (!box) return;
+      box.innerHTML = types.map(t => {
+        const stat = getAvailableRoomsOnDate(targetDate, t);
+        const isAvail = stat.available > 0;
+        return `
+          <div style="background:#090d16;border:1px solid ${isAvail ? '#10b981' : '#f43f5e'};border-radius:12px;padding:10px;">
+            <div style="font-size:12px;font-weight:800;color:#fff;">${t}</div>
+            <div class="between" style="margin-top:4px;">
+              <span style="font-size:11px;color:var(--muted);">ทั้งหมด: ${stat.total}</span>
+              <b style="font-size:16px;color:${isAvail ? '#34d399' : '#f43f5e'};">ว่าง ${stat.available} ห้อง</b>
+            </div>
+          </div>`;
+      }).join('');
+    };
+
+    const _prevRenderBookList = window.renderBookingsList;
+    window.renderBookingsList = function() {
+      if (_prevRenderBookList) _prevRenderBookList.apply(this, arguments);
+      const tapeTbl = document.querySelector('#pro-tape-chart-card .tape-table tbody');
+      if (tapeTbl && (state.rooms || []).some(r => r.type === 'Triple Room') && !tapeTbl.textContent.includes('Triple Room')) {
+        const days = [];
+        const baseD = new Date();
+        for (let i = 0; i < 14; i++) {
+          const d = new Date(baseD); d.setDate(baseD.getDate() + i);
+          days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+        }
+        const cells = days.map(iso => {
+          const st = getAvailableRoomsOnDate(iso, 'Triple Room');
+          const cls = st.available <= 0 ? 'tape-cell-full' : (st.available <= 3 ? 'tape-cell-low' : 'tape-cell-ok');
+          return `<td class="${cls}">${st.available}/${st.total}</td>`;
+        }).join('');
+        tapeTbl.insertAdjacentHTML('afterbegin', `<tr><td style="text-align:left;font-weight:800;color:#5eead4;background:#0b1120;white-space:nowrap;">Triple Room</td>${cells}</tr>`);
+      }
+    };
+
+    const _prevRenderRooms = window.renderRooms;
+    window.renderRooms = function() {
+      ensureV5StateFields();
+      if (_prevRenderRooms) _prevRenderRooms.apply(this, arguments);
+      patchTripleBadgesOnGrid();
+      enhanceExecutiveDashboardV5();
+      if (hkActive) renderHousekeepingBoard();
+    };
+
+    const _prevOpenRoom = window.openRoomModal;
+    window.openRoomModal = function(idx) {
+      replaceSingleToTripleInSelects();
+      if (_prevOpenRoom) _prevOpenRoom.apply(this, arguments);
+      injectIdScannerUI();
+      injectCheckoutPaymentMethodUI();
+      const r = state.rooms[idx];
+      if (r && r.type === 'Triple Room') {
+        const rt = document.getElementById('m-room-type');
+        if (rt) rt.value = 'Triple Room';
+      }
+      refreshRoomIdThumb();
+      window.__hotelV5.setCheckoutPayMethod('cash');
+    };
+
+    const _prevCheckIn = window.checkInRoom;
+    window.checkInRoom = function() {
+      const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+      const snapPhoto = snapRoom ? snapRoom.guestIdPhoto : '';
+      if (_prevCheckIn) _prevCheckIn.apply(this, arguments);
+      if (snapRoom && snapPhoto) {
+        const gName = (snapRoom.guestName || '').trim();
+        if (gName) {
+          const cust = (state.customers || []).find(c => (c.name || '').trim().toLowerCase() === gName.toLowerCase());
+          if (cust) {
+            cust.idPhoto = snapPhoto;
+            cust.idPhotoDate = localDateISO(0);
+          }
+        }
+        ensureV5StateFields();
+        state.idVault.unshift({
+          guestName: gName || ('ห้อง ' + snapRoom.number),
+          tax: snapRoom.guestTax || '',
+          room: snapRoom.number,
+          date: localDateISO(0),
+          photo: snapPhoto
+        });
+        if (state.idVault.length > 20) state.idVault = state.idVault.slice(0, 20);
+        saveDatabase();
+      }
+    };
+
+    const _prevRenderCust = window.renderCustomers;
+    window.renderCustomers = function() {
+      if (_prevRenderCust) _prevRenderCust.apply(this, arguments);
+      const box = document.getElementById('cust-list');
+      if (!box) return;
+      box.querySelectorAll('button[onclick^="viewCustomerHistory("]').forEach(btn => {
+        const m = (btn.getAttribute('onclick') || '').match(/viewCustomerHistory\((\d+)\)/);
+        if (!m) return;
+        const c = state.customers[Number(m[1])];
+        if (c && c.idPhoto && !btn.parentNode.querySelector('.v5-view-id-btn')) {
+          const idBtn = document.createElement('button');
+          idBtn.type = 'button';
+          idBtn.className = 'btn btn-purple v5-view-id-btn';
+          idBtn.style.cssText = 'padding:4px 8px;font-size:10.5px;';
+          idBtn.textContent = '🪪 ดูบัตร';
+          idBtn.onclick = () => window.__hotelV5.openPhotoViewer(c.idPhoto, `ภาพบัตร: ${c.name} (${c.idPhotoDate || ''})`);
+          btn.parentNode.insertBefore(idBtn, btn);
+        }
+      });
+    };
+
+    const _prevCheckout = window.completeCheckOutAndPay;
+    window.completeCheckOutAndPay = function() {
+      const prevTxLen = (state.transactions || []).length;
+      const prevRcpLen = (state.receiptsArchive || []).length;
+      const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+      const snapPhoto = snapRoom ? snapRoom.guestIdPhoto : '';
+      const snapName = snapRoom ? (snapRoom.guestName || '').trim() : '';
+
+      if (_prevCheckout) _prevCheckout.apply(this, arguments);
+
+      const pm = activeCheckoutPayMethod || 'cash';
+      const pmTag = pm === 'transfer' ? ' [โอน QR]' : ' [เงินสด]';
+
+      if ((state.transactions || []).length > prevTxLen && state.transactions[0]) {
+        state.transactions[0].paymentMethod = pm;
+        if (!state.transactions[0].title.includes('[เงินสด]') && !state.transactions[0].title.includes('[โอน QR]')) {
+          state.transactions[0].title += pmTag;
+        }
+      }
+      if ((state.receiptsArchive || []).length > prevRcpLen && state.receiptsArchive[0]) {
+        state.receiptsArchive[0].paymentMethod = pm;
+      }
+      if (snapPhoto && snapName) {
+        const cust = (state.customers || []).find(c => (c.name || '').trim().toLowerCase() === snapName.toLowerCase());
+        if (cust) { cust.idPhoto = snapPhoto; cust.idPhotoDate = localDateISO(0); }
+      }
+      if (snapRoom) snapRoom.guestIdPhoto = '';
+
+      saveDatabase();
+      renderAll();
+    };
+
+    const _prevSaveTx = window.saveTransaction;
+    window.saveTransaction = function() {
+      const prevLen = (state.transactions || []).length;
+      const pm = document.getElementById('tx-pay-method')?.value || 'cash';
+      if (_prevSaveTx) _prevSaveTx.apply(this, arguments);
+      if ((state.transactions || []).length > prevLen && state.transactions[0]) {
+        state.transactions[0].paymentMethod = pm;
+        const tag = pm === 'transfer' ? ' [โอน QR]' : ' [เงินสด]';
+        if (!state.transactions[0].title.includes('[เงินสด]') && !state.transactions[0].title.includes('[โอน QR]')) {
+          state.transactions[0].title += tag;
+        }
+        saveDatabase();
+        renderFinance();
+      }
+    };
+
+    const _prevRenderFinance = window.renderFinance;
+    window.renderFinance = function() {
+      if (_prevRenderFinance) _prevRenderFinance.apply(this, arguments);
+      injectFinanceCashTransferUI();
+      enhanceExecutiveDashboardV5();
+    };
+
+    if (window.__hotelWow && typeof window.__hotelWow.toggleExecDash === 'function') {
+      const _prevToggleDash = window.__hotelWow.toggleExecDash;
+      window.__hotelWow.toggleExecDash = function() {
+        _prevToggleDash.apply(this, arguments);
+        enhanceExecutiveDashboardV5();
+      };
+    }
+
+    if (typeof window.sendToGoogleSheet === 'function' && !window.sendToGoogleSheet._v5Wrapped) {
+      const _prevSendSheet = window.sendToGoogleSheet;
+      const wrappedSheet = function(actionName, payloadData) {
+        if (actionName === 'SAVE_TX' && payloadData && typeof payloadData === 'object') {
+          const cloned = Object.assign({}, payloadData);
+          const pm = cloned.paymentMethod || activeCheckoutPayMethod || (document.getElementById('tx-pay-method')?.value) || 'cash';
+          const tag = pm === 'transfer' ? ' [โอน QR]' : ' [เงินสด]';
+          if (cloned.title && !cloned.title.includes('[เงินสด]') && !cloned.title.includes('[โอน QR]') && cloned.type !== 'test') {
+            cloned.title = cloned.title + tag;
+          }
+          return _prevSendSheet(actionName, cloned);
+        }
+        return _prevSendSheet.apply(this, arguments);
+      };
+      wrappedSheet._v5Wrapped = true;
+      window.sendToGoogleSheet = wrappedSheet;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'housekeeping') {
+      document.getElementById('login-screen')?.classList.add('hidden');
+      window.__hotelV5.enterHousekeepingMode();
+    } else {
+      renderAll();
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(bootUltimateV5, 780);
+  });
+})();
+</script>
+ <!-- ================= ADD-ON V6: รายงานภาษีขาย (ภ.พ.30) + สมุดทะเบียนผู้เข้าพัก (ร.ร.4) + EXPORT EXCEL/CSV & A4 PRINT ================= -->
+<style>
+  .v6-gov-btn {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #fff;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 99px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  }
+  .v6-tbl-wrap {
+    overflow-x: auto;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    background: #030712;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .v6-tbl {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 11.5px;
+  }
+  .v6-tbl th, .v6-tbl td {
+    border: 1px solid #1e293b;
+    padding: 7px 8px;
+    text-align: left;
+  }
+  .v6-tbl th {
+    background: #0f172a;
+    color: #fbbf24;
+    font-weight: 800;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .v6-tbl td.num, .v6-tbl th.num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .v6-tbl tfoot td {
+    background: #0f172a;
+    font-weight: 900;
+    color: #34d399;
+    border-top: 2px solid #f59e0b;
+  }
+  #v6-print-area {
+    display: none;
+  }
+  @media print {
+    body.v6-printing-report * {
+      visibility: hidden !important;
+    }
+    body.v6-printing-report #receipt-paper,
+    body.v6-printing-report #receipt-paper * {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    body.v6-printing-report #v6-print-area,
+    body.v6-printing-report #v6-print-area * {
+      visibility: visible !important;
+    }
+    body.v6-printing-report #v6-print-area {
+      display: block !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      background: #ffffff !important;
+      color: #000000 !important;
+      padding: 12mm !important;
+      font-family: "Sarabun", Tahoma, sans-serif !important;
+      font-size: 11.5px !important;
+      line-height: 1.4 !important;
+    }
+    body.v6-printing-report #v6-print-area table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin-top: 8px !important;
+    }
+    body.v6-printing-report #v6-print-area th,
+    body.v6-printing-report #v6-print-area td {
+      border: 1px solid #000 !important;
+      padding: 5px 6px !important;
+      color: #000 !important;
+      font-size: 11px !important;
+    }
+    body.v6-printing-report #v6-print-area th {
+      background: #f1f5f9 !important;
+      font-weight: 800 !important;
+    }
+  }
+</style>
+
+<!-- พื้นที่สำหรับพิมพ์รายงาน A4 (ซ่อนบนหน้าจอ แสดงเฉพาะตอนสั่งพิมพ์) -->
+<div id="v6-print-area"></div>
+
+<!-- ================= MODAL: รายงานภาษีขาย (ภ.พ.30) & สมุดทะเบียนผู้เข้าพัก (ร.ร.4) ================= -->
+<div id="gov-reports-modal" class="modal-backdrop hidden" style="z-index: 9970;">
+  <div class="modal-box" style="max-width: 960px; border: 2px solid #38bdf8;">
+    <div class="between" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:10px;">
+      <div>
+        <b style="font-size:16px;color:#38bdf8;">📑 ศูนย์เอกสารราชการ • รายงานภาษีขาย (ภ.พ.30) & ทะเบียนผู้พัก (ร.ร.4)</b>
+        <div style="font-size:11px;color:var(--muted);">ดึงข้อมูลจากใบเสร็จและรายการเข้าพักจริง พร้อมส่งออกไฟล์ Excel (CSV) และพิมพ์ A4 ส่งสรรพากร / ฝ่ายปกครอง</div>
+      </div>
+      <button onclick="document.getElementById('gov-reports-modal').classList.add('hidden')" class="btn btn-dark">✕</button>
+    </div>
+
+    <!-- สลับแท็บ ภ.พ.30 / ร.ร.4 -->
+    <div class="grid-2" style="margin-bottom:10px;">
+      <button type="button" id="v6-tab-pp30" onclick="window.__hotelV6.switchTab('pp30')" class="btn btn-amber" style="padding:10px;font-size:13px;">🧾 รายงานภาษีขาย (ภ.พ.30 / VAT 7%)</button>
+      <button type="button" id="v6-tab-rr4" onclick="window.__hotelV6.switchTab('rr4')" class="btn btn-dark" style="padding:10px;font-size:13px;">📘 สมุดทะเบียนผู้เข้าพัก (แบบ ร.ร.4)</button>
+    </div>
+
+    <!-- แถบเลือกเดือน & ข้อมูลผู้ประกอบการ -->
+    <div class="subcard" style="padding:10px 12px;">
+      <div class="grid-3">
+        <div>
+          <span style="font-size:11px;color:#38bdf8;font-weight:700;">📅 เลือกเดือนภาษี / เดือนที่เข้าพัก</span>
+          <input type="month" id="v6-month-inp" onchange="window.__hotelV6.renderCurrentTab()" style="color:#38bdf8;font-weight:800;">
+        </div>
+        <div>
+          <span style="font-size:11px;color:var(--muted);">เลขประจำตัวผู้เสียภาษีโรงแรม (13 หลัก)</span>
+          <input type="text" id="v6-hotel-taxid" placeholder="เช่น 0275560000123" onchange="window.__hotelV6.saveGovProfile()">
+        </div>
+        <div>
+          <span style="font-size:11px;color:var(--muted);">ชื่อผู้จัดการโรงแรม (ลงนาม ร.ร.4)</span>
+          <input type="text" id="v6-hotel-mgr" placeholder="เช่น นายภูเบศร์ อภัยวงศ์" onchange="window.__hotelV6.saveGovProfile()">
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB 1: รายงานภาษีขาย ภ.พ.30 ========== -->
+    <div id="v6-pane-pp30">
+      <div class="between" style="margin-bottom:8px;">
+        <label class="row" style="font-size:12px;font-weight:700;cursor:pointer;color:#fde68a;">
+          <input type="checkbox" id="v6-pp30-onlyvat" checked onchange="window.__hotelV6.renderPP30()" style="width:16px;height:16px;accent-color:#f59e0b;">
+          แสดงเฉพาะบิลที่คิด VAT 7% เท่านั้น (ติ๊กออกเพื่อดูยอดขายรวมทุกบิลในเดือน)
+        </label>
+        <div class="row" style="gap:6px;">
+          <button type="button" onclick="window.__hotelV6.exportPP30Csv()" class="btn btn-emerald" style="padding:7px 12px;font-size:12px;">📥 Export Excel (CSV)</button>
+          <button type="button" onclick="window.__hotelV6.printPP30A4()" class="btn btn-amber" style="padding:7px 12px;font-size:12px;">🖨️ พิมพ์ ภ.พ.30 (A4)</button>
+        </div>
+      </div>
+
+      <div id="v6-pp30-kpi" class="grid-3" style="margin-bottom:8px;"></div>
+      <div class="v6-tbl-wrap">
+        <table class="v6-tbl">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>วัน/เดือน/ปี</th>
+              <th>เลขที่ใบกำกับภาษี</th>
+              <th>ชื่อผู้รับบริการ</th>
+              <th>เลขผู้เสียภาษี</th>
+              <th class="num">มูลค่าก่อน VAT</th>
+              <th class="num">ภาษี 7%</th>
+              <th class="num">ยอดรวมสุทธิ</th>
+            </tr>
+          </thead>
+          <tbody id="v6-pp30-tbody"></tbody>
+          <tfoot id="v6-pp30-tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== TAB 2: สมุดทะเบียนผู้เข้าพัก ร.ร.4 ========== -->
+    <div id="v6-pane-rr4" class="hidden">
+      <div class="between" style="margin-bottom:8px;">
+        <input type="text" id="v6-rr4-search" oninput="window.__hotelV6.renderRR4()" placeholder="🔍 ค้นหาชื่อแขก, เลขห้อง, เลขบัตร ปชช./พาสปอร์ต..." style="max-width:290px;padding:6px 10px;font-size:12px;">
+        <div class="row" style="gap:6px;">
+          <button type="button" onclick="window.__hotelV6.addManualRR4Row()" class="btn btn-sky" style="padding:7px 11px;font-size:12px;">➕ เพิ่มรายการเอง</button>
+          <button type="button" onclick="window.__hotelV6.exportRR4Csv()" class="btn btn-emerald" style="padding:7px 12px;font-size:12px;">📥 Export Excel (CSV)</button>
+          <button type="button" onclick="window.__hotelV6.printRR4A4()" class="btn btn-amber" style="padding:7px 12px;font-size:12px;">🖨️ พิมพ์ ร.ร.4 (A4)</button>
+        </div>
+      </div>
+
+      <div class="v6-tbl-wrap">
+        <table class="v6-tbl" style="min-width:860px;">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>วัน-เวลาเข้าพัก</th>
+              <th>ห้อง</th>
+              <th>ชื่อ-สกุลผู้เข้าพัก</th>
+              <th>สัญชาติ</th>
+              <th>เลขบัตร ปชช./พาสปอร์ต</th>
+              <th>อาชีพ</th>
+              <th>มาจาก / ที่อยู่</th>
+              <th>วัน-เวลาออก</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="v6-rr4-tbody"></tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+        * ระบบบันทึกเข้าสมุด ร.ร.4 อัตโนมัติทุกครั้งที่กดเช็คอิน/เช็คเอาท์ (แตะปุ่ม ✏️ หลังแถวเพื่อเติมสัญชาติ/อาชีพ/ภูมิลำเนาเพิ่มเติมได้)
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function initHotelGovReportsV6() {
+  let currentGovTab = 'pp30';
+
+  function esc(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+
+  function localDateISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function localTimeHHMM() {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function ensureV6State() {
+    if (typeof state === 'undefined' || !state) return;
+    if (!state.hotelInfo) {
+      state.hotelInfo = {
+        nameTh: 'ภูเบศร์อินเตอร์โฮเต็ล',
+        nameEn: 'PHUBESTH INTER HOTEL',
+        address: '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120',
+        phone: '037231232'
+      };
+    }
+    if (!Array.isArray(state.rr4Logs)) {
+      state.rr4Logs = state.rr4Logs && typeof state.rr4Logs === 'object'
+        ? Object.values(state.rr4Logs) : [];
+    }
+  }
+
+  function downloadCsvFile(filename, headers, rows) {
+    const csvEscape = (v) => {
+      const s = String(v === null || v === undefined ? '' : v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const lines = [headers.map(csvEscape).join(',')];
+    rows.forEach(r => lines.push(r.map(csvEscape).join(',')));
+    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try { document.body.removeChild(a); } catch (e) {}
+      URL.revokeObjectURL(url);
+    }, 1500);
+    showToast('📥 ดาวน์โหลดไฟล์ ' + filename + ' เรียบร้อย!');
+  }
+
+  function printHtmlReportA4(htmlContent) {
+    const printBox = document.getElementById('v6-print-area');
+    if (!printBox) return;
+    printBox.innerHTML = htmlContent;
+    document.body.classList.add('v6-printing-report');
+
+    const cleanup = () => {
+      document.body.classList.remove('v6-printing-report');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(() => {
+      window.print();
+      setTimeout(cleanup, 4000);
+    }, 120);
+  }
+
+  function getPP30Rows(monthStr, onlyVat) {
+    const list = (state.receiptsArchive || []).filter(r => {
+      if (!r || !(r.date || '').startsWith(monthStr)) return false;
+      if (onlyVat && !r.vatEnabled) return false;
+      return true;
+    });
+    list.sort((a, b) => (String(a.date) + String(a.time || '')).localeCompare(String(b.date) + String(b.time || '')));
+    return list.map(r => {
+      const c = r.calc || {};
+      const grand = Number(c.grand) || 0;
+      const vat = r.vatEnabled ? (Number(c.vat) || 0) : 0;
+      const preVat = Number((grand - vat).toFixed(2));
+      return {
+        date: r.date || '',
+        receiptId: r.receiptId || '-',
+        guestName: r.guestName || 'ลูกค้าทั่วไป',
+        guestTax: r.guestTax || '-',
+        roomNumber: r.roomNumber || '',
+        preVat,
+        vat,
+        grand
+      };
+    });
+  }
+
+  function getCombinedRR4Rows(monthStr) {
+    ensureV6State();
+    const mapByKey = new Map();
+
+    (state.rr4Logs || []).forEach((row, idx) => {
+      if (!row || !(row.checkInDate || '').startsWith(monthStr)) return;
+      const key = row.id || (row.checkInDate + '_' + row.roomNumber + '_' + row.guestName);
+      mapByKey.set(key, Object.assign({ _source: 'log', _logIdx: idx }, row));
+    });
+
+    (state.receiptsArchive || []).forEach(rcp => {
+      if (!rcp || !(rcp.date || '').startsWith(monthStr)) return;
+      const matched = Array.from(mapByKey.values()).some(x =>
+        String(x.roomNumber) === String(rcp.roomNumber) &&
+        String(x.guestName) === String(rcp.guestName || 'ลูกค้าทั่วไป') &&
+        (String(x.checkOutDate) === String(rcp.date) || String(x.checkInDate) === String(rcp.date))
+      );
+      if (!matched) {
+        const key = 'rcp_' + (rcp.receiptId || Math.random());
+        mapByKey.set(key, {
+          _source: 'archive',
+          _logIdx: -1,
+          id: key,
+          checkInDate: rcp.date || '',
+          checkInTime: '-',
+          roomNumber: rcp.roomNumber || '',
+          guestName: rcp.guestName || 'ลูกค้าทั่วไป',
+          nationality: 'ไทย',
+          idNumber: rcp.guestTax || '-',
+          occupation: '-',
+          address: '-',
+          phone: rcp.guestPhone || '',
+          checkOutDate: rcp.date || '',
+          checkOutTime: rcp.time || ''
+        });
+      }
+    });
+
+    if (monthStr === localDateISO().slice(0, 7)) {
+      (state.rooms || []).forEach(rm => {
+        if (!rm || rm.status !== 'occupied') return;
+        const already = Array.from(mapByKey.values()).some(x =>
+          String(x.roomNumber) === String(rm.number) && !x.checkOutDate
+        );
+        if (!already) {
+          const key = 'live_' + rm.number;
+          mapByKey.set(key, {
+            _source: 'live',
+            _logIdx: -1,
+            id: key,
+            checkInDate: localDateISO(),
+            checkInTime: rm.checkInTime || '-',
+            roomNumber: rm.number || '',
+            guestName: rm.guestName || 'ลูกค้าทั่วไป',
+            nationality: rm.guestNationality || 'ไทย',
+            idNumber: rm.guestTax || '-',
+            occupation: rm.guestOccupation || '-',
+            address: rm.guestAddress || '-',
+            phone: rm.guestPhone || '',
+            checkOutDate: '',
+            checkOutTime: 'กำลังเข้าพัก'
+          });
+        }
+      });
+    }
+
+    const result = Array.from(mapByKey.values());
+    result.sort((a, b) => (String(a.checkInDate) + String(a.checkInTime || '')).localeCompare(String(b.checkInDate) + String(b.checkInTime || '')));
+    return result;
+  }
+
+  function injectExtraRR4InputsInRoomModal() {
+    const idBar = document.getElementById('v5-id-scan-bar') || document.getElementById('m-guest-tax')?.closest('.grid-3');
+    if (!idBar || document.getElementById('v6-rr4-extra-row')) return;
+    idBar.insertAdjacentHTML('afterend', `
+      <div id="v6-rr4-extra-row" class="grid-3" style="margin-top:8px;">
+        <input type="text" id="m-guest-nat" oninput="window.__hotelV6.saveExtraGuestFields()" placeholder="สัญชาติ (เช่น ไทย) [ร.ร.4]" style="font-size:12px;padding:6px 9px;">
+        <input type="text" id="m-guest-occ" oninput="window.__hotelV6.saveExtraGuestFields()" placeholder="อาชีพ [ร.ร.4]" style="font-size:12px;padding:6px 9px;">
+        <input type="text" id="m-guest-addr" oninput="window.__hotelV6.saveExtraGuestFields()" placeholder="มาจาก / ที่อยู่ [ร.ร.4]" style="font-size:12px;padding:6px 9px;">
+      </div>
+    `);
+  }
+
+  function injectGovReportButtons() {
+    const adminBox = document.getElementById('drw-sec-admin');
+    if (adminBox && !document.getElementById('drw-btn-gov-reports')) {
+      const btn = document.createElement('button');
+      btn.id = 'drw-btn-gov-reports';
+      btn.type = 'button';
+      btn.className = 'btn btn-sky';
+      btn.innerHTML = '📑 รายงาน ภ.พ.30 / ทะเบียน ร.ร.4';
+      btn.onclick = () => window.__hotelV6.openModal('pp30');
+      adminBox.insertBefore(btn, adminBox.firstChild);
+    }
+
+    const rcpInp = document.getElementById('rcp-search-inp');
+    if (rcpInp && !document.getElementById('v6-rcp-gov-btn')) {
+      const wrap = document.createElement('div');
+      wrap.className = 'row';
+      wrap.style.gap = '6px';
+      wrap.innerHTML = `
+        <button id="v6-rcp-gov-btn" type="button" onclick="window.__hotelV6.openModal('pp30')" class="btn btn-sky" style="padding:7px 11px;font-size:11.5px;">🧾 รายงาน ภ.พ.30</button>
+        <button type="button" onclick="window.__hotelV6.openModal('rr4')" class="btn btn-amber" style="padding:7px 11px;font-size:11.5px;">📘 ทะเบียน ร.ร.4</button>
+      `;
+      rcpInp.parentNode.insertBefore(wrap, rcpInp);
+    }
+
+    const actionPills = document.querySelector('#v5-exec-luxury-bar .v5-action-pills');
+    if (actionPills && !document.getElementById('v6-dash-gov-btn')) {
+      const b = document.createElement('button');
+      b.id = 'v6-dash-gov-btn';
+      b.type = 'button';
+      b.className = 'v6-gov-btn';
+      b.textContent = '📑 ภ.พ.30 / ร.ร.4';
+      b.onclick = () => window.__hotelV6.openModal('pp30');
+      actionPills.appendChild(b);
+    }
+  }
+
+  window.__hotelV6 = {
+    openModal(tab = 'pp30') {
+      ensureV6State();
+      const mEl = document.getElementById('v6-month-inp');
+      if (mEl && !mEl.value) mEl.value = localDateISO().slice(0, 7);
+      const tEl = document.getElementById('v6-hotel-taxid');
+      const mgrEl = document.getElementById('v6-hotel-mgr');
+      if (tEl) tEl.value = state.hotelInfo.taxId || '';
+      if (mgrEl) mgrEl.value = state.hotelInfo.managerName || 'นายภูเบศร์ อภัยวงศ์';
+      document.getElementById('gov-reports-modal').classList.remove('hidden');
+      this.switchTab(tab);
+    },
+    switchTab(tab) {
+      currentGovTab = tab;
+      document.getElementById('v6-pane-pp30')?.classList.toggle('hidden', tab !== 'pp30');
+      document.getElementById('v6-pane-rr4')?.classList.toggle('hidden', tab !== 'rr4');
+      const b1 = document.getElementById('v6-tab-pp30');
+      const b2 = document.getElementById('v6-tab-rr4');
+      if (b1) b1.className = tab === 'pp30' ? 'btn btn-amber' : 'btn btn-dark';
+      if (b2) b2.className = tab === 'rr4' ? 'btn btn-amber' : 'btn btn-dark';
+      this.renderCurrentTab();
+    },
+    renderCurrentTab() {
+      if (currentGovTab === 'pp30') this.renderPP30();
+      else this.renderRR4();
+    },
+    saveGovProfile() {
+      ensureV6State();
+      state.hotelInfo.taxId = (document.getElementById('v6-hotel-taxid')?.value || '').trim();
+      state.hotelInfo.managerName = (document.getElementById('v6-hotel-mgr')?.value || '').trim();
+      saveDatabase();
+      showToast('บันทึกข้อมูลผู้ประกอบการสำหรับเอกสารราชการแล้ว');
+    },
+    saveExtraGuestFields() {
+      if (activeRoomIndex === null || !state.rooms[activeRoomIndex]) return;
+      const r = state.rooms[activeRoomIndex];
+      r.guestNationality = (document.getElementById('m-guest-nat')?.value || '').trim();
+      r.guestOccupation = (document.getElementById('m-guest-occ')?.value || '').trim();
+      r.guestAddress = (document.getElementById('m-guest-addr')?.value || '').trim();
+      saveDatabase();
+    },
+
+    renderPP30() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const onlyVat = !!document.getElementById('v6-pp30-onlyvat')?.checked;
+      const rows = getPP30Rows(monthStr, onlyVat);
+
+      const sumPre = rows.reduce((s, r) => s + r.preVat, 0);
+      const sumVat = rows.reduce((s, r) => s + r.vat, 0);
+      const sumGrand = rows.reduce((s, r) => s + r.grand, 0);
+
+      const kpi = document.getElementById('v6-pp30-kpi');
+      if (kpi) {
+        kpi.innerHTML = `
+          <div style="background:#090d16;border:1px solid #334155;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:10.5px;color:#94a3b8;">ยอดขายก่อน VAT (${rows.length} บิล)</div>
+            <b style="font-size:16px;color:#e2e8f0;">฿${sumPre.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b>
+          </div>
+          <div style="background:#090d16;border:1px solid #f59e0b;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:10.5px;color:#fde68a;">ภาษีขายที่ต้องนำส่ง (VAT 7%)</div>
+            <b style="font-size:16px;color:#fbbf24;">฿${sumVat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b>
+          </div>
+          <div style="background:#090d16;border:1px solid #10b981;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:10.5px;color:#6ee7b7;">ยอดรวมสุทธิทั้งเดือน</div>
+            <b style="font-size:16px;color:#34d399;">฿${sumGrand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</b>
+          </div>
+        `;
+      }
+
+      const tbody = document.getElementById('v6-pp30-tbody');
+      const tfoot = document.getElementById('v6-pp30-tfoot');
+      if (!tbody || !tfoot) return;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px;">ไม่พบใบเสร็จในเดือน ${esc(monthStr)} (ลองติ๊กเอา "เฉพาะบิลที่คิด VAT 7%" ออกเพื่อดูบิลทั้งหมด)</td></tr>`;
+        tfoot.innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="white-space:nowrap;">${esc(r.date)}</td>
+          <td style="color:#c084fc;font-weight:700;">${esc(r.receiptId)}</td>
+          <td>${esc(r.guestName)} <span style="color:#64748b;font-size:10px;">(ห้อง ${esc(r.roomNumber)})</span></td>
+          <td>${esc(r.guestTax)}</td>
+          <td class="num">${r.preVat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="num" style="color:#fbbf24;font-weight:800;">${r.vat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="num" style="color:#34d399;font-weight:800;">${r.grand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        </tr>
+      `).join('');
+
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:right;">รวมทั้งสิ้น (${rows.length} รายการ)</td>
+          <td class="num">${sumPre.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="num">${sumVat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="num">${sumGrand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        </tr>
+      `;
+    },
+    exportPP30Csv() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const onlyVat = !!document.getElementById('v6-pp30-onlyvat')?.checked;
+      const rows = getPP30Rows(monthStr, onlyVat);
+      if (rows.length === 0) return alert('ไม่มีข้อมูลในเดือนที่เลือกครับ');
+
+      const headers = ['ลำดับ', 'วัน/เดือน/ปี', 'เลขที่ใบกำกับภาษี', 'เลขห้อง', 'ชื่อผู้ซื้อ/ผู้รับบริการ', 'เลขประจำตัวผู้เสียภาษี', 'มูลค่าสินค้า/บริการ (ก่อน VAT)', 'ภาษีมูลค่าเพิ่ม 7%', 'ยอดรวมสุทธิ'];
+      const dataRows = rows.map((r, i) => [
+        i + 1, r.date, r.receiptId, r.roomNumber, r.guestName, "'" + r.guestTax,
+        r.preVat.toFixed(2), r.vat.toFixed(2), r.grand.toFixed(2)
+      ]);
+      const sumPre = rows.reduce((s, r) => s + r.preVat, 0);
+      const sumVat = rows.reduce((s, r) => s + r.vat, 0);
+      const sumGrand = rows.reduce((s, r) => s + r.grand, 0);
+      dataRows.push(['', '', '', '', 'รวมทั้งสิ้น', '', sumPre.toFixed(2), sumVat.toFixed(2), sumGrand.toFixed(2)]);
+      downloadCsvFile(`PP30_SalesTax_${monthStr}.csv`, headers, dataRows);
+    },
+    printPP30A4() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const onlyVat = !!document.getElementById('v6-pp30-onlyvat')?.checked;
+      const rows = getPP30Rows(monthStr, onlyVat);
+      if (rows.length === 0) return alert('ไม่มีข้อมูลในเดือนที่เลือกครับ');
+
+      const info = state.hotelInfo || {};
+      const sumPre = rows.reduce((s, r) => s + r.preVat, 0);
+      const sumVat = rows.reduce((s, r) => s + r.vat, 0);
+      const sumGrand = rows.reduce((s, r) => s + r.grand, 0);
+
+      const html = `
+        <div style="text-align:center;margin-bottom:10px;">
+          <h2 style="margin:0;font-size:18px;">รายงานภาษีขาย (ประกอบแบบ ภ.พ.30)</h2>
+          <div style="font-size:13px;font-weight:bold;margin-top:4px;">เดือนภาษี: ${esc(monthStr)}</div>
+        </div>
+        <div style="margin-bottom:8px;font-size:12px;">
+          <div><b>ชื่อผู้ประกอบการ / สถานประกอบการ:</b> ${esc(info.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล')}</div>
+          <div><b>ที่อยู่:</b> ${esc(info.address || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120')} | <b>โทร:</b> ${esc(info.phone || '037231232')}</div>
+          <div><b>เลขประจำตัวผู้เสียภาษีอากร:</b> ${esc(info.taxId || '.............................................')}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:center;">ลำดับ</th>
+              <th>วัน/เดือน/ปี</th>
+              <th>เลขที่ใบกำกับภาษี</th>
+              <th>ชื่อผู้รับบริการ</th>
+              <th>เลขผู้เสียภาษี</th>
+              <th style="text-align:right;">มูลค่าก่อน VAT</th>
+              <th style="text-align:right;">ภาษี 7%</th>
+              <th style="text-align:right;">ยอดรวมสุทธิ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r, i) => `
+              <tr>
+                <td style="text-align:center;">${i + 1}</td>
+                <td>${esc(r.date)}</td>
+                <td>${esc(r.receiptId)}</td>
+                <td>${esc(r.guestName)} (ห้อง ${esc(r.roomNumber)})</td>
+                <td>${esc(r.guestTax)}</td>
+                <td style="text-align:right;">${r.preVat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                <td style="text-align:right;">${r.vat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                <td style="text-align:right;">${r.grand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              </tr>`).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold;">
+              <td colspan="5" style="text-align:right;">รวมยอดทั้งเดือน (${rows.length} รายการ)</td>
+              <td style="text-align:right;">${sumPre.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              <td style="text-align:right;">${sumVat.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              <td style="text-align:right;">${sumGrand.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+      printHtmlReportA4(html);
+    },
+
+    renderRR4() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const q = (document.getElementById('v6-rr4-search')?.value || '').trim().toLowerCase();
+      const rows = getCombinedRR4Rows(monthStr).filter(r =>
+        !q ||
+        (r.guestName || '').toLowerCase().includes(q) ||
+        (r.roomNumber || '').toLowerCase().includes(q) ||
+        (r.idNumber || '').toLowerCase().includes(q)
+      );
+
+      const tbody = document.getElementById('v6-rr4-tbody');
+      if (!tbody) return;
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:20px;">ไม่พบรายการผู้เข้าพักในเดือน ${esc(monthStr)}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="white-space:nowrap;">${esc(r.checkInDate)} ${esc(r.checkInTime || '')}</td>
+          <td style="font-weight:800;color:#38bdf8;">${esc(r.roomNumber)}</td>
+          <td style="font-weight:700;color:#fff;">${esc(r.guestName)}</td>
+          <td>${esc(r.nationality || 'ไทย')}</td>
+          <td>${esc(r.idNumber || '-')}</td>
+          <td>${esc(r.occupation || '-')}</td>
+          <td>${esc(r.address || '-')}</td>
+          <td style="white-space:nowrap;">${esc(r.checkOutDate || '')} ${esc(r.checkOutTime || '')}</td>
+          <td style="white-space:nowrap;">
+            ${r._logIdx >= 0
+              ? `<button type="button" onclick="window.__hotelV6.editRR4Row(${r._logIdx})" class="btn btn-sky" style="padding:3px 7px;font-size:10.5px;">✏️</button>
+                 <button type="button" onclick="window.__hotelV6.deleteRR4Row(${r._logIdx})" class="btn btn-rose" style="padding:3px 7px;font-size:10.5px;">🗑️</button>`
+              : `<span style="font-size:10px;color:#64748b;">จากบิล</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+    },
+    addManualRR4Row() {
+      ensureV6State();
+      const roomNumber = prompt('เลขห้องพัก:', '102');
+      if (!roomNumber) return;
+      const guestName = prompt('ชื่อ-นามสกุลผู้เข้าพัก:', '');
+      if (!guestName) return;
+      const idNumber = prompt('เลขบัตรประจำตัวประชาชน / พาสปอร์ต:', '') || '-';
+      const nationality = prompt('สัญชาติ:', 'ไทย') || 'ไทย';
+      const occupation = prompt('อาชีพ:', '-') || '-';
+      const address = prompt('มาจาก / ที่อยู่:', '-') || '-';
+
+      state.rr4Logs.unshift({
+        id: 'RR4-' + Date.now().toString().slice(-6),
+        checkInDate: localDateISO(),
+        checkInTime: localTimeHHMM(),
+        roomNumber: roomNumber.trim(),
+        guestName: guestName.trim(),
+        nationality: nationality.trim(),
+        idNumber: idNumber.trim(),
+        occupation: occupation.trim(),
+        address: address.trim(),
+        phone: '',
+        checkOutDate: '',
+        checkOutTime: ''
+      });
+      saveDatabase();
+      this.renderRR4();
+      showToast('เพิ่มรายการลงสมุดทะเบียน ร.ร.4 แล้ว');
+    },
+    editRR4Row(idx) {
+      const r = (state.rr4Logs || [])[idx];
+      if (!r) return;
+      const n = prompt('แก้ไขชื่อ-สกุล:', r.guestName || '');
+      if (n === null) return;
+      const idn = prompt('แก้ไขเลขบัตร ปชช./พาสปอร์ต:', r.idNumber || '');
+      if (idn === null) return;
+      const nat = prompt('แก้ไขสัญชาติ:', r.nationality || 'ไทย');
+      if (nat === null) return;
+      const occ = prompt('แก้ไขอาชีพ:', r.occupation || '-');
+      if (occ === null) return;
+      const addr = prompt('แก้ไขมาจาก / ที่อยู่:', r.address || '-');
+      if (addr === null) return;
+      r.guestName = n.trim() || r.guestName;
+      r.idNumber = idn.trim();
+      r.nationality = nat.trim() || 'ไทย';
+      r.occupation = occ.trim() || '-';
+      r.address = addr.trim() || '-';
+      saveDatabase();
+      this.renderRR4();
+      showToast('อัปเดตข้อมูล ร.ร.4 สำเร็จ');
+    },
+    deleteRR4Row(idx) {
+      if (!confirm('ลบรายการนี้ออกจากสมุด ร.ร.4?')) return;
+      state.rr4Logs.splice(idx, 1);
+      saveDatabase();
+      this.renderRR4();
+    },
+    exportRR4Csv() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const rows = getCombinedRR4Rows(monthStr);
+      if (rows.length === 0) return alert('ไม่มีข้อมูลผู้เข้าพักในเดือนที่เลือกครับ');
+
+      const headers = ['ลำดับ', 'วันเวลาเข้าพัก', 'เลขห้องพัก', 'ชื่อตัวและชื่อสกุล', 'สัญชาติ', 'เลขบัตรประจำตัวประชาชน/พาสปอร์ต', 'อาชีพ', 'มาจาก/ที่อยู่', 'วันเวลาที่ออกไป', 'เบอร์โทร'];
+      const dataRows = rows.map((r, i) => [
+        i + 1,
+        `${r.checkInDate} ${r.checkInTime || ''}`.trim(),
+        r.roomNumber,
+        r.guestName,
+        r.nationality || 'ไทย',
+        "'" + (r.idNumber || '-'),
+        r.occupation || '-',
+        r.address || '-',
+        `${r.checkOutDate || ''} ${r.checkOutTime || ''}`.trim(),
+        "'" + (r.phone || '')
+      ]);
+      downloadCsvFile(`RR4_GuestRegister_${monthStr}.csv`, headers, dataRows);
+    },
+    printRR4A4() {
+      const monthStr = document.getElementById('v6-month-inp')?.value || localDateISO().slice(0, 7);
+      const rows = getCombinedRR4Rows(monthStr);
+      if (rows.length === 0) return alert('ไม่มีข้อมูลผู้เข้าพักในเดือนที่เลือกครับ');
+
+      const info = state.hotelInfo || {};
+      const html = `
+        <div style="text-align:right;font-weight:bold;font-size:12px;">แบบ ร.ร.4</div>
+        <div style="text-align:center;margin-bottom:8px;">
+          <h2 style="margin:0;font-size:17px;">บัตรทะเบียนผู้พัก (สมุดทะเบียนผู้เข้าพักโรงแรม)</h2>
+          <div style="font-size:13px;font-weight:bold;margin-top:3px;">โรงแรม ${esc(info.nameTh || 'ภูเบศร์อินเตอร์โฮเต็ล')} • ประจำเดือน ${esc(monthStr)}</div>
+          <div style="font-size:11.5px;">ที่ตั้ง: ${esc(info.address || '108/7 ถ.ชาตะสิงห์ อ.อรัญประเทศ จ.สระแก้ว 27120')} | โทร: ${esc(info.phone || '037231232')}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:center;">เลขลำดับ</th>
+              <th>วันเวลาที่เข้ามาพัก</th>
+              <th style="text-align:center;">ห้องพัก</th>
+              <th>ชื่อตัวและชื่อสกุล</th>
+              <th>สัญชาติ</th>
+              <th>เลขประจำตัว ปชช./พาสปอร์ต</th>
+              <th>อาชีพ</th>
+              <th>มาจาก / ที่อยู่</th>
+              <th>วันเวลาที่ออกไป</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r, i) => `
+              <tr>
+                <td style="text-align:center;">${i + 1}</td>
+                <td>${esc(r.checkInDate)} ${esc(r.checkInTime || '')}</td>
+                <td style="text-align:center;">${esc(r.roomNumber)}</td>
+                <td>${esc(r.guestName)}</td>
+                <td>${esc(r.nationality || 'ไทย')}</td>
+                <td>${esc(r.idNumber || '-')}</td>
+                <td>${esc(r.occupation || '-')}</td>
+                <td>${esc(r.address || '-')}</td>
+                <td>${esc(r.checkOutDate || '')} ${esc(r.checkOutTime || '')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:26px;display:flex;justify-content:flex-end;">
+          <div style="text-align:center;width:260px;font-size:12px;">
+            <div>ลงชื่อ ...................................................... ผู้จัดการ</div>
+            <div style="margin-top:4px;">(${esc(info.managerName || '..............................................')})</div>
+            <div style="margin-top:4px;">วันที่พิมพ์: ${localDateISO()}</div>
+          </div>
+        </div>
+      `;
+      printHtmlReportA4(html);
+    }
+  };
+
+  function recordRR4CheckIn(r) {
+    if (!r) return;
+    ensureV6State();
+    state.rr4Logs.unshift({
+      id: 'RR4-' + Date.now().toString().slice(-6),
+      checkInDate: localDateISO(),
+      checkInTime: r.checkInTime || localTimeHHMM(),
+      roomNumber: r.number,
+      guestName: r.guestName || 'ลูกค้าทั่วไป',
+      nationality: r.guestNationality || 'ไทย',
+      idNumber: r.guestTax || '-',
+      occupation: r.guestOccupation || '-',
+      address: r.guestAddress || '-',
+      phone: r.guestPhone || '',
+      checkOutDate: '',
+      checkOutTime: ''
+    });
+    if (state.rr4Logs.length > 500) state.rr4Logs = state.rr4Logs.slice(0, 500);
+    saveDatabase();
+  }
+
+  function recordRR4CheckOut(roomNum, guestName) {
+    ensureV6State();
+    const target = (state.rr4Logs || []).find(x =>
+      String(x.roomNumber) === String(roomNum) && !x.checkOutDate
+    );
+    if (target) {
+      target.checkOutDate = localDateISO();
+      target.checkOutTime = localTimeHHMM();
+      if (guestName) target.guestName = guestName;
+      saveDatabase();
+    }
+  }
+
+  function bootGovReportsV6() {
+    ensureV6State();
+    injectExtraRR4InputsInRoomModal();
+    injectGovReportButtons();
+
+    const _prevOpenRoom = window.openRoomModal;
+    window.openRoomModal = function(idx) {
+      if (_prevOpenRoom) _prevOpenRoom.apply(this, arguments);
+      injectExtraRR4InputsInRoomModal();
+      const r = state.rooms[idx];
+      if (r) {
+        const nat = document.getElementById('m-guest-nat');
+        const occ = document.getElementById('m-guest-occ');
+        const addr = document.getElementById('m-guest-addr');
+        if (nat) nat.value = r.guestNationality || '';
+        if (occ) occ.value = r.guestOccupation || '';
+        if (addr) addr.value = r.guestAddress || '';
+      }
+    };
+
+    const _prevCheckIn = window.checkInRoom;
+    window.checkInRoom = function() {
+      const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+      if (_prevCheckIn) _prevCheckIn.apply(this, arguments);
+      if (snapRoom && snapRoom.status === 'occupied') recordRR4CheckIn(snapRoom);
+    };
+
+    const _prevQuickCI = window.quickCheckInBooking;
+    window.quickCheckInBooking = function(roomIdx) {
+      if (_prevQuickCI) _prevQuickCI.apply(this, arguments);
+      const r = state.rooms[roomIdx];
+      if (r && r.status === 'occupied') recordRR4CheckIn(r);
+    };
+
+    const _prevCheckout = window.completeCheckOutAndPay;
+    window.completeCheckOutAndPay = function() {
+      const snapRoom = (activeRoomIndex !== null && state.rooms[activeRoomIndex]) ? state.rooms[activeRoomIndex] : null;
+      const rNum = snapRoom ? snapRoom.number : '';
+      const gName = snapRoom ? snapRoom.guestName : '';
+      if (_prevCheckout) _prevCheckout.apply(this, arguments);
+      if (rNum) recordRR4CheckOut(rNum, gName);
+      if (snapRoom) {
+        snapRoom.guestNationality = '';
+        snapRoom.guestOccupation = '';
+        snapRoom.guestAddress = '';
+      }
+    };
+
+    const _prevRenderRooms = window.renderRooms;
+    window.renderRooms = function() {
+      if (_prevRenderRooms) _prevRenderRooms.apply(this, arguments);
+      injectGovReportButtons();
+    };
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(bootGovReportsV6, 950);
+  });
+})();
+</script>
 </body>
 </html>
