@@ -10693,5 +10693,66 @@ window.kickDrawerOnly = async function() {
   });
 })();
 </script>
+ <!-- ================= HOTFIX V6.1: แก้จอดำโหมดแม่บ้าน & จอลูกค้า (ย้าย Overlay ออกจาก #app-screen ที่ลืมปิดแท็ก + จัดลำดับชั้น z-index) ================= -->
+<style>
+  #hk-overlay { z-index: 9500 !important; }
+  #cfd-overlay { z-index: 9550 !important; }
+  #maint-tickets-modal { z-index: 9960 !important; }
+  #shift-handover-modal { z-index: 9965 !important; }
+  #gov-reports-modal { z-index: 9970 !important; }
+  #v5-photo-viewer-modal { z-index: 9995 !important; }
+  #toast { z-index: 100000 !important; }
+</style>
+<script>
+(function fixUnclosedAppScreenOverlays() {
+  const topLevelIds = [
+    'hk-overlay',
+    'cfd-overlay',
+    'maint-tickets-modal',
+    'shift-handover-modal',
+    'gov-reports-modal',
+    'v5-photo-viewer-modal',
+    'v6-print-area',
+    'archived-receipt-modal',
+    'cloud-db-modal',
+    'ocpp-direct-modal',
+    'pwa-guide-modal',
+    'top-url-install-bar',
+    'hotel-pro-backdrop',
+    'hotel-pro-drawer'
+  ];
+
+  function rescueToBody() {
+    topLevelIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentNode !== document.body) {
+        document.body.appendChild(el);
+      }
+    });
+  }
+
+  // ย้ายทันทีตั้งแต่โหลดไฟล์เสร็จ ก่อนสคริปต์อื่นจะเริ่มทำงาน
+  rescueToBody();
+
+  window.addEventListener('DOMContentLoaded', () => {
+    rescueToBody();
+    setTimeout(() => {
+      rescueToBody();
+      // ป้องกันจอดำตอนกดปุ่ม "🚪 ออก" จากโหมดแม่บ้าน (ทั้งแบบเข้าด้วย PIN และลิงก์ ?mode=housekeeping)
+      if (window.__hotelV5 && typeof window.__hotelV5.exitHousekeepingMode === 'function') {
+        const _origExitHk = window.__hotelV5.exitHousekeepingMode.bind(window.__hotelV5);
+        window.__hotelV5.exitHousekeepingMode = function() {
+          _origExitHk();
+          const appSc = document.getElementById('app-screen');
+          const loginSc = document.getElementById('login-screen');
+          if (appSc && appSc.classList.contains('hidden') && loginSc) {
+            loginSc.classList.remove('hidden');
+          }
+        };
+      }
+    }, 900);
+  });
+})();
+</script>
 </body>
 </html>
